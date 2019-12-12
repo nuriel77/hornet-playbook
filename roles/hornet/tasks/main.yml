@@ -1,0 +1,3 @@
+- import_tasks: role.yml
+  tags:
+    - hornet_role

@@ -1,0 +1,37 @@
+# --- CentOS
+- name: Install epel-release
+  yum:
+    state: latest
+    name: epel-release
+
+- name: Install some packages
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - git
+      - policycoreutils-python
+      - libappindicator
+      - firewalld
+      - curl
+      - wget
+      - lsof
+      - jq
+      - pv
+      - screen
+      - rsync
+      - nano
+      - sysstat
+      - atop
+      - htop
+      - fpaste
+      - openssl
+      - util-linux
+      - python-pip
+      - python-passlib
+      - httpd-tools
+      - python-pip
+      - ansible
+  tags:
+    - scripts
+    - deps

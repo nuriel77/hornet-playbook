@@ -1,0 +1,12 @@
+hornet_git_url: https://github.com/gohornet/hornet.git
+hornet_git_dest: /opt/hornet
+hornet_ports:
+  - {port: 15600, proto: tcp}
+  - {port: 14625, proto: tcp}
+
+hornet_image: gohonet/hornet
+hornet_tag: latest
+hornet_user: hornet
+hornet_group: hornet
+hornet_home_path: /var/lib/hornet
+goshimmber_db_path: "{{ hornet_home_path }}/mainnetdb"

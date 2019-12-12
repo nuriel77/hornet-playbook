@@ -1,0 +1,7 @@
+- name: copy hornet nginx config
+  template:
+    src: ../shared-files/hornet.conf.j2
+    dest: /etc/nginx/conf.d/hornet.conf
+    validate: "/usr/local/bin/validate_nginx_config.sh -t %s -d hornet.conf"
+  notify:
+    - reload nginx

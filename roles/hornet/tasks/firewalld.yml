@@ -1,0 +1,13 @@
+- name: ensure firewalld started and enabled
+  systemd:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: allow hornet tcp ports in firewall
+  firewalld:
+    port: "{{ item.port }}/{{ item.proto }}"
+    permanent: true
+    state: enabled
+    immediate: yes
+  with_items: "{{ hornet_ports }}"
