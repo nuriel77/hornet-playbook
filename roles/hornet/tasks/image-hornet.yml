@@ -26,6 +26,7 @@
   docker_image:
     build:
       path: "{{ hornet_git_dest }}"
+      pull: no
     name: "{{ hornet_image }}"
     tag: "{{ hornet_tag }}"
     source: build

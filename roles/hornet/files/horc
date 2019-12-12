@@ -13,24 +13,24 @@ fi
 clear
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.1.2
+VERSION_TEMP=0.1.0
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
 : "${GOSC_BRANCH:=master}"
 CUR_DIR="$(pwd)"
 
-PID_FILE="/var/run/gosc.pid"
+PID_FILE="/var/run/horc.pid"
 WIDTH=78
 
 # Source if exists
-[ -f ~/.gosc ] && . ~/.gosc
+[ -f ~/.horc ] && . ~/.horc
 
 export NEWT_COLORS='
 window=,
 '
 
-# Check if another process of gosc is already running.
+# Check if another process of horc is already running.
 if [ -e "$PID_FILE" ]
 then
     PID_FROM_FILE=$(cat "$PID_FILE")
@@ -220,14 +220,14 @@ function upgrade_hornet() {
 }
 
 ## GOSC
-function get_latest_gosc_version() {
+function get_latest_horc_version() {
     local RAND=$(echo -n $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 7 | head -n 1))
-    curl -s -f -m 5 -H 'Cache-Control: no-cache' "https://raw.githubusercontent.com/nuriel77/hornet-playbook/${GOSC_BRANCH}/roles/hornet/files/gosc?nocache=$RAND"|grep ^VERSION|cut -d= -f2
+    curl -s -f -m 5 -H 'Cache-Control: no-cache' "https://raw.githubusercontent.com/nuriel77/hornet-playbook/${GOSC_BRANCH}/roles/hornet/files/horc?nocache=$RAND"|grep ^VERSION|cut -d= -f2
 }
 
-function check_new_gosc() {
+function check_new_horc() {
     local CURR_VERSION="$__VERSION__"
-    local GOSC_VERSION=$(get_latest_gosc_version 2>&1)
+    local GOSC_VERSION=$(get_latest_horc_version 2>&1)
     if [[ $? -ne 0 ]] || [[ "$GOSC_VERSION" == "" ]]; then
         return 1
     fi
@@ -239,8 +239,8 @@ function check_new_gosc() {
     fi
 }
 
-function update_gosc() {
-    local GOSC_VERSION=$(get_latest_gosc_version 2>&1)
+function update_horc() {
+    local GOSC_VERSION=$(get_latest_horc_version 2>&1)
     local CURR_VERSION="$__VERSION__"
     if [[ $? -ne 0 ]] || [[ "$GOSC_VERSION" == "" ]]; then
         whiptail --title "GOSC Update Failed" \
@@ -284,7 +284,7 @@ function update_gosc() {
 
     # Run playbook script upgrades
     cd /opt/hornet-playbook && ansible-playbook -i inventory site.yml -v --tags=scripts
-    [[ $? -ne 0 ]] && MSG="Updating GOSC failed!!! Check output above for errors." || MSG="Update finished successfully! Additional updates may apply upon restart of gosc."
+    [[ $? -ne 0 ]] && MSG="Updating GOSC failed!!! Check output above for errors." || MSG="Update finished successfully! Additional updates may apply upon restart of horc."
     pause "$MSG Press ENTER to return to menu."
     clear
 
@@ -395,10 +395,10 @@ function choose_editor() {
     fi
 
     EDITOR=$USER_CHOICE
-    if ! grep -q "^export EDITOR" $HOME/.gosc; then
-        echo "export EDITOR=${EDITOR}" >> $HOME/.gosc
+    if ! grep -q "^export EDITOR" $HOME/.horc; then
+        echo "export EDITOR=${EDITOR}" >> $HOME/.horc
     else
-        sed -i "s/^export EDITOR=.*/export EDITOR=${EDITOR}/g" $HOME/.gosc
+        sed -i "s/^export EDITOR=.*/export EDITOR=${EDITOR}/g" $HOME/.horc
     fi
 }
 
@@ -723,7 +723,7 @@ function configure_files() {
 
 function main_menu() {
     local MENU="Choose an option"
-    if check_new_gosc; then
+    if check_new_horc; then
         MENU="${MENU}\n(*GOSC update available)"
     fi
 
@@ -781,7 +781,7 @@ function run_main_menu() {
             ;;
 
         "g)")
-            update_gosc
+            update_horc
             run_main_menu
             ;;
 

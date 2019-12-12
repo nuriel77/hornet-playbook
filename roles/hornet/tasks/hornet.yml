@@ -15,10 +15,10 @@
 - name: scripts block
   block:
 
-    - name: copy gosc
+    - name: copy horc
       copy:
-        src: files/gosc
-        dest: /usr/bin/gosc
+        src: files/horc
+        dest: /usr/bin/horc
         mode: 0755
         owner: root
         group: root
@@ -109,6 +109,29 @@
     - hornet_service_file
   notify:
     - restart hornet
+
+- name: copy hornet config file
+  template:
+    src: templates/config.json.j2
+    dest: "{{ hornet_home_path }}/config.json"
+    mode: 0600
+    owner: "{{ hornet_user }}"
+    group: "{{ hornet_group }}"
+    force: "{{ overwrite | default('no') }}"
+    backup: yes
+  tags: hornet_config_file
+  notify: restart hornet
+
+- name: download hornet snapshot DB (can take a while)
+  get_url:
+    url: "{{ hornet_db_source }}"
+    dest: "{{ hornet_db_tar }}"
+    mode: 0644
+    owner: "{{ hornet_user }}"
+    group: "{{ hornet_group }}"
+    force: "{{ overwrite | default('no') }}"
+  tags:
+    - download_snapshot_db
 
 # Image
 - name: build hornet image task

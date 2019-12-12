@@ -8,7 +8,7 @@
 
 - name: stop if unknown distribution
   assert:
-    that: ansible_distribution in supported_distributions
+    that: ansible_distribution in debian_family_list or ansible_distribution in redhat_family_list
   tags:
     - always
     - check_dist

@@ -2,5 +2,4 @@
   tags:
     - docker_role
   when:
-    - install_docker is defined
-    - install_docker|bool == True
+    - install_docker|default(true)|bool

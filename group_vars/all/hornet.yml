@@ -9,4 +9,29 @@ hornet_tag: latest
 hornet_user: hornet
 hornet_group: hornet
 hornet_home_path: /var/lib/hornet
-goshimmber_db_path: "{{ hornet_home_path }}/mainnetdb"
+hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
+hornet_config: "{{ hornet_home_path }}/config.json"
+hornet_db_tar: "{{ hornet_home_path }}/latest-export.gz.bin"
+hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
+
+hornet_neighbors:
+  - identity: example1.neighbor.com:15600
+    preferIPv6: false
+  - identity: example2.neighbor.com:15600
+    preferIPv6: false
+
+hornet_api_auth_enabled: false
+hornet_disable_plugins: []
+hornet_enable_plugins: []
+hornet_permit_remote_access_list:
+ - getNodeInfo
+ - getBalances
+ - checkConsistency
+ - getTransactionsToApprove
+ - getInclusionStates
+ - getNodeAPIConfiguration
+ - wereAddressesSpentFrom
+ - broadcastTransactions
+ - findTransactions
+ - storeTransactions
+ - getTrytes

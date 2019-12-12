@@ -28,7 +28,6 @@
   roles:
     - docker
     - hornet
-    - iotacaddy
     - nginx
     - haproxy
     - cleanup
