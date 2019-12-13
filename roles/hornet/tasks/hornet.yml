@@ -47,20 +47,32 @@
     state: present
     reload: yes
 
-- name: clone hornet repository
-  git:
-    repo: '{{ hornet_git_url }}'
-    dest: '{{ hornet_git_dest }}'
+- name: hornet source code
+  tags:
+    - hornet_source
+    - build_hornet_image
+  block:
 
-# Clone hornet
-- name: get latest hornet git commit
-  shell: "cd {{ hornet_git_dest }} && git rev-parse --short HEAD"
-  register: hornet_commit_hash
-  changed_when: false
+    - name: get latest hornet release
+      uri:
+        url: "{{ hornet_releases_url }}/latest"
+        return_content: yes
+      register: hornet_release_json
 
-- name: set hornet image tag
-  set_fact:
-    hornet_tag: "{{ hornet_commit_hash.stdout }}"
+    - name: get release tag
+      set_fact:
+        hornet_tag: >-
+          {%- if hornet_version == 'latest' -%}
+            {{ hornet_release_json.content | from_json | json_query('tag_name') }}
+          {%- else -%}
+            {{ hornet_version }}
+          {%- endif -%}
+
+    - name: clone hornet repository
+      git:
+        repo: '{{ hornet_git_url }}'
+        dest: '{{ hornet_git_dest }}'
+        version: '{{ hornet_tag }}'
 
 # User
 - name: add user to run hornet as
@@ -136,3 +148,4 @@
 # Image
 - name: build hornet image task
   import_tasks: image-hornet.yml
+  tags: build_hornet_image
