@@ -3,7 +3,7 @@
 # It will update system packages and install Ansible and git
 # Then it will clone the hornet-playbook and run it.
 
-# Iri playbook: https://github.com/nuriel77/hornet-playbook
+# Hornet playbook: https://github.com/nuriel77/hornet-playbook
 # By Nuriel Shem-Tov (https://github.com/nuriel77), December 2019
 # Copyright (c) 2019 Nuriel Shem-Tov
 
@@ -41,12 +41,12 @@ declare -g INSTALLER_OVERRIDE_FILE="${HORNET_PLAYBOOK_DIR}/group_vars/all/z-inst
 clear
 cat <<'EOF'
 
-       ██╗  ██╗ ██████╗ ██████╗ ███╗   ██╗███████╗████████╗
-       ██║  ██║██╔═══██╗██╔══██╗████╗  ██║██╔════╝╚══██╔══╝
-       ███████║██║   ██║██████╔╝██╔██╗ ██║█████╗     ██║
-       ██╔══██║██║   ██║██╔══██╗██║╚██╗██║██╔══╝     ██║
-       ██║  ██║╚██████╔╝██║  ██║██║ ╚████║███████╗   ██║
-       ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝
+██╗  ██╗ ██████╗ ██████╗ ███╗   ██╗███████╗████████╗
+██║  ██║██╔═══██╗██╔══██╗████╗  ██║██╔════╝╚══██╔══╝
+███████║██║   ██║██████╔╝██╔██╗ ██║█████╗     ██║
+██╔══██║██║   ██║██╔══██╗██║╚██╗██║██╔══╝     ██║
+██║  ██║╚██████╔╝██║  ██║██║ ╚████║███████╗   ██║
+╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝
 
           _|                      _|                            _|
 _|_|_|    _|    _|_|_|  _|    _|  _|_|_|      _|_|      _|_|    _|  _|

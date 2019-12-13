@@ -57,11 +57,11 @@ userlist lb_auth
     user {{ fullnode_user }} password {{ fullnode_user_password | password_hash('sha512') }}
 {% endif %}
 
-frontend iri_front
+frontend hornet_front
     mode http
     capture request header User-Agent len 128
     option forwardfor
-    maxconn {{ haproxy_iri_max_connections }}
+    maxconn {{ haproxy_hornet_max_connections }}
     timeout client 5m
     timeout client-fin 5m
     timeout http-request 10s
@@ -94,18 +94,18 @@ frontend iri_front
 
     stick-table type ip size 1m expire 5m store gpc0,http_req_rate(5s),http_req_cnt,conn_cnt,sess_cnt
 
-    acl source_is_abuser src_get_gpc0(iri_front) gt 0
+    acl source_is_abuser src_get_gpc0(hornet_front) gt 0
     tcp-request connection reject if source_is_abuser
     tcp-request connection track-sc1 src if !source_is_abuser
 
     # drop connections from user with more then 500 requests in 5m
-    acl source_is_hacker src_http_req_cnt(iri_front) gt 500
+    acl source_is_hacker src_http_req_cnt(hornet_front) gt 500
     tcp-request content reject if source_is_hacker
 
     # limit OPTIONS method because this is only used on browsers
     acl options_method method OPTIONS
 
-    # check IRI/IOTA header if present all is fine else redirect or kick
+    # check HORNET/IOTA header if present all is fine else redirect or kick
     acl api_header req.hdr(X-IOTA-API-Version) -m found
     http-request deny if !api_header !options_method
 
@@ -127,19 +127,19 @@ frontend iri_front
     # Check if PoW
     acl wants_pow req.body -m reg attachToTangle|interruptAttachingToTangle
 
-    # Enable these two lines for SSL to IRI
+    # Enable these two lines for SSL to HORNET
     {% if haproxy_https is not defined or haproxy_https|bool == False %}#{% endif %}http-request add-header X-Forwarded-Proto https
 {% for lb_bind_address in lb_bind_addresses %}
-    {% if haproxy_https is not defined or haproxy_https|bool == False %}#{% endif %}bind {{ lb_bind_address }}:{{ iri_api_port_remote }} ssl crt {{ ssl_certkey_file }}
+    {% if haproxy_https is not defined or haproxy_https|bool == False %}#{% endif %}bind {{ lb_bind_address }}:{{ hornet_api_port_remote }} ssl crt {{ ssl_certkey_file }}
 {% endfor %}
     # Disable this line and use line above for SSL
 {% for lb_bind_address in lb_bind_addresses %}
-    {% if haproxy_https is defined and haproxy_https|bool == True %}#{% endif %}bind {{ lb_bind_address }}:{{ iri_api_port_remote }}
+    {% if haproxy_https is defined and haproxy_https|bool == True %}#{% endif %}bind {{ lb_bind_address }}:{{ hornet_api_port_remote }}
 {% endfor %}
-    use_backend iri_pow_back if wants_pow
-    use_backend iri_back
+    use_backend hornet_pow_back if wants_pow
+    use_backend hornet_back
 
-backend iri_pow_back
+backend hornet_pow_back
     mode http
     fullconn {{ max_connections_pow_backend | default('180') }}
     option redispatch
@@ -171,7 +171,7 @@ backend iri_pow_back
     #acl is_bad lua.check_post -m str somestr
     #http-request deny if is_bad
 
-    balance {{ haproxy_iri_back_pow_algo | default('leastconn')  }}
+    balance {{ haproxy_hornet_back_pow_algo | default('leastconn')  }}
 
     compression algo gzip
     compression type application/json text/html text/plain text/xml text/json text/css text/javascript application/javascript
@@ -182,10 +182,10 @@ backend iri_pow_back
     option httpchk POST / HTTP/1.1\r\nHost:\ ha.example.com\r\nX-IOTA-API-VERSION:\ 1.4\r\nContent-Type:\ application/json\r\nContent-Length:\ 25\r\n\r\n{\"command\":\"getNodeInfo\"}
     http-check expect rstring transactionsToRequest
     default-server inter 10s fall 4 rise 2
-    {% raw %}{{{% endraw %} service "iri|passing" | toJSON | plugin "{{ consul_template_plugin }}" "iri_pow_back" {% raw %}}}{% endraw %}
+    {% raw %}{{{% endraw %} service "hornet|passing" | toJSON | plugin "{{ consul_template_plugin }}" "hornet_pow_back" {% raw %}}}{% endraw %}
 
 
-backend iri_back
+backend hornet_back
     mode http
     fullconn {{ max_connections_backend|default('180') }}
     option redispatch
@@ -215,7 +215,7 @@ backend iri_back
     #acl is_bad lua.check_post -m str badstr
     #http-request deny if is_bad
 
-    balance {{ haproxy_iri_back_algo | default('source') }}
+    balance {{ haproxy_hornet_back_algo | default('source') }}
 
     compression algo gzip
     compression type application/json text/html text/plain text/xml text/json text/css text/javascript application/javascript
@@ -227,7 +227,7 @@ backend iri_back
     option httpchk POST / HTTP/1.1\r\nHost:\ ha.example.com\r\nX-IOTA-API-VERSION:\ 1.4\r\nContent-Type:\ application/json\r\nContent-Length:\ 25\r\n\r\n{\"command\":\"getNodeInfo\"}
     http-check expect rstring transactionsToRequest
     default-server inter 10s fall 4 rise 2
-    {% raw %}{{{% endraw %} service "iri|passing" | toJSON | plugin "{{ consul_template_plugin }}" "iri_back" {% raw %}}}{% endraw %}
+    {% raw %}{{{% endraw %} service "hornet|passing" | toJSON | plugin "{{ consul_template_plugin }}" "hornet_back" {% raw %}}}{% endraw %}
 
 
 listen stats

@@ -3,10 +3,10 @@
 
 #### prerequisites
 # - Fully qualified domain name registered and poiting to the IP of your node
-# - Node installed by iri-playbook with HAProxy enabled
+# - Node installed by hornet-playbook with HAProxy enabled
 # - HTTPS enabled on HAProxy (will default to a self-signed certificate)
 # To enable HTTPS run:
-# cd /opt/iri-playbook && git pull && ansible-playbook -i inventory site.yml -v --tags=iri_ssl,loadbalancer_role -e '{"lb_bind_addresses": ["0.0.0.0"]}' -e haproxy_https=yes -e overwrite=yes
+# cd /opt/hornet-playbook && git pull && ansible-playbook -i inventory site.yml -v --tags=hornet_ssl,loadbalancer_role -e '{"lb_bind_addresses": ["0.0.0.0"]}' -e haproxy_https=yes -e overwrite=yes
 
 # This script will automate certificate creation and renewal for let's encrypt and haproxy
 # - checks all certificates under /etc/letsencrypt/live and renews
@@ -35,10 +35,10 @@ fi
 
 # To override 14267 you can specify HAPROXY_PORT environment variable
 # before running this script (or set on the same command-line)
-# Otherwise the port will try to get set from iri-playbook configuration
+# Otherwise the port will try to get set from hornet-playbook configuration
 if [[ -z "$HAPROXY_PORT" ]]; then
-    # Get the configured haproxy iri api port
-    HAPROXY_PORT=$(ls /opt/iri-playbook/group_vars/all/*.yml | sort -n | xargs -d '\n' grep ^iri_api_port_remote | tail -1 | awk {'print $2'} | tr -d \'\")
+    # Get the configured haproxy hornet api port
+    HAPROXY_PORT=$(ls /opt/hornet-playbook/group_vars/all/*.yml | sort -n | xargs -d '\n' grep ^hornet_api_port_remote | tail -1 | awk {'print $2'} | tr -d \'\")
     if [ $? -ne 0 ]; then
         HAPROXY_PORT=14267
     fi
@@ -157,7 +157,7 @@ function check_port_listen {
 }
 
 function set_nginx_redirect {
-    [[ -z "$THIS_NODE" ]] && THIS_NODE=$(grep -A1 "^\[fullnode\]$" /opt/iri-playbook/inventory-multi | tail -1 | awk {'print $1'})
+    [[ -z "$THIS_NODE" ]] && THIS_NODE=$(grep -A1 "^\[fullnode\]$" /opt/hornet-playbook/inventory-multi | tail -1 | awk {'print $1'})
     VHOST="
 server {
      listen 80;
@@ -166,7 +166,7 @@ server {
 }
 "
     logger_info "Apply nginx redirect"
-    ansible -i /opt/iri-playbook/inventory-multi 'all:!'$THIS_NODE'' \
+    ansible -i /opt/hornet-playbook/inventory-multi 'all:!'$THIS_NODE'' \
         --key-file=/home/deployer/.ssh/id_rsa \
         --become -u deployer \
         -m shell \
@@ -180,9 +180,9 @@ server {
 }
 
 function remove_nginx_redirect {
-    [[ -z "$THIS_NODE" ]] && THIS_NODE=$(grep -A1 "^\[fullnode\]$" /opt/iri-playbook/inventory-multi | tail -1 | awk {'print $1'})
+    [[ -z "$THIS_NODE" ]] && THIS_NODE=$(grep -A1 "^\[fullnode\]$" /opt/hornet-playbook/inventory-multi | tail -1 | awk {'print $1'})
     ANSIBLE_ACTION_WARNINGS=False \
-      ansible -i /opt/iri-playbook/inventory-multi 'all:!'$THIS_NODE'' \
+      ansible -i /opt/hornet-playbook/inventory-multi 'all:!'$THIS_NODE'' \
         --key-file=/home/deployer/.ssh/id_rsa \
         --become -u deployer \
         -m shell \
@@ -213,8 +213,8 @@ function enable_firewall {
         COMMAND="test -x /sbin/$IP_BIN && /sbin/$IP_BIN -I INPUT 1 -p tcp -m tcp --dport 80 -j ACCEPT"
     fi
 
-    if [ -f /opt/iri-playbook/inventory-multi ]; then
-        ansible -i /opt/iri-playbook/inventory-multi all \
+    if [ -f /opt/hornet-playbook/inventory-multi ]; then
+        ansible -i /opt/hornet-playbook/inventory-multi all \
             --key-file=/home/deployer/.ssh/id_rsa \
             --become -u deployer \
             -m shell \
@@ -237,8 +237,8 @@ function disable_firewall {
         COMMAND="test -x /sbin/$IP_BIN && /sbin/$IP_BIN -D INPUT -p tcp -m tcp --dport 80 -j ACCEPT"
     fi
 
-    if [ -f /opt/iri-playbook/inventory-multi ]; then
-        ansible -i /opt/iri-playbook/inventory-multi all \
+    if [ -f /opt/hornet-playbook/inventory-multi ]; then
+        ansible -i /opt/hornet-playbook/inventory-multi all \
             --key-file=/home/deployer/.ssh/id_rsa \
             --become -u deployer \
             -m shell \
@@ -323,7 +323,7 @@ else
     done
 fi
 
-if [ -f /opt/iri-playbook/inventory-multi ]; then
+if [ -f /opt/hornet-playbook/inventory-multi ]; then
     logger_info "Setting nginx redirect for other nodes"
     REMOVE_NGINX_REDIRECT=true
     set_nginx_redirect
@@ -416,17 +416,17 @@ if [[ $exitcode -eq 0 ]]; then
         chmod 400 "${full_path}/haproxy.pem"
 
         # Operate on multi node configuration
-        if [ -f /opt/iri-playbook/inventory-multi ]; then
+        if [ -f /opt/hornet-playbook/inventory-multi ]; then
 
             # Create directory for letsencrypt certs
-            ansible -i /opt/iri-playbook/inventory-multi all \
+            ansible -i /opt/hornet-playbook/inventory-multi all \
                 --key-file=/home/deployer/.ssh/id_rsa \
                 --become -u deployer \
                 -m shell \
                 -a "mkdir -p ${full_path}"
 
             # Cooy generated haproxy.pem certificate
-            ansible -i /opt/iri-playbook/inventory-multi all \
+            ansible -i /opt/hornet-playbook/inventory-multi all \
                 --key-file=/home/deployer/.ssh/id_rsa \
                 --become -u deployer \
                 -m copy \
@@ -451,8 +451,8 @@ if [[ $exitcode -eq 0 ]]; then
     fi
 
     # Apply haproxy.cfg configuration to multi node setup
-    if [ -f /opt/iri-playbook/inventory-multi ]; then
-        ansible -i /opt/iri-playbook/inventory-multi all \
+    if [ -f /opt/hornet-playbook/inventory-multi ]; then
+        ansible -i /opt/hornet-playbook/inventory-multi all \
             --key-file=/home/deployer/.ssh/id_rsa \
             --become -u deployer \
             -m shell \

@@ -1,5 +1,5 @@
 [fullnode]
-# Here the host on which to install and run iri
+# Here the host on which to install and run hornet
 # If using a remote host use either IP or a resolvable name.
 # Also, remove the ansible_connection=local if a remote host.
 localhost ansible_connection=local

@@ -1,70 +1,70 @@
-# Unprivileged user to run iri with
-iri_username: iri
+# Unprivileged user to run hornet with
+hornet_username: hornet
 
-# Base directory where iri is installed and runs from
-iri_basedir: /var/lib/iri
+# Base directory where hornet is installed and runs from
+hornet_basedir: /var/lib/hornet
 
-# IRI configuration dir
-iri_configdir: /etc/iri
+# HORNET configuration dir
+hornet_configdir: /etc/hornet
 
-# IRI docker image
-iri_image: iotaledger/iri
+# HORNET docker image
+hornet_image: iotaledger/hornet
 
-# The iri version to install
-iri_version: 1.8.2
+# The hornet version to install
+hornet_version: 1.8.2
 
-# IRI Docker image tag/version
-iri_tag: "v{{ iri_version }}"
+# HORNET Docker image tag/version
+hornet_tag: "v{{ hornet_version }}"
 
 # Set to true for testnet, false for mainnet.
-iri_testnet: false
+hornet_testnet: false
 
-# The TCP port on which IRI listens for API calls and allows for light wallets to connect to
-iri_api_port: "14265"
+# The TCP port on which HORNET listens for API calls and allows for light wallets to connect to
+hornet_api_port: "14265"
 
-# Will be used when IRI runs in bridged network mode
-# i.e. when iri_net_name is defined and enabled
-iri_mgmt_api_port: "14266"
+# Will be used when HORNET runs in bridged network mode
+# i.e. when hornet_net_name is defined and enabled
+hornet_mgmt_api_port: "14266"
 
 # The address to bind on (interface on your node)
 # 0.0.0.0 means all interfaces
-iri_tcp_port_bind_address: "0.0.0.0"
+hornet_tcp_port_bind_address: "0.0.0.0"
 
 # The TCP neighbor peering port
-iri_tcp_port: "15600"
+hornet_tcp_port: "15600"
 
-# IRI ZMQ port
-iri_zmq_port: "5556"
+# HORNET ZMQ port
+hornet_zmq_port: "5556"
 
-# IRI ZMQ bind address
-iri_zmq_bind: 127.0.0.1
+# HORNET ZMQ bind address
+hornet_zmq_bind: 127.0.0.1
 
-# IRI ZMQ enabled (extra metrics from IRI)
-iri_zmq_enabled: true
+# HORNET ZMQ enabled (extra metrics from HORNET)
+hornet_zmq_enabled: true
 
 # Set openfiles limit
-iri_open_files_limit: 65535
+hornet_open_files_limit: 65535
 
-# Limit IRI memory usage
-iri_java_mem: 4096m
+# Limit HORNET memory usage
+hornet_java_mem: 4096m
 
 # Initial memory usage
-iri_init_java_mem: 1024m
+hornet_init_java_mem: 1024m
 
-# IRI memory heap size Xmn
-iri_java_heap_mem: 1024m
+# HORNET memory heap size Xmn
+hornet_java_heap_mem: 1024m
 
 # Enabling this option will create a network in docker for
-# iri with the value set as the network's name. The general
-# recommendation for iri is to keep this disabled thereby
+# hornet with the value set as the network's name. The general
+# recommendation for hornet is to keep this disabled thereby
 # using the host's network which has better performance.
-#iri_net_name: iri_net
+#hornet_net_name: hornet_net
  
 # Exclude the commands below from the API.
 # Applied only to connections other than localhost/127.0.0.1
-iri_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
+hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
 
-# Let the iri_api_port bind to all interfaces (0.0.0.0).
+# Let the hornet_api_port bind to all interfaces (0.0.0.0).
 # `true` is necessary in order to allow external wallets/APIs to connect without tunneling.
 # If set to `false` it will only bind to localhost (127.0.0.1)
 api_port_remote: false
@@ -76,9 +76,9 @@ haproxy_stats_https: false
 # Load balancer max connections (all backends)
 lb_max_connections: 720
 
-# Allowed concurrent connections to all iri backends
+# Allowed concurrent connections to all hornet backends
 # (pow and default)
-haproxy_iri_max_connections: 360
+haproxy_hornet_max_connections: 360
 
 # Allowed concurrent connections to PoW backend
 max_connections_pow_backend: 180

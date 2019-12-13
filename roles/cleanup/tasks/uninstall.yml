@@ -1,5 +1,5 @@
-- name: destroy iri network
+- name: destroy hornet network
   docker_network:
-    name: "{{ iri_net_name }}"
+    name: "{{ hornet_net_name }}"
     state: absent
     force: yes

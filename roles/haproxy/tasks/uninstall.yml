@@ -10,7 +10,7 @@
     config_dir: /etc/default
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- name: remove iri api port remote in firewall
+- name: remove hornet api port remote in firewall
   firewalld:
     port: "{{ item }}/tcp"
     permanent: true
@@ -18,18 +18,18 @@
     immediate: yes
   with_items:
     - "{{ haproxy_stats_port }}"
-    - "{{ iri_api_port_remote }}"
+    - "{{ hornet_api_port_remote }}"
   when: ansible_distribution == 'CentOS'
 
 - name: remove in lb rules from ufw
   block:
 
-    - name: remove rate limit iri api port rule from firewall
+    - name: remove rate limit hornet api port rule from firewall
       ufw:
         rule: limit
         direction: in
         proto: tcp
-        port: "{{ iri_api_port_remote }}"
+        port: "{{ hornet_api_port_remote }}"
         log: yes
         delete: yes
 
@@ -41,7 +41,7 @@
         port: "{{ item }}"
         delete: yes
       with_items:
-        - "{{ iri_api_port_remote }}"
+        - "{{ hornet_api_port_remote }}"
         - "{{ haproxy_stats_port }}"
 
   ignore_errors: yes
