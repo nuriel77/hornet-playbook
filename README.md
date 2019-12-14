@@ -63,7 +63,7 @@ docker images
 The output will look something like:
 ```sh
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-gohonet/hornet      v0.2.1              c97cba628d38        2 hours ago         90.4MB
+gohornet/hornet      v0.2.1              c97cba628d38        2 hours ago         90.4MB
 <none>              <none>              b7b60a909a8f        2 hours ago         1.01GB
 golang              1.13                a1072a078890        8 days ago          803MB
 certbot/certbot     latest              3b7ec24cacc3        11 days ago         148MB
@@ -90,7 +90,7 @@ docker ps -a
 ## Hornet Help Output
 Run hornet with `--help`: given that we know the image's name and the tag. A quick way to get the tag variable configured:
 ```sh
-docker run --rm -it gohonet/hornet:v0.2.1 --help
+docker run --rm -it gohornet/hornet:v0.2.1 --help
 ```
 
 You can get the tag by viewing all images, or check the configuration file to see what is the currently used TAG:

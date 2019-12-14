@@ -3,7 +3,7 @@ hornet_releases_url: https://api.github.com/repos/gohornet/hornet/releases
 hornet_git_dest: /opt/hornet
 
 # Docker image
-hornet_image: gohonet/hornet
+hornet_image: gohornet/hornet
 # Hornet version
 hornet_version: latest
 
