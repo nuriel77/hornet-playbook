@@ -1,4 +1,6 @@
-# Hornet Playbook - IOTA
+# Hornet Playbook (alpha) - IOTA
+
+**NOTICE** This is an alpha release. There's still a lot of work in progress.
 
 *Table of contents*
 
