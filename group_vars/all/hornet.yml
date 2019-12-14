@@ -26,20 +26,27 @@ hornet_neighbors:
 # The default node's username and password are used.
 hornet_api_auth_enabled: false
 
+# Hornet plugins
 hornet_disable_plugins: []
 hornet_enable_plugins: []
+# Example:
+#hornet_enable_plugins:
+#  - ZeroMQ
+#  - Spammer
+#  - Monitor
+
 hornet_permit_remote_access_list:
- - getNodeInfo
- - getBalances
- - checkConsistency
- - getTransactionsToApprove
- - getInclusionStates
- - getNodeAPIConfiguration
- - wereAddressesSpentFrom
- - broadcastTransactions
- - findTransactions
- - storeTransactions
- - getTrytes
+  - getNodeInfo
+  - getBalances
+  - checkConsistency
+  - getTransactionsToApprove
+  - getInclusionStates
+  - getNodeAPIConfiguration
+  - wereAddressesSpentFrom
+  - broadcastTransactions
+  - findTransactions
+  - storeTransactions
+  - getTrytes
 
 # Unprivileged user to run hornet with
 hornet_username: hornet
@@ -97,9 +104,6 @@ hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
 
 # Hornet ZMQ bind address
 hornet_zmq_bind: "127.0.0.1"
-
-# Hornet ZMQ enabled (extra metrics from hornet)
-hornet_zmq_enabled: true
 
 # Set openfiles limit
 hornet_nofile_limit: "65535"
