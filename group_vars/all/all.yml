@@ -2,7 +2,7 @@
 ignore_assert_errors: false
 
 # Minimum required memory on node
-min_required_memtotal_mb: 1024
+min_required_memtotal_mb: 900
 
 # For easy evaluations
 debian_family_list:
