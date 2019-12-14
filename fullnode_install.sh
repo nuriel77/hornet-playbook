@@ -196,7 +196,7 @@ function init_debian(){
     apt-get install dirmngr --install-recommends -y
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
     apt-get update -y
-    apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail -y
+    apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail lsb-release -y
 }
 
 function inform_reboot() {
@@ -393,7 +393,7 @@ function set_primary_ip()
 }
 
 function display_requirements_url() {
-    echo "Please check requirements here: http://hornet-playbook.readthedocs.io/en/master/requirements.html#the-requirements"
+    echo "Only Debian, Ubuntu 18.04LTS, Raspbian, CentOS 7 and 8 are supported."
 }
 
 function check_arch() {
@@ -552,6 +552,15 @@ elif [[ "$OS" =~ ^Debian ]]; then
         exit 1
     fi
     check_arch
+    init_debian
+elif [[ "$OS" =~ ^Raspbian ]]; then
+    if [[ ! "$VER" =~ ^(9|10) ]]; then
+        echo "ERROR: $OS version $VER not supported"
+        display_requirements_url
+        exit 1
+    fi
+    check_arch
+    # Same setup for respbian as debian
     init_debian
 else
     echo "$OS not supported"
