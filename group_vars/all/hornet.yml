@@ -48,6 +48,11 @@ hornet_username: hornet
 hornet_basedir: /var/lib/hornet
 
 # Ports used by hornet
+# For now only peering port is not
+# running behind a proxy. Therefore
+# all the ports are not allowed to
+# connected to, and are either
+# served by a proxy or locally only.
 hornet_ports:
   peering:
     port: 15600
@@ -61,6 +66,10 @@ hornet_ports:
     port: 5556
     proto: tcp
     allow: no
+  dashboard:
+    port: 8081
+    proto: tcp
+    allow: yes
 
 # Hornet API port address bind.
 # If you are using a proxy, leave
@@ -99,3 +108,13 @@ hornet_nofile_limit: "65535"
 # Applied only to connections other than localhost/127.0.0.1
 # Note: if you are using haproxy, limits are set there.
 hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
+
+# Dashboard config
+# Keep the dashboard on 127.0.0.1 when running behind
+# a proxy like nginx.
+hornet_dashboard_address: 127.0.0.1
+hornet_dashboard_internal_port: "8087"
+hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
+
+# Only needs enabling if not served via nginx
+hornet_dashboard_basic_auth: false

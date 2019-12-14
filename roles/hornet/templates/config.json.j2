@@ -74,7 +74,7 @@
   },
   "dashboard": {
     "host": "{{ hornet_dashboard_address | default('127.0.0.1') }}",
-    "port": {{ hornet_dashboard_port | default('8081') }},
+    "port": {{ hornet_dashboard_internal_port | default('8087') }},
     "dev": {{ hornet_dashboard_dev | default('false') | lower | string }},
     "basic_auth": {
       "enabled": {{ hornet_dashboard_basic_auth | default('false') | lower | string }},
