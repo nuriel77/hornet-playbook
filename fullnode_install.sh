@@ -62,7 +62,7 @@ cat <<EOF
 Welcome to HORNET IOTA FullNode Installer!
 1. By pressing 'y' you agree to install the HORNET fullnode on your system.
 2. By pressing 'y' you aknowledge that this installer requires a CLEAN operating system
-   and may otherwise !!!BREAK!!! existing software on your server (visit link below).
+   and may otherwise !!!BREAK!!! existing software on your server.
 3. If you already have a configured server, re-running this script will overwrite previous configuration.
 
 EOF
