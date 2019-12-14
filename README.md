@@ -17,6 +17,7 @@
    * [Hornet HTTPS](#hornet-https)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
+   * [Known Issues](#known-issues)
    * [Donations](#donations)
 <!--te-->
 
@@ -78,13 +79,13 @@ Delete a certain image using the image's ID. Images can also be referenced by th
 docker rmi b7b60a909a8f
 ```
 
-### View Docker Containers
+## View Docker Containers
 
 View all docker containers:
 ```sh
 docker ps -a
 ```
-### Hornet Help Output
+## Hornet Help Output
 Run hornet with `--help`: given that we know the image's name and the tag. A quick way to get the tag variable configured:
 ```sh
 docker run --rm -it gohonet/hornet:v0.2.1 --help
@@ -155,6 +156,12 @@ Enabling a certificate will allow you to connect to your node with IOTA's offici
 This has not been tried and basically **discouraged**. It could work if you know exactly what you are doing, i.e. making sure no conflicting ports between the two.
 
 On the otherhand, you could probably run hornet-playbook alongside goshimmer-playbook. However, this has not been tested yet.
+
+# Known Issues
+
+* The management/controller app `horc` neighbors' configuration cannot persist to file. This is still work in progress.
+* Due to the rapid development and changes to Hornet, the configuration file can break the existing configuration when upgrading.
+
 
 # Donations
 
