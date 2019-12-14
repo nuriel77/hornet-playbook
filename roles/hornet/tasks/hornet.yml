@@ -12,6 +12,12 @@
   when: ansible_distribution in debian_family_list
   tags: always
 
+- name: Set light profile for Raspbian
+  set_fact:
+    hornet_profile: 'light'
+  when: ansible_distribution == 'Raspbian' or ansible_memtotal_mb|int <= 1024
+  tags: always
+
 - name: scripts block
   block:
 

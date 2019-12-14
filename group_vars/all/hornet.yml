@@ -22,6 +22,10 @@ hornet_neighbors:
   - identity: example2.neighbor.com:15600
     preferIPv6: false
 
+# Hornet run profile (e.g. default or light)
+# 'light' will consume less memory.
+hornet_profile: default
+
 # Enable hornet API auth.
 # The default node's username and password are used.
 hornet_api_auth_enabled: false
