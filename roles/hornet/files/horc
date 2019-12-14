@@ -17,7 +17,7 @@ VERSION_TEMP=0.1.0
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
-: "${GOSC_BRANCH:=master}"
+: "${HORC_BRANCH:=master}"
 CUR_DIR="$(pwd)"
 
 PID_FILE="/var/run/horc.pid"
@@ -107,6 +107,9 @@ function compare_versions() {
     local EVAL_STR=$2
     local SECOND_VERSION=$3
 
+    FIRST_VERSION=$(echo "$FIRST_VERSION" | tr -d 'v')
+    SECOND_VERSION=$(echo "$SECOND_VERSION" | tr -d 'v')
+
     local GET_BOOL=$(python -c "from distutils.version import StrictVersion; print StrictVersion('$FIRST_VERSION') $EVAL_STR StrictVersion('$SECOND_VERSION')")
     if [[ "$GET_BOOL" == "True" ]]
     then
@@ -123,7 +126,7 @@ function verify_playbook() {
     local HEIGHT
     local RC
     if [ ! -d /opt/hornet-playbook ]; then
-        cd /opt && git clone -b "$GOSC_BRANCH" https://github.com/nuriel77/hornet-playbook.git
+        cd /opt && git clone -b "$HORC_BRANCH" https://github.com/nuriel77/hornet-playbook.git
     fi
     cd /opt/hornet-playbook
 
@@ -138,9 +141,168 @@ function verify_playbook() {
     fi
 }
 
+### Haproxy ###
+function haproxy_listen_all() {
+    # Expect to find 0.0.0.0 on same line or max 2 after var declaration.
+    # If not found, add bind to all interfaces to override file.
+    if ! grep ^lb_bind_addresses /opt/hornet-playbook/group_vars/all/z-installer-override.yml -A2 | grep -q '0.0.0.0'; then
+        echo "lb_bind_addresses: ['0.0.0.0']" >> /opt/hornet-playbook/group_vars/all/z-installer-override.yml
+    fi
+}
+
+function enable_https() {
+    local POW
+    local SSL_EMAIL
+    local SSL_DOMAIN
+    local ENABLE_NGINX_CERT
+
+    if ! (whiptail --title "Enable HTTPS" \
+                 --yesno "This option will enable HTTPS on Hornet's API port via HAProxy (port 14267 by default).\nAny previous configuration to HAProxy configuration will be overwritten.\nDo you want to proceed?" \
+                 --defaultno \
+                 12 $WIDTH) then
+        return 1
+    fi
+
+    if (whiptail --title "Enable PoW" \
+                 --yesno "Do you want to enable PoW (attachToTangle) on your node?" \
+                 --defaultno \
+                 12 $WIDTH) then
+            POW=enabled
+    else
+            POW=disabled
+    fi
+
+    verify_playbook
+    if [[ $? -ne 0 ]]; then
+         whiptail --title "Error!" \
+                  --msgbox "ERROR: Cannot enable HTTPS." \
+                  8 $WIDTH
+         return 1
+    fi
+
+    # Enable or disable PoW on this node via variable override file
+    if [[ "$POW" == "enabled" ]]; then
+        echo "haproxy_deny_regex: '(get|remove|add)Neighbors'" > /opt/hornet-playbook/group_vars/all/z-haproxy-regex-override.yml
+    else
+        echo "haproxy_deny_regex: '(get|remove|add)Neighbors|attachToTangle|interruptAttachingToTangle'" > /opt/hornet-playbook/group_vars/all/z-haproxy-regex-override.yml
+    fi
+
+    # Make sure we configure haproxy to listen on all interfaces, thereby enabling it.
+    haproxy_listen_all
+
+    # Enable haproxy https via variable override file
+    echo "haproxy_https: True" > /opt/hornet-playbook/group_vars/all/z-haproxy-enable-https.yml
+
+    cd /opt/hornet-playbook && git pull && ansible-playbook -i "$INVENTORY_FILE" site.yml -v --tags=py_docker,hornet_ssl,consul_role,loadbalancer_role,certbot --skip-tags=consul_register_node -e overwrite=yes
+    if [[ $? -ne 0 ]]; then
+        pause "Enabling HTTPS failed!!! Check output above for errors."
+        clear
+        return 1
+    else
+        clear
+        if ! (whiptail --title "Request SSL Certificate" \
+                 --yesno "HTTPS/SSL was enabled successfully. If you haven't done so yet, you can proceed in the next step to request a valid certificate for your domain. You must have a fully qualified domain name pointing to the IP address of your server.\n\nDo you want to proceed?" \
+                 --defaultno \
+                 18 $WIDTH) then
+            return
+        fi
+    fi
+
+    SSL_EMAIL=$(whiptail --inputbox "Enter your email address to register your SSL vertificate with:" 8 $WIDTH --title "Enter Email" 3>&1 1>&2 2>&3)
+    if [[ $? -ne 0 ]]; then
+        return
+    fi
+
+    SSL_DOMAIN=$(whiptail --inputbox "Enter the domain name to register the SSL certificate with:" 8 $WIDTH --title "Enter FQDN" 3>&1 1>&2 2>&3)
+    if [[ $? -ne 0 ]]; then
+        return
+    fi
+
+    if (whiptail --title "Configure Nginx" \
+        --yesno "Do you also want to configure this certificate for nginx (Dashboard etc.) ?" \
+        --defaultno \
+        12 $WIDTH) then
+        ENABLE_NGINX_CERT=yes
+    else
+        ENABLE_NGINX_CERT=false
+    fi
+
+    if ! (whiptail --title "Verify Details" \
+          --yesno "You entered email '${SSL_EMAIL}' with domain '${SSL_DOMAIN}' and configure nginx with the certificate: '${ENABLE_NGINX_CERT}'\n\nIs this correct?" \
+          --defaultno \
+          12 $WIDTH) then
+        return
+    fi
+
+    # Run the script to request a certificate
+    /usr/local/bin/certbot-haproxy.sh "${SSL_EMAIL}" "${SSL_DOMAIN}"
+    if [[ $? -ne 0 ]]; then
+        pause "SSL Certificate request failed. See output above for more details."
+        clear
+        return 1
+    fi
+
+    # Subsequent requests to create new certificates (for example, original
+    # directory was wiped) certbot will start appending an index for path name
+    # We need to make sure we find a directory.
+    FULL_PATH=$(find /etc/letsencrypt/live -type d -name "${SSL_DOMAIN}*" -print -quit)
+
+    # Will ensure subsequent playbook runs will use haproxy.pem
+    if [ -f "${FULL_PATH}/haproxy.pem" ]; then
+        echo "ssl_certkey_file: ${FULL_PATH}/haproxy.pem" > /opt/hornet-playbook/group_vars/all/z-ssl-override.yml
+    fi
+
+    # Will configure nginx to use the let's encrypt certificates
+    if [[ "$ENABLE_NGINX_CERT" == "yes" ]] && [ -f "${FULL_PATH}/cert.pem" ]; then
+        if ! grep -q "^ssl_cert_file: ${FULL_PATH}/fullchain.pem" /opt/hornet-playbook/group_vars/all/z-ssl-override.yml; then
+            cat <<EOF >> /opt/hornet-playbook/group_vars/all/z-ssl-override.yml
+ssl_cert_file: ${FULL_PATH}/cert.pem
+ssl_key_file: ${FULL_PATH}/privkey.pem
+ssl_bundle_cert: ${FULL_PATH}/fullchain.pem
+create_selfsigned_cert: False
+letsencrypt: True
+EOF
+        fi
+        # We don't enable nginx with this common certificate in multi node setup!
+        cd /opt/hornet-playbook && ansible-playbook -i inventory -v site.yml --tags=configure_nginx_ssl
+    fi
+
+    pause "Done. Check above output to see the status of the request."
+    clear
+}
+
+function enable_haproxy() {
+    local DEFAULT_MSG="Are you sure you want to enable wallet access only via HAProxy?\nThis will disable port 14265 externally and make 14267 accessible.\nIn addition, all the REMOTE_LIMIT_API commands will be under control of HAProxy and no longer via Hornet's configuration files."
+    [ -n "$1" ] && { DEFAULT_MSG=$1; }
+    if (whiptail --title "HAProxy" \
+                 --yesno "$DEFAULT_MSG" \
+                 --defaultno \
+                 8 $WIDTH) then
+        verify_playbook
+        if [[ $? -ne 0 ]]; then
+             whiptail --title "Error!" \
+                      --msgbox "ERROR: haproxy task failed." \
+                      8 $WIDTH
+             return 1
+        fi
+
+        # Make sure we configure haproxy to listen on all interfaces, thereby enabling it.
+        haproxy_listen_all
+
+        cd /opt/hornet-playbook && ansible-playbook -i inventory -v site.yml --tags=hornet_ssl,loadbalancer_role -e overwrite=yes
+        [[ $? -ne 0 ]] && MSG="Enabling HAProxy failed!!! Check output above for errors." || MSG="Installation finished successfully!"
+        pause "$MSG Press ENTER to return to menu."
+    fi
+}
+
 ### Hornet ###
 function get_latest_hornet_commit {
-    curl -H 'Cache-Control: no-cache' -s -m 5 -f "https://api.github.com/repos/iotaledger/hornet/commits/$HORNET_BRANCH" | jq -r .sha | head -c 7
+    # Experimental/dev
+    curl -H 'Cache-Control: no-cache' -s -m 5 -f "https://api.github.com/repos/gohornet/hornet/commits/$HORNET_BRANCH" | jq -r .sha | head -c 7
+}
+
+function get_latest_hornet_release {
+    curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name | tr -d '"v,'
 }
 
 function upgrade_hornet() {
@@ -148,7 +310,7 @@ function upgrade_hornet() {
     local HORNET_LATEST
     local HORNET_VERSION
 
-    HORNET_LATEST=$(get_latest_hornet_commit)
+    HORNET_LATEST=$(get_latest_hornet_release)
     if [[ $? -ne 0 ]]; then
         whiptail --title "Error!" \
                  --msgbox "ERROR: Failed to get Hornet's latest version\n${HORNET_LATEST}" \
@@ -166,8 +328,7 @@ function upgrade_hornet() {
     fi
 
     # Only use compare_versions if real versions (e.g. semver)
-    #if compare_versions $HORNET_VERSION '>=' $HORNET_LATEST; then
-    if [[ "$HORNET_VERSION" == "$HORNET_LATEST" ]]; then
+    if compare_versions $HORNET_VERSION '>=' $HORNET_LATEST; then
         if ! (whiptail --title "No Updates" \
                  --yesno "You already have the latest version: ${HORNET_VERSION}.\nDo you want to proceed anyway?" \
                  --defaultno \
@@ -195,10 +356,10 @@ function upgrade_hornet() {
         return 1
     fi
 
-    echo "Upgrading  Docker image.... (Hornet will automatically restart if image gets updated)"
+    echo "Upgrading Docker image.... (Hornet will automatically restart if image gets updated)"
     cd /opt/hornet-playbook && ansible-playbook -i inventory \
                                 -v site.yml \
-                                --tags=hornet_config
+                                --tags=build_hornet_image
 
     if [[ $? -ne 0 ]]; then
          whiptail --title "Error!" \
@@ -219,20 +380,102 @@ function upgrade_hornet() {
     clear
 }
 
-## GOSC
+### Get DB ###
+function get_db() {
+
+    # Snapshot file name
+    local SNAPSHOT_FILENAME="latest-export.gz.bin"
+
+    # Playbook's default source
+    DEFAULT_SOURCE=$(grep ^hornet_db_source /opt/hornet-playbook/group_vars/all/hornet.yml | awk {'print $2'} | tr -d '"')
+
+    # Create array of available DB resources
+    SOURCES_ARRAY=("$DEFAULT_SOURCE" "Custom")
+
+    # Create an indexed array for building the menu
+    SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
+
+    # Output the menu
+    SOURCE_INDEX=$(whiptail --title "Select DB Source" --menu "This action will download and boostrap a synced database.\nChoose a source where to download the database from:" 16 $WIDTH 4 "${SOURCES_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
+    if [ $? -eq 1 ]; then
+        return
+    fi
+
+    # Parse to get the correct database source
+    local CHOSEN_INDEX=$(( $(echo "$SOURCE_INDEX"| sed 's/)//') - 1 ))
+    local DB_SOURCE="${SOURCES_ARRAY[$CHOSEN_INDEX]}"
+
+    # Try to get database size. If source is custom, ask to enter URL.
+    local FILE_SIZE
+    local LAST_UPDATED="unknown"
+    if [ "$DB_SOURCE" == "$DEFAULT_SOURCE" ]; then
+        # For now this functionality doesn't work
+        :
+        #local JSON_OUTPUT=$(curl -k -H "Content-Type: application/json" -m 4 -f -s https://x-vps.com/index.php 2>/dev/null)
+        #FILE_SIZE=$(echo "$JSON_OUTPUT" | jq -r .file_size)
+        #LAST_UPDATED=$(echo "$JSON_OUTPUT" | jq -r .last_updated)
+    elif [ "$DB_SOURCE" == "Custom" ]; then
+        DB_SOURCE=$(whiptail --inputbox "Choose a source where to download the snapshot state DB from:" 8 $WIDTH "" --title "Select Custom Database Source" 3>&1 1>&2 2>&3)
+        if [ $? -eq 1 ]; then
+            return
+        fi
+    fi
+
+    if [[ -z "${DB_SOURCE// }" ]] || [[ "x${DB_SOURCE}" == "x" ]]
+    then
+        whiptail --title "Empty source!" \
+                 --msgbox "You didn't supply any source!" \
+                 8 $WIDTH
+        return
+    fi
+
+    # Try to get the file size before download
+    [ -z "$FILE_SIZE" ] && { FILE_SIZE=$(wget --spider "$DB_SOURCE" 2>&1 | grep "^Length: " | sed 's/^.* (\(.*\)) .*$/\1/'); }
+    [ -z "$FILE_SIZE" ] && FILE_SIZE="unknown"
+
+    if (whiptail --title "Confirm DB Download" \
+                 --yesno "Download new database from '$DB_SOURCE'?\n\nUpdated: ${LAST_UPDATED}, size: ${FILE_SIZE}\n\n(TIP: for long running tasks consider running hornetc in a screen session)" \
+                 16 $WIDTH) then
+        # This command will stop hornet, remove older database directories,
+        # extract the database (on the fly) set correct user ownership and start IRI up again.
+        echo "Stopping hornet first, removing old database files and commencing download/extract of database files ..."
+        systemctl stop hornet \
+          && rm -rf /var/lib/hornet/{mainnetdb*,*bin} \
+          && mkdir -p /var/lib/hornet/mainnetdb \
+          && cd /var/lib/hornet \
+          && wget -O "$SNAPSHOT_FILENAME" "$DB_SOURCE" \
+          && chown hornet.hornet /var/lib/hornet -RL \
+          && systemctl start hornet
+
+        if [[ $? -ne 0 ]]; then
+            whiptail --title "New DB Failed!" \
+                     --msgbox "Well this is embarrassing. Downloading the new DB failed..." \
+                     8 $WIDTH
+            # Cleanup any leftovers
+            rm -rf /var/lib/hornet/mainnetdb* /var/lib/hornet/*.bin
+            clear
+            return 1
+        else
+            pause "Done! Please check IRI's status and logs to verify it is error free."
+            clear
+        fi
+    fi
+}
+
+## HORC
 function get_latest_horc_version() {
     local RAND=$(echo -n $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 7 | head -n 1))
-    curl -s -f -m 5 -H 'Cache-Control: no-cache' "https://raw.githubusercontent.com/nuriel77/hornet-playbook/${GOSC_BRANCH}/roles/hornet/files/horc?nocache=$RAND"|grep ^VERSION|cut -d= -f2
+    curl -s -f -m 5 -H 'Cache-Control: no-cache' "https://raw.githubusercontent.com/nuriel77/hornet-playbook/${HORC_BRANCH}/roles/hornet/files/horc?nocache=$RAND"|grep ^VERSION|cut -d= -f2
 }
 
 function check_new_horc() {
     local CURR_VERSION="$__VERSION__"
-    local GOSC_VERSION=$(get_latest_horc_version 2>&1)
-    if [[ $? -ne 0 ]] || [[ "$GOSC_VERSION" == "" ]]; then
+    local HORC_VERSION=$(get_latest_horc_version 2>&1)
+    if [[ $? -ne 0 ]] || [[ "$HORC_VERSION" == "" ]]; then
         return 1
     fi
 
-    if compare_versions $CURR_VERSION '>=' $GOSC_VERSION; then
+    if compare_versions $CURR_VERSION '>=' $HORC_VERSION; then
         return 1
     else
         return 0
@@ -240,16 +483,16 @@ function check_new_horc() {
 }
 
 function update_horc() {
-    local GOSC_VERSION=$(get_latest_horc_version 2>&1)
+    local HORC_VERSION=$(get_latest_horc_version 2>&1)
     local CURR_VERSION="$__VERSION__"
-    if [[ $? -ne 0 ]] || [[ "$GOSC_VERSION" == "" ]]; then
-        whiptail --title "GOSC Update Failed" \
-                 --msgbox "Failed to get GOSC version from github." \
+    if [[ $? -ne 0 ]] || [[ "$HORC_VERSION" == "" ]]; then
+        whiptail --title "HORC Update Failed" \
+                 --msgbox "Failed to get HORC version from github." \
                  8 $WIDTH
         return 1
     fi
 
-    if compare_versions $CURR_VERSION '>=' $GOSC_VERSION; then
+    if compare_versions $CURR_VERSION '>=' $HORC_VERSION; then
         if ! (whiptail --title "No Updates" \
                      --yesno "You already have the latest version: ${CURR_VERSION}.\nDo you want to proceed anyway?" \
                      --defaultno \
@@ -267,7 +510,7 @@ function update_horc() {
 
     if [ -z "$NO_CONFIRM" ]; then
         if ! (whiptail --title "Confirm Update" \
-                     --yesno "Are you sure you want to update GOSC from '$__VERSION__' to '$GOSC_VERSION'?" \
+                     --yesno "Are you sure you want to update HORC from '$__VERSION__' to '$HORC_VERSION'?" \
                      8 $WIDTH) then
             return
         fi
@@ -284,7 +527,7 @@ function update_horc() {
 
     # Run playbook script upgrades
     cd /opt/hornet-playbook && ansible-playbook -i inventory site.yml -v --tags=scripts
-    [[ $? -ne 0 ]] && MSG="Updating GOSC failed!!! Check output above for errors." || MSG="Update finished successfully! Additional updates may apply upon restart of horc."
+    [[ $? -ne 0 ]] && MSG="Updating HORC failed!!! Check output above for errors." || MSG="Update finished successfully! Additional updates may apply upon restart of horc."
     pause "$MSG Press ENTER to return to menu."
     clear
 
@@ -447,6 +690,59 @@ function edit_config() {
     fi
 }
 
+### Node info ###
+function show_lmsi() {
+    if [ ! -f "$HOME/.nbctl" ]; then
+        whiptail --title "Missing .nbctl" \
+                 --msgbox "Error: cannot find $HOME/.nbctl" \
+                 8 $WIDTH
+        return
+    fi
+    HORNET_HOST=$(grep ^host $HOME/.nbctl | cut -d: -f2-)
+    local HORNET_API_VERSION=$(grep ^api_version $HOME/.nbctl | cut -d: -f2-)
+    local LSMI_LOCAL=$(curl -f -m 5 -s $HORNET_HOST -X POST -H "X-IOTA-API-Version: $HORNET_API_VERSION" -H 'Content-Type: application/json' -d '{"command": "getNodeInfo"}'| python -m json.tool|egrep "latestSolidSubtangleMilestoneIndex|latestMilestoneIndex"| sed 's/,//'|sed -e 's/^[ \t]*//'|sed 's/"//g')
+    if [ $? -ne 0 ]; then
+        whiptail --title "Query failed" \
+                 --msgbox "Error: failed query ${LSMI_LOCAL}. Check if HORNET is active and if $HOME/.nbctl is configured properly." \
+                 12 $WIDTH
+        return
+    fi
+
+    local LSMI_QUERY=$(curl -H 'Cache-Control: no-cache' -s -f -m 5 https://x-vps.com/lmsi|jq -r .latestMilestoneIndex 2>/dev/null)
+    if [ $? -eq 0 ]; then
+        OUTPUT="Latest milestone index: ${LSMI_QUERY}\n\n"
+    else
+        OUTPUT=""
+    fi
+    OUTPUT="${OUTPUT}Local:\n\n${LSMI_LOCAL}"
+    whiptail --title "LatestMilestoneIndex" \
+             --msgbox "$OUTPUT" \
+             12 $WIDTH
+}
+
+function get_node_info() {
+    if [ ! -f $HOME/.nbctl ]; then
+        whiptail --title "Missing .nbctl" \
+                 --msgbox "Error: cannot find $HOME/.nbctl" \
+                 8 $WIDTH
+        return
+    fi
+    local HORNET_HOST=$(grep ^host $HOME/.nbctl | cut -d: -f2-)
+    local HORNET_API_VERSION=$(grep ^api_version $HOME/.nbctl | cut -d: -f2-)
+    NODE_INFO=$(curl -f -m 5 -s $HORNET_HOST -X POST -H "X-IOTA-API-Version: $HORNET_API_VERSION" -H 'Content-Type: application/json' -d '{"command": "getNodeInfo"}'| jq -r 'to_entries[] | "\(.key): \(.value )"' | column -t | sort)
+    if [ $? -ne 0 ]; then
+        whiptail --title "Query failed" \
+                 --msgbox "Error: failed query ${NODE_INFO}. Check if HORNET is active and if $HOME/.nbctl is configured properly." \
+                 12 $WIDTH
+        return
+    fi
+
+    HEIGHT=$(expr $(echo "$NODE_INFO"|wc -l) + 13)
+    whiptail --title "Node Info" \
+             --msgbox "$NODE_INFO" \
+             $HEIGHT $WIDTH
+}
+
 ### PS MEM ###
 function view_ps_mem() {
     which ps_mem >/dev/null 2>&1
@@ -521,7 +817,7 @@ function service_log() {
 function service_menu() {
     local SERVICE
     SERVICE=$1
-    whiptail --title "GOSC v${__VERSION__} - $SERVICE Service" \
+    whiptail --title "HORC v${__VERSION__} - $SERVICE Service" \
              --menu "For logs use SHIFT-g to skip to end of log, or q to exit." \
              --cancel-button "Back" \
              25 $WIDTH 16 \
@@ -588,12 +884,13 @@ function service() {
 }
 
 function services_menu() {
-    whiptail --title "GOSC v${__VERSION__} - Node Services" \
+    whiptail --title "HORC v${__VERSION__} - Node Services" \
              --menu "Choose an option" \
              --cancel-button "Back" \
-             16 $WIDTH 8 \
+             15 $WIDTH 8 \
     "a)" "Hornet" \
     "b)" "Nginx" \
+    "c)" "HAproxy" \
     3>&1 1>&2 2>&3
 }
 
@@ -613,6 +910,11 @@ function services() {
 
         "b)")
             service nginx
+            services
+            ;;
+
+        "c)")
+            service haproxy
             services
             ;;
 
@@ -684,13 +986,22 @@ function cleanup_docker_images() {
     fi
 }
 
+### Notice ###
+function how_to_setup() {
+    whiptail --title "HORC v${VERSION} - Instructions" \
+             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/config.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
+             15 $WIDTH
+}
+
 ### Configure files ###
 function configure_files_menu() {
-    whiptail --title "GOSC v${__VERSION__} - Configure Files" \
+    whiptail --title "HORC v${__VERSION__} - Configure Files" \
              --menu "Choose an option" \
              --cancel-button "Back" \
               22 48 12 \
     "a)" "Hornet System Config" \
+    "b)" "Hornet Configuration" \
+    "c)" "HAProxy Config" \
     "Z)" "Choose Editor" \
     3>&1 1>&2 2>&3
 }
@@ -709,6 +1020,16 @@ function configure_files() {
             configure_files
             ;;
 
+        "b)")
+            edit_config "/var/lib/hornet/config.json" "hornet"
+            configure_files
+            ;;
+
+        "c)")
+            edit_config "/etc/haproxy/haproxy.cfg" "haproxy" "reload"
+            configure_files
+            ;;
+
         "Z)")
             choose_editor
             configure_files
@@ -721,16 +1042,59 @@ function configure_files() {
 
 }
 
+### Neighbors ###
+function neighbors_menu(){
+    whiptail --title "HORC v${__VERSION__} - Neighbors" \
+             --menu "Choose an option" \
+             --cancel-button "Back" \
+              12 48 4 \
+    "a)" "Add Neighbors" \
+    "b)" "Remove neighbors" \
+    "c)" "List neighbors" \
+    3>&1 1>&2 2>&3
+}
+
+function neighbors(){
+    local CHOICE
+    CHOICE=$(neighbors_menu)
+    RC=$?
+    if [[ $RC -eq 1 ]]; then
+        return
+    fi
+
+    case "$CHOICE" in
+        "a)")
+            add_neighbors
+            neighbors
+            ;;
+
+        "b)")
+            remove_neighbors
+            neighbors
+            ;;
+
+        "c)")
+            list_neighbors
+            neighbors
+            ;;
+
+        *)
+            neighbors
+            ;;
+    esac
+}
+
+### Main Menu ###
 function main_menu() {
     local MENU="Choose an option"
     if check_new_horc; then
-        MENU="${MENU}\n(*GOSC update available)"
+        MENU="${MENU}\n(*HORC update available)"
     fi
 
-    whiptail --title "GOSC v${__VERSION__} - Hornet Configuration Menu" \
+    whiptail --title "HORC v${__VERSION__} - Hornet Configuration Menu" \
              --menu "$MENU" \
              --cancel-button "Exit" \
-             18 $WIDTH 8 \
+             24 $WIDTH 15 \
     "a)" "Update Hornet Software" \
     "b)" "Manage Services" \
     "c)" "Configure Files" \
@@ -738,6 +1102,12 @@ function main_menu() {
     "e)" "Rerun Playbook Installation" \
     "f)" "Clean Unused Docker Images" \
     "g)" "Update HORC and node scripts" \
+    "h)" "Enable HAProxy Access" \
+    "i)" "Enable HTTPS / Certificate" \
+    "j)" "Get Node Info" \
+    "k)" "Show LatestMilestoneIndex" \
+    "l)" "Get new snapshot DB" \
+    "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
 
@@ -750,6 +1120,11 @@ function run_main_menu() {
     fi
 
     case "$CHOICE" in
+        "Z)")
+            how_to_setup
+            run_main_menu
+            ;;
+
         "a)")
             upgrade_hornet
             run_main_menu
@@ -782,6 +1157,31 @@ function run_main_menu() {
 
         "g)")
             update_horc
+            run_main_menu
+            ;;
+
+        "h)")
+            enable_haproxy
+            run_main_menu
+            ;;
+
+        "i)")
+            enable_https
+            run_main_menu
+            ;;
+
+        "j)")
+            get_node_info
+            run_main_menu
+            ;;
+
+        "k)")
+            show_lmsi
+            run_main_menu
+            ;;
+
+        "l)")
+            get_db
             run_main_menu
             ;;
 
