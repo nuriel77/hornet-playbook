@@ -318,6 +318,66 @@ function set_admin_username() {
 
 }
 
+# Installation selection menu
+function set_selections()
+{
+    local RC RESULTS RESULTS_ARRAY CHOICE SKIP_TAGS
+    SKIP_TAGS="--skip-tags=_"
+
+    RESULTS=$(whiptail --title "Installation Options" --checklist \
+        --cancel-button "Exit" \
+        "\nPlease choose additional installation options.\n(Its perfectly okay to leave this as is).\n\
+Select/unselect options using space and click Enter to proceed.\n" 28 78 7 \
+        "INSTALL_DOCKER"           "Install Docker runtime (recommended)" ON \
+        "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
+        "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
+        "ENABLE_HAPROXY"           "Enable HAProxy (recommended)" ON \
+        "DISABLE_MONITORING"       "Disable node monitoring"    OFF \
+        3>&1 1>&2 2>&3)
+
+    RC=$?
+    if [[ $RC -ne 0 ]]; then
+        echo "Installation cancelled"
+        exit 1
+    fi
+
+    read -a RESULTS_ARRAY <<< "$RESULTS"
+    for CHOICE in "${RESULTS_ARRAY[@]}"
+    do
+        case $CHOICE in
+            '"INSTALL_DOCKER"')
+                echo "install_docker: true" >>"$INSTALLER_OVERRIDE_FILE"
+                ;;
+            '"INSTALL_NGINX"')
+                echo "install_nginx: true" >>"$INSTALLER_OVERRIDE_FILE"
+                ;;
+            '"SKIP_FIREWALL_CONFIG"')
+                echo "configure_firewall: false" >>"$INSTALLER_OVERRIDE_FILE"
+                ;;
+            '"DISABLE_MONITORING"')
+                SKIP_TAGS+=",monitoring_role"
+                echo "disable_monitoring: true" >>"$INSTALLER_OVERRIDE_FILE"
+                ;;
+            '"ENABLE_HAPROXY"')
+                echo "lb_bind_addresses: ['0.0.0.0']" >>"$INSTALLER_OVERRIDE_FILE"
+                ;;
+            *)
+                ;;
+        esac
+    done
+
+    if [[ -n "$RESULTS" ]]; then
+        RESULTS_MSG=$(echo "$RESULTS"|sed 's/ /\n/g')
+        if ! (whiptail --title "Confirmation" \
+                 --yesno "You chose:\n\n$RESULTS_MSG\n\nPlease confirm you want to proceed with the installation?" \
+                 --defaultno \
+                 16 78); then
+            exit 1
+        fi
+    fi
+    INSTALL_OPTIONS+=" $SKIP_TAGS"
+}
+
 # Get primary IP from ICanHazIP, if it does not validate, fallback to local hostname
 function set_primary_ip()
 {
@@ -523,6 +583,9 @@ fi
 # Clone the repository (optional branch)
 git clone $GIT_OPTIONS https://github.com/nuriel77/hornet-playbook.git
 cd "${HORNET_PLAYBOOK_DIR}"
+
+# Let user choose installation add-ons
+set_selections
 
 # Get the administrators username
 set_admin_username
