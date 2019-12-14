@@ -84,6 +84,24 @@ haproxy_whitelist:
   - 127.0.0.1
 #   - 10.20.30.40/22 # -> example IP with cidr notation
 
+# When using distributed LB
+# Haproxy stats port with https
+haproxy_stats_https: false
+
+# Allowed concurrent connections to all hornet backends
+# (pow and default)
+haproxy_hornet_max_connections: 360
+
+# Allowed concurrent connections to PoW backend
+max_connections_pow_backend: 180
+
+# Allowed concurrent connection to default backend (no PoW)
+max_connections_backend: 180
+
+# Enable remote auth with password.
+# This will only allow connections using basic auth.
+haproxy_remote_auth: false
+
 # Commands to deny access to
 haproxy_deny_regex: '(get|remove|add)Neighbors|attachToTangle|interruptAttachingToTangle'
 

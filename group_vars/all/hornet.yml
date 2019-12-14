@@ -1,12 +1,12 @@
 hornet_git_url: https://github.com/gohornet/hornet.git
 hornet_releases_url: https://api.github.com/repos/gohornet/hornet/releases
 hornet_git_dest: /opt/hornet
-hornet_ports:
-  - {port: 15600, proto: tcp}
-  - {port: 14625, proto: tcp}
 
+# Docker image
 hornet_image: gohonet/hornet
+# Hornet version
 hornet_version: latest
+
 hornet_user: hornet
 hornet_group: hornet
 hornet_home_path: /var/lib/hornet
@@ -15,13 +15,17 @@ hornet_config: "{{ hornet_home_path }}/config.json"
 hornet_db_tar: "{{ hornet_home_path }}/latest-export.gz.bin"
 hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
 
+# Neighbors
 hornet_neighbors:
   - identity: example1.neighbor.com:15600
     preferIPv6: false
   - identity: example2.neighbor.com:15600
     preferIPv6: false
 
+# Enable hornet API auth.
+# The default node's username and password are used.
 hornet_api_auth_enabled: false
+
 hornet_disable_plugins: []
 hornet_enable_plugins: []
 hornet_permit_remote_access_list:
@@ -43,57 +47,55 @@ hornet_username: hornet
 # Base directory where hornet is installed and runs from
 hornet_basedir: /var/lib/hornet
 
-# HORNET configuration dir
-hornet_configdir: /etc/hornet
+# Ports used by hornet
+hornet_ports:
+  peering:
+    port: 15600
+    proto: tcp
+    allow: yes
+  api:
+    port: 14265
+    proto: tcp
+    allow: no
+  zmq:
+    port: 5556
+    proto: tcp
+    allow: no
 
-# The TCP port on which HORNET listens for API calls and allows for light wallets to connect to
-hornet_api_port: "14265"
+# Hornet API port address bind.
+# If you are using a proxy, leave
+# this is as it is.
+hornet_api_address: "127.0.0.1"
 
-# The address to bind on (interface on your node)
+# The TCP port on which hornet listens for API calls and allows for light wallets to connect to
+hornet_api_port: "{{ hornet_ports.api.port }}"
+
+# The peering address to listen on (interface on your node)
 # 0.0.0.0 means all interfaces
-hornet_tcp_port_bind_address: "0.0.0.0"
+hornet_peering_address: "0.0.0.0"
 
 # The TCP neighbor peering port
-hornet_tcp_port: "15600"
+hornet_peering_port: "{{ hornet_ports.peering.port }}"
 
-# HORNET ZMQ port
-hornet_zmq_port: "5556"
+# Hornet autopeering enabled
+hornet_auto_peering_enabled: false
 
-# HORNET ZMQ bind address
-hornet_zmq_bind: 127.0.0.1
+# Hornet max neighbors
+hornet_max_neighbors: 5
 
-# HORNET ZMQ enabled (extra metrics from HORNET)
+# Hornet ZMQ port
+hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
+
+# Hornet ZMQ bind address
+hornet_zmq_bind: "127.0.0.1"
+
+# Hornet ZMQ enabled (extra metrics from hornet)
 hornet_zmq_enabled: true
 
 # Set openfiles limit
-hornet_open_files_limit: 65535
+hornet_nofile_limit: "65535"
 
 # Exclude the commands below from the API.
 # Applied only to connections other than localhost/127.0.0.1
+# Note: if you are using haproxy, limits are set there.
 hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
-
-# Let the hornet_api_port bind to all interfaces (0.0.0.0).
-# `true` is necessary in order to allow external wallets/APIs to connect without tunneling.
-# If set to `false` it will only bind to localhost (127.0.0.1)
-api_port_remote: false
-
-# When using distributed LB
-# Haproxy stats port with https
-haproxy_stats_https: false
-
-# Load balancer max connections (all backends)
-lb_max_connections: 720
-
-# Allowed concurrent connections to all hornet backends
-# (pow and default)
-haproxy_hornet_max_connections: 360
-
-# Allowed concurrent connections to PoW backend
-max_connections_pow_backend: 180
-
-# Allowed concurrent connection to default backend (no PoW)
-max_connections_backend: 180
-
-# Enable remote auth with password.
-# This will only allow connections using basic auth.
-haproxy_remote_auth: false

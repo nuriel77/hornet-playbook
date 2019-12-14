@@ -1,10 +1,10 @@
-- name: allow hornet ports in firewall
+- name: configure hornet ports in firewall
   ufw:
-    rule: allow
+    rule: "{% if hornet_ports[item].allow|bool %}allow{% else %}deny{% endif %}"
     direction: in
-    proto: "{{ item.proto }}"
-    port: "{{ item.port }}"
-  with_items: "{{ hornet_ports }}"
+    proto: "{{ hornet_ports[item].proto }}"
+    port: "{{ hornet_ports[item].port }}"
+  with_items: "{{ hornet_ports.keys() }}"
 
 - name: allow ssh port firewall
   ufw:

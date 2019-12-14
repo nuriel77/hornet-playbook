@@ -4,10 +4,10 @@
     state: started
     enabled: yes
 
-- name: allow hornet tcp ports in firewall
+- name: configure hornet tcp ports in firewall
   firewalld:
-    port: "{{ item.port }}/{{ item.proto }}"
+    port: "{{ hornet_ports[item].port }}/{{ hornet_ports[item].proto }}"
+    state: "{% if hornet_ports[item].allow|bool %}enabled{% else %}disabled{% endif %}"
     permanent: true
-    state: enabled
     immediate: yes
-  with_items: "{{ hornet_ports }}"
+  with_items: "{{ hornet_ports.keys() }}"

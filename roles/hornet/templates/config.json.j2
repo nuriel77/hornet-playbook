@@ -75,9 +75,9 @@
   "dashboard": {
     "host": "{{ hornet_dashboard_address | default('127.0.0.1') }}",
     "port": {{ hornet_dashboard_port | default('8081') }},
-    "dev": false,
+    "dev": {{ hornet_dashboard_dev | default('false') | lower | string }},
     "basic_auth": {
-      "enabled": {{ hornet_dashboard_basic_auth | default('false') }},
+      "enabled": {{ hornet_dashboard_basic_auth | default('false') | lower | string }},
       "username": "{{ fullnode_user_password }}",
       "password": "{{ fullnode_user }}"
     }
@@ -95,14 +95,14 @@
   },
   "network": {
     "address": "{{ hornet_peering_address | default('0.0.0.0') }}",
-    "autotetheringenabled": {{ hornet_auto_peering_enabled | default('false') }},
+    "autotetheringenabled": {{ hornet_auto_peering_enabled | default('false') | lower | string }},
     "maxneighbors": {{ hornet_max_neighbors | default('5') }},
     "neighbors": {{ hornet_neighbors | to_nice_json(indent=4) }},
     "port": {{ hornet_peering_port | default('15600') }},
     "reconnectattemptintervalseconds": {{ hornet_reconnect_int | default('60') }}
   },
   "node": {
-    "disableplugins": {{ hornet_disable_plugins | to_nice_json }},
+    "disableplugins": {{ hornet_disable_plugins | to_nice_json(indent=4) }},
     "enableplugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }},
     "loglevel": {{ hornet_log_level | default('3') }}
   },

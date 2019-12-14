@@ -41,7 +41,3 @@
         hornet_image_stat.rc == 1 and
         (images_from_master is not defined or
          images_from_master|bool == False)
-
-- name: clean dangling images msg
-  debug:
-    msg: 'To clean un-used docker buidl images use: docker rmi -f $(docker images -f "dangling=true" -q)'

@@ -15,6 +15,31 @@
 - name: scripts block
   block:
 
+    - set_fact:
+        system_settings_locale: "{{ add_locale | default('en_US.UTF-8') }}"
+
+    - name: generate required locale Ubuntu/Debian
+      locale_gen:
+        name: "{{ system_settings_locale }}"
+        state: present
+      ignore_errors: yes
+      tags: gen_locale
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: check if locale exists
+      shell: "/usr/bin/locale -a | grep -i {{ system_settings_locale | regex_replace('-', '') | quote }}"
+      register: found_locale
+      changed_when: no
+      failed_when: no
+      when: ansible_distribution == 'CentOS'
+
+    - name: create locale
+      command: "localedef -i {{ system_settings_locale | regex_replace('(.*)\\..*', '\\1') | quote }} -f {{ system_settings_locale | regex_replace('.*\\.(.*)', '\\1') | quote }} {{ system_settings_locale | quote }}"
+      ignore_errors: yes
+      when:
+        - ansible_distribution == 'CentOS'
+        - found_locale.rc != 0
+
     - name: copy horc
       copy:
         src: files/horc
@@ -23,6 +48,12 @@
         owner: root
         group: root
 
+    - name: download nbctl
+      get_url:
+        url: https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/nbctl
+        dest: /usr/bin/nbctl
+        mode: 0755
+
     - name: download ps_mem
       get_url:
         url: https://raw.githubusercontent.com/pixelb/ps_mem/master/ps_mem.py
@@ -30,11 +61,44 @@
         mode: 0755
       ignore_errors: yes
 
+    - name: download iritop requirements
+      get_url:
+        url: https://raw.githubusercontent.com/maeck70/iritop/master/requirements.txt
+        dest: /tmp/iritop-requirements.txt
+        force: yes
+      ignore_errors: yes
+
+    - name: link python3 to python
+      file:
+        src: /usr/bin/python3
+        dest: /usr/bin/python
+        force: no
+        state: link
+      when: "ansible_distribution_major_version == '8'"
+
     - name: ensure ~/.horc exists
       copy:
         dest: "{{ ansible_env.HOME }}/.horc"
         content: ""
         force: no
+
+    - name: config default ~/.nbctl
+      copy:
+        dest: "{{ ansible_env.HOME }}/.nbctl"
+        content: "api_version: {{ hornet_api_version | default('1') }}\nhost: http://127.0.0.1:{{ hornet_api_port }}\nfile: {{ hornet_home_path }}/config.json\n"
+        force: "{{ overwrite | default('no') }}"
+        backup: yes
+      tags:
+        - nbctl_config
+
+    - name: configure ~/.iritop
+      copy:
+        dest: "{{ ansible_env.HOME }}/.iritop"
+        content: "node: http://127.0.0.1:{{ hornet_api_port }}"
+        force: "{{ overwrite | default('no') }}"
+        backup: yes
+      tags:
+        - iritop_config
 
   tags:
     - scripts
@@ -142,6 +206,7 @@
     owner: "{{ hornet_user }}"
     group: "{{ hornet_group }}"
     force: "{{ overwrite | default('no') }}"
+  notify: restart hornet
   tags:
     - download_snapshot_db
 
