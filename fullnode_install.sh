@@ -496,9 +496,9 @@ EOF
     OUTPUT=$(cat <<EOF
 * A log of this installation has been saved to: $LOGFILE
 
-* You should be able to connect to IOTA Peer Manager and Grafana:
+* You should be able to connect to Hornet's Dashboard and Grafana:
 
-https://${PRIMARY_IP}:8812 and https://${PRIMARY_IP}:5554
+https://${PRIMARY_IP}:8081 and https://${PRIMARY_IP}:5555
 
 * Note that your IP might be different as this one has been auto-detected in best-effort.
 
