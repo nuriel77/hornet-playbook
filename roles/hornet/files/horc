@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.1.0
+VERSION_TEMP=0.1.1
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -110,10 +110,7 @@ function compare_versions() {
     local EVAL_STR=$2
     local SECOND_VERSION=$3
 
-    FIRST_VERSION=$(echo "$FIRST_VERSION" | tr -d 'v')
-    SECOND_VERSION=$(echo "$SECOND_VERSION" | tr -d 'v')
-
-    local GET_BOOL=$(python -c "from distutils.version import StrictVersion; print StrictVersion('$FIRST_VERSION') $EVAL_STR StrictVersion('$SECOND_VERSION')")
+    local GET_BOOL=$(python -c "from distutils.version import StrictVersion; print(StrictVersion('$FIRST_VERSION') $EVAL_STR StrictVersion('$SECOND_VERSION'))")
     if [[ "$GET_BOOL" == "True" ]]
     then
         return 0
