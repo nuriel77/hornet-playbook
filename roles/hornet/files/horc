@@ -12,6 +12,9 @@ fi
 
 clear
 
+[ -f "$HOME/.horc" ] && . "$HOME/.horc"
+[ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
+
 : "${EDITOR:=nano}"
 VERSION_TEMP=0.1.0
 __VERSION__=${VERSION_TEMP}
@@ -193,7 +196,14 @@ function enable_https() {
     # Enable haproxy https via variable override file
     echo "haproxy_https: True" > /opt/hornet-playbook/group_vars/all/z-haproxy-enable-https.yml
 
-    cd /opt/hornet-playbook && git pull && ansible-playbook -i "$INVENTORY_FILE" site.yml -v --tags=py_docker,hornet_ssl,consul_role,loadbalancer_role,certbot --skip-tags=consul_register_node -e overwrite=yes
+    cd /opt/hornet-playbook \
+      && git pull \
+      && ansible-playbook -i "$INVENTORY_FILE" \
+         site.yml -v \
+         --tags=py_docker,hornet_ssl,consul_role,loadbalancer_role,certbot \
+         --skip-tags=consul_register_node \
+         -e overwrite=yes
+
     if [[ $? -ne 0 ]]; then
         pause "Enabling HTTPS failed!!! Check output above for errors."
         clear
