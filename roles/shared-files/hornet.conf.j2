@@ -1,0 +1,38 @@
+upstream hornet_dashboard {
+    server {{ hornet_dashboard_address }}:{{ hornet_dashboard_internal_port }};
+}
+
+# Rate limit requestsi
+limit_req_zone $binary_remote_addr zone=hornet_dashboard:{{ nginx_shared_mem_rate_limit | default('2m') }} rate={{ nginx_req_per_sec | default('5') }}r/s;
+
+server {
+    limit_req zone=hornet_dashboard burst={{ vhost_nginx_burst_limit | default('20') }};
+    listen {{ hornet_dashboard_proxy_port }} default_server ssl http2;
+    server_name _;
+    server_tokens off;
+
+    # Redirect same port from http to https
+    # This directive is only used when using any
+    # port other than 80
+    error_page 497 https://$host:$server_port$request_uri;
+
+    # Here you would include the SSL directives
+    # or include a file containing the SSL directives
+    include /etc/nginx/conf.d/ssl.cfg;
+
+    # For password authentication use a htpasswd file
+    auth_basic "Restricted";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+
+    location /ws {
+        proxy_pass http://hornet_dashboard/ws;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+
+    location / {
+        proxy_pass http://hornet_dashboard;
+    }
+}

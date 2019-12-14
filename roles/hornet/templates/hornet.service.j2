@@ -1,0 +1,30 @@
+[Unit]
+Description=Hornet IOTA
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+TimeoutStopSec={{ hornet_timeout_stop | default('120') }}
+Restart=always
+EnvironmentFile=-{{ config_dir }}/hornet
+SuccessExitStatus={{ service_success_exit_status | default('143') }}
+ExecStartPre=-/bin/bash -c "/usr/bin/docker rm %p || /bin/true"
+ExecStart=/usr/bin/docker run \
+  --name %p \
+  --net=host \
+  --user={{ hornet_uid.stdout }} \
+  --cap-drop=ALL \
+  -v /etc/localtime:/etc/localtime:ro,Z \
+  -v {{ hornet_db_path }}:/app/mainnetdb:rw,Z \
+  -v {{ hornet_config }}:/app/config.json:ro,Z \
+  -v {{ hornet_db_tar }}:/app/latest-export.gz.bin:ro,Z \
+  --ulimit nofile={{ hornet_nofile_limit }}:{{ hornet_nofile_limit }} \
+  $DOCKER_OPTS \
+  ${HORNET_IMAGE}:${TAG} \
+  $OPTIONS
+ExecStop=/usr/bin/docker stop %p
+ExecReload=/usr/bin/docker restart %p
+
+[Install]
+WantedBy=multi-user.target

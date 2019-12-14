@@ -1,0 +1,29 @@
+- name: configure hornet ports in firewall
+  ufw:
+    rule: "{% if hornet_ports[item].allow|bool %}allow{% else %}deny{% endif %}"
+    direction: in
+    proto: "{{ hornet_ports[item].proto }}"
+    port: "{{ hornet_ports[item].port }}"
+  with_items: "{{ hornet_ports.keys() }}"
+
+- name: allow ssh port firewall
+  ufw:
+    rule: allow
+    direction: in
+    proto: tcp
+    port: "{{ ssh_port }}"
+
+- name: ufw default outgoing policy allowed
+  ufw:
+    direction: outgoing
+    policy: allow
+
+- name: ensure ufw started and default incoming policy denied
+  ufw:
+    state: enabled
+    direction: incoming
+    policy: deny
+
+- name: Set ufw logging
+  ufw:
+    logging: "{{ ufw_logging }}"

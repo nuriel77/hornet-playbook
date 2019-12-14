@@ -1,0 +1,43 @@
+- name: remove hornet image
+  block:
+
+    - name: "stopping hornet service, this might take a moment..."
+      systemd:
+        name: hornet.service
+        state: stopped
+      ignore_errors: yes
+
+    - name: delete hornet image
+      docker_image:
+        name: "{{ hornet_image }}"
+        tag: "{{ hornet_tag }}"
+        state: absent
+        force_absent: yes
+
+  when: remove_hornet_image|default(False)|bool
+
+- name: check hornet image exists
+  shell: "/usr/bin/docker images {{ hornet_image }}:{{ hornet_tag }} | grep -q ^hornet"
+  changed_when: False
+  register: hornet_image_stat
+  failed_when: "hornet_image_stat.rc > 1"
+
+- name: build hornet image, this can take a moment...
+  docker_image:
+    build:
+      path: "{{ hornet_git_dest }}"
+      pull: no
+    name: "{{ hornet_image }}"
+    tag: "{{ hornet_tag }}"
+    source: build
+  notify:
+    - restart hornet
+  tags: hornet_image_build
+  register: build_image_status
+  until: build_image_status is succeeded
+  retries: 3
+  delay: 2
+  when: >
+        hornet_image_stat.rc == 1 and
+        (images_from_master is not defined or
+         images_from_master|bool == False)

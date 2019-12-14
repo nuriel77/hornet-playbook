@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: "Check ansible version >=2.8.0"
+      assert:
+        msg: "Ansible version 2.8.0 or above is required to run this playbook"
+        that:
+          - ansible_version.string is version("2.8.0", ">=")
+      tags:
+        - always
+        - check_version
+      run_once: yes
+      ignore_errors: "{{ ignore_assert_errors }}"
+  vars:
+    ansible_connection: local
+
+- hosts: all
+  gather_facts: true
+  roles:
+    - common
+
+- hosts: fullnode
+  gather_facts: true
+  become: true
+  become_method: sudo
+  any_errors_fatal: true
+  roles:
+    - docker
+    - hornet
+    - nginx
+    - haproxy
+    - monitoring
+    - cleanup

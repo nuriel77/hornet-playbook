@@ -1,0 +1,124 @@
+hornet_git_url: https://github.com/gohornet/hornet.git
+hornet_releases_url: https://api.github.com/repos/gohornet/hornet/releases
+hornet_git_dest: /opt/hornet
+
+# Docker image
+hornet_image: gohonet/hornet
+# Hornet version
+hornet_version: latest
+
+hornet_user: hornet
+hornet_group: hornet
+hornet_home_path: /var/lib/hornet
+hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
+hornet_config: "{{ hornet_home_path }}/config.json"
+hornet_db_tar: "{{ hornet_home_path }}/latest-export.gz.bin"
+hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
+
+# Neighbors
+hornet_neighbors:
+  - identity: example1.neighbor.com:15600
+    preferIPv6: false
+  - identity: example2.neighbor.com:15600
+    preferIPv6: false
+
+# Enable hornet API auth.
+# The default node's username and password are used.
+hornet_api_auth_enabled: false
+
+# Hornet plugins
+hornet_disable_plugins: []
+hornet_enable_plugins: []
+# Example:
+#hornet_enable_plugins:
+#  - ZeroMQ
+#  - Spammer
+#  - Monitor
+
+hornet_permit_remote_access_list:
+  - getNodeInfo
+  - getBalances
+  - checkConsistency
+  - getTransactionsToApprove
+  - getInclusionStates
+  - getNodeAPIConfiguration
+  - wereAddressesSpentFrom
+  - broadcastTransactions
+  - findTransactions
+  - storeTransactions
+  - getTrytes
+
+# Unprivileged user to run hornet with
+hornet_username: hornet
+
+# Base directory where hornet is installed and runs from
+hornet_basedir: /var/lib/hornet
+
+# Ports used by hornet
+# For now only peering port is not
+# running behind a proxy. Therefore
+# all the ports are not allowed to
+# connected to, and are either
+# served by a proxy or locally only.
+hornet_ports:
+  peering:
+    port: 15600
+    proto: tcp
+    allow: yes
+  api:
+    port: 14265
+    proto: tcp
+    allow: no
+  zmq:
+    port: 5556
+    proto: tcp
+    allow: no
+  dashboard:
+    port: 8081
+    proto: tcp
+    allow: yes
+
+# Hornet API port address bind.
+# If you are using a proxy, leave
+# this is as it is.
+hornet_api_address: "127.0.0.1"
+
+# The TCP port on which hornet listens for API calls and allows for light wallets to connect to
+hornet_api_port: "{{ hornet_ports.api.port }}"
+
+# The peering address to listen on (interface on your node)
+# 0.0.0.0 means all interfaces
+hornet_peering_address: "0.0.0.0"
+
+# The TCP neighbor peering port
+hornet_peering_port: "{{ hornet_ports.peering.port }}"
+
+# Hornet autopeering enabled
+hornet_auto_peering_enabled: false
+
+# Hornet max neighbors
+hornet_max_neighbors: 5
+
+# Hornet ZMQ port
+hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
+
+# Hornet ZMQ bind address
+hornet_zmq_bind: "127.0.0.1"
+
+# Set openfiles limit
+hornet_nofile_limit: "65535"
+
+# Exclude the commands below from the API.
+# Applied only to connections other than localhost/127.0.0.1
+# Note: if you are using haproxy, limits are set there.
+hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
+
+# Dashboard config
+# Keep the dashboard on 127.0.0.1 when running behind
+# a proxy like nginx.
+hornet_dashboard_address: 127.0.0.1
+hornet_dashboard_internal_port: "8087"
+hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
+
+# Only needs enabling if not served via nginx
+hornet_dashboard_basic_auth: false

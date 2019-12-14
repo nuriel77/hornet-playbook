@@ -1,0 +1,18 @@
+# Set to true to ignore preflight checks
+ignore_assert_errors: false
+
+# Minimum required memory on node
+min_required_memtotal_mb: 1024
+
+# For easy evaluations
+debian_family_list:
+  - Debian
+  - Ubuntu
+  - Raspbian
+
+redhat_family_list:
+  - Redhat
+  - CentOS
+
+# UFW logging: on, off, low, medium, high or full.
+ufw_logging: off

@@ -1,0 +1,44 @@
+- import_tasks: deps_apt.yml
+  tags:
+    - hornet_deps_apt
+  when:
+    - ansible_distribution in debian_family_list
+    - install_system_deps|default(False)|bool
+
+- import_tasks: deps_yum.yml
+  tags:
+    - hornet_deps_yum
+  when:
+    - ansible_distribution in redhat_family_list
+    - install_system_deps|default(False)|bool
+
+- import_tasks: pip.yml
+  tags:
+    - py_docker
+
+- name: set ip variable if not set
+  set_fact:
+    ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+  when: ip is not defined
+
+- import_tasks: firewalld.yml
+  tags:
+    - hornet_firewalld
+  when:
+    - ansible_distribution in redhat_family_list
+    - configure_firewall|default(False)|bool
+
+- import_tasks: ufw.yml
+  tags:
+    - hornet_ufw
+  when:
+    - ansible_distribution in debian_family_list
+    - configure_firewall|default(False)|bool
+
+- import_tasks: hornet.yml
+  tags:
+    - hornet_config
+
+- import_tasks: ssl.yml
+  tags:
+    - hornet_ssl

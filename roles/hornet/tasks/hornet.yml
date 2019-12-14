@@ -1,0 +1,216 @@
+- name: set variables centos
+  set_fact:
+    systemd_dir: /usr/lib/systemd/system
+    config_dir: /etc/sysconfig
+  when: ansible_distribution in redhat_family_list
+  tags: always
+
+- name: set variables ubuntu
+  set_fact:
+    systemd_dir: /etc/systemd/system
+    config_dir: /etc/default
+  when: ansible_distribution in debian_family_list
+  tags: always
+
+- name: scripts block
+  block:
+
+    - set_fact:
+        system_settings_locale: "{{ add_locale | default('en_US.UTF-8') }}"
+
+    - name: generate required locale Ubuntu/Debian
+      locale_gen:
+        name: "{{ system_settings_locale }}"
+        state: present
+      ignore_errors: yes
+      tags: gen_locale
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: check if locale exists
+      shell: "/usr/bin/locale -a | grep -i {{ system_settings_locale | regex_replace('-', '') | quote }}"
+      register: found_locale
+      changed_when: no
+      failed_when: no
+      when: ansible_distribution == 'CentOS'
+
+    - name: create locale
+      command: "localedef -i {{ system_settings_locale | regex_replace('(.*)\\..*', '\\1') | quote }} -f {{ system_settings_locale | regex_replace('.*\\.(.*)', '\\1') | quote }} {{ system_settings_locale | quote }}"
+      ignore_errors: yes
+      when:
+        - ansible_distribution == 'CentOS'
+        - found_locale.rc != 0
+
+    - name: copy horc
+      copy:
+        src: files/horc
+        dest: /usr/bin/horc
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: download nbctl
+      get_url:
+        url: https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/nbctl
+        dest: /usr/bin/nbctl
+        mode: 0755
+
+    - name: download ps_mem
+      get_url:
+        url: https://raw.githubusercontent.com/pixelb/ps_mem/master/ps_mem.py
+        dest: /usr/bin/ps_mem
+        mode: 0755
+      ignore_errors: yes
+
+    - name: download iritop requirements
+      get_url:
+        url: https://raw.githubusercontent.com/maeck70/iritop/master/requirements.txt
+        dest: /tmp/iritop-requirements.txt
+        force: yes
+      ignore_errors: yes
+
+    - name: link python3 to python
+      file:
+        src: /usr/bin/python3
+        dest: /usr/bin/python
+        force: no
+        state: link
+      when: "ansible_distribution_major_version == '8'"
+
+    - name: ensure ~/.horc exists
+      copy:
+        dest: "{{ ansible_env.HOME }}/.horc"
+        content: ""
+        force: no
+
+    - name: config default ~/.nbctl
+      copy:
+        dest: "{{ ansible_env.HOME }}/.nbctl"
+        content: "api_version: {{ hornet_api_version | default('1') }}\nhost: http://127.0.0.1:{{ hornet_api_port }}\nfile: {{ hornet_home_path }}/config.json\n"
+        force: "{{ overwrite | default('no') }}"
+        backup: yes
+      tags:
+        - nbctl_config
+
+    - name: configure ~/.iritop
+      copy:
+        dest: "{{ ansible_env.HOME }}/.iritop"
+        content: "node: http://127.0.0.1:{{ hornet_api_port }}"
+        force: "{{ overwrite | default('no') }}"
+        backup: yes
+      tags:
+        - iritop_config
+
+  tags:
+    - scripts
+
+- name: allow IPv4 forwarding in kernel
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: hornet source code
+  tags:
+    - hornet_source
+    - build_hornet_image
+  block:
+
+    - name: get latest hornet release
+      uri:
+        url: "{{ hornet_releases_url }}/latest"
+        return_content: yes
+      register: hornet_release_json
+
+    - name: get release tag
+      set_fact:
+        hornet_tag: >-
+          {%- if hornet_version == 'latest' -%}
+            {{ hornet_release_json.content | from_json | json_query('tag_name') }}
+          {%- else -%}
+            {{ hornet_version }}
+          {%- endif -%}
+
+    - name: clone hornet repository
+      git:
+        repo: '{{ hornet_git_url }}'
+        dest: '{{ hornet_git_dest }}'
+        version: '{{ hornet_tag }}'
+
+# User
+- name: add user to run hornet as
+  user:
+    name: "{{ hornet_user }}"
+    shell: /sbin/nologin
+    createhome: no
+    home: "{{ hornet_home_path }}"
+  tags:
+    - hornet_user
+
+- name: get hornet user uid
+  shell: "echo -n $(id -u {{ hornet_user }})"
+  changed_when: false
+  register: hornet_uid
+  tags:
+    - hornet_create_container
+    - get_hornet_uid
+
+- name: hornet paths
+  file:
+    state: directory
+    mode: 0700
+    owner: "{{ hornet_user }}"
+    group: "{{ hornet_group }}"
+    path: "{{ item }}"
+  with_items:
+    - "{{ hornet_home_path }}"
+    - "{{ hornet_db_path }}"
+
+# hornet system config
+- name: copy hornet environment config file
+  template:
+    src: templates/hornet.sysconfig.j2
+    dest: "{{ config_dir }}/hornet"
+    force: "{{ overwrite | default('no') }}"
+    backup: yes
+  notify:
+    - restart hornet
+
+- name: copy hornet systemd file
+  template:
+    src: templates/hornet.service.j2
+    dest: "{{ systemd_dir }}/hornet.service"
+  tags:
+    - hornet_service_file
+  notify:
+    - restart hornet
+
+- name: copy hornet config file
+  template:
+    src: templates/config.json.j2
+    dest: "{{ hornet_home_path }}/config.json"
+    mode: 0600
+    owner: "{{ hornet_user }}"
+    group: "{{ hornet_group }}"
+    force: "{{ overwrite | default('no') }}"
+    backup: yes
+  tags: hornet_config_file
+  notify: restart hornet
+
+- name: download hornet snapshot DB (can take a while)
+  get_url:
+    url: "{{ hornet_db_source }}"
+    dest: "{{ hornet_db_tar }}"
+    mode: 0644
+    owner: "{{ hornet_user }}"
+    group: "{{ hornet_group }}"
+    force: "{{ overwrite | default('no') }}"
+  notify: restart hornet
+  tags:
+    - download_snapshot_db
+
+# Image
+- name: build hornet image task
+  import_tasks: image-hornet.yml
+  tags: build_hornet_image

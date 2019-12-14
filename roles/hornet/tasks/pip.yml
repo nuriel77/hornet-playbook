@@ -1,0 +1,5 @@
+- name: install python deps via pip
+  pip:
+    name:
+     - docker
+     - jmespath

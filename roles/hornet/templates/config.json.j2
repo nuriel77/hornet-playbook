@@ -1,0 +1,119 @@
+{
+  "useProfile": "default",
+  "profiles": {
+    "custom": {
+      "caches": {
+        "requestQueue": {
+          "size": 100000
+        },
+        "approvers": {
+          "size": 100000,
+          "evictionSize": 1000
+        },
+        "bundles": {
+          "size": 20000,
+          "evictionSize": 1000
+        },
+        "milestones": {
+          "size": 1000,
+          "evictionSize": 100
+        },
+        "spentAddresses": {
+          "size": 5000,
+          "evictionSize": 1000
+        },
+        "transactions": {
+          "size": 50000,
+          "evictionSize": 1000
+        },
+        "incomingTransactionFilter": {
+          "size": 5000
+        },
+        "refsInvalidBundle": {
+          "size": 10000
+        }
+      },
+      "badger": {
+        "levelOneSize": 268435456,
+        "levelSizeMultiplier": 10,
+        "tableLoadingMode": 2,
+        "valueLogLoadingMode": 2,
+        "maxLevels": 7,
+        "maxTableSize": 67108864,
+        "numCompactors": 2,
+        "numLevelZeroTables": 5,
+        "numLevelZeroTablesStall": 10,
+        "numMemtables": 5,
+        "numVersionsToKeep": 1,
+        "syncWrites": true,
+        "compactLevel0OnClose": true,
+        "valueLogFileSize": 1073741823,
+        "valueLogMaxEntries": 1000000,
+        "valueThreshold": 32,
+        "logRotatesToFlush": 2,
+        "maxCacheSize": 50000000
+      }
+    }
+  },
+  "api": {
+    "auth": {
+      "password": "{% if hornet_api_auth_enabled|bool %}{{ fullnode_user_password }}{% endif %}",
+      "username": "{% if hornet_api_auth_enabled|bool %}{{ fullnode_user }}{% endif %}"
+    },
+    "permitRemoteAccess": {{ hornet_permit_remote_access_list | to_nice_json(indent=6) }},
+    "host": "{{ hornet_api_address | default('0.0.0.0') }}",
+    "maxbodylength": {{ hornet_max_body_length | default('1000000') }},
+    "maxfindtransactions": {{ hornet_max_find_transactions | default('100000') }},
+    "maxgettrytes": {{ hornet_max_get_trytes | default('1000') }},
+    "maxrequestslist": {{ hornet_max_requests_list | default('1000') }},
+    "port": {{ hornet_api_port | default('14265') }},
+    "remoteauth": ""
+  },
+  "compass": {
+    "loadLSMIAsLMI": false
+  },
+  "dashboard": {
+    "host": "{{ hornet_dashboard_address | default('127.0.0.1') }}",
+    "port": {{ hornet_dashboard_internal_port | default('8087') }},
+    "dev": {{ hornet_dashboard_dev | default('false') | lower | string }},
+    "basic_auth": {
+      "enabled": {{ hornet_dashboard_basic_auth | default('false') | lower | string }},
+      "username": "{{ fullnode_user_password }}",
+      "password": "{{ fullnode_user }}"
+    }
+  },
+  "db": {
+    "path": "mainnetdb"
+  },
+  "localsnapshots": {
+    "path": "latest-export.gz.bin"
+  },
+  "milestones": {
+    "coordinator": "{{ hornet_coo_address | default('EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9') }}",
+    "coordinatorsecuritylevel": {{ hornet_coo_security_level | default('2') }},
+    "numberofkeysinamilestone": {{ hornet_number_of_keys_in_milestone | default('23') }}
+  },
+  "network": {
+    "address": "{{ hornet_peering_address | default('0.0.0.0') }}",
+    "autotetheringenabled": {{ hornet_auto_peering_enabled | default('false') | lower | string }},
+    "maxneighbors": {{ hornet_max_neighbors | default('5') }},
+    "neighbors": {{ hornet_neighbors | to_nice_json(indent=4) }},
+    "port": {{ hornet_peering_port | default('15600') }},
+    "reconnectattemptintervalseconds": {{ hornet_reconnect_int | default('60') }}
+  },
+  "node": {
+    "disableplugins": {{ hornet_disable_plugins | to_nice_json(indent=4) }},
+    "enableplugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }},
+    "loglevel": {{ hornet_log_level | default('3') }}
+  },
+  "protocol": {
+    "mwm": {{ hornet_protocol_mwm | default('14') }}
+  },
+  "tipsel": {
+    "belowmaxdepthtransactionlimit": {{ hornet_belowmax_depth_tx_limit | default('20000') }},
+    "maxdepth": {{ hornet_max_depth | default('15') }}
+  },
+  "zmq": {
+    "port": {{ hornet_zmq_port | default('5556') }}
+  }
+}

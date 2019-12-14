@@ -1,0 +1,5 @@
+- name: destroy hornet network
+  docker_network:
+    name: "{{ hornet_net_name }}"
+    state: absent
+    force: yes
