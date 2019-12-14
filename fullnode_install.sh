@@ -326,7 +326,7 @@ function set_selections()
 
     RESULTS=$(whiptail --title "Installation Options" --checklist \
         --cancel-button "Exit" \
-        "\nPlease choose additional installation options.\n(Its perfectly okay to leave this as is).\n\
+        "\nPlease choose additional installation options.\n(It is perfectly okay to leave this as is).\n\
 Select/unselect options using space and click Enter to proceed.\n" 28 78 7 \
         "INSTALL_DOCKER"           "Install Docker runtime (recommended)" ON \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
