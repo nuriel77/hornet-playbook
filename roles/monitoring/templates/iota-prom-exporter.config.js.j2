@@ -11,7 +11,7 @@ module.exports = {
 
     // address where zmq is being served (example: '127.0.0.1:5556')
     // *** Leave blank if ZMQ is not enabled on IRI ***
-    zmq_url: '{% if 'ZeroMQ' hornet_enable_plugins %}127.0.0.1:{{ hornet_zmq_port }}{% endif %}',
+    zmq_url: '{% if 'ZeroMQ' in hornet_enable_plugins %}127.0.0.1:{{ hornet_zmq_port }}{% endif %}',
 
     // the frequency that this application will seek for new messages
     // and force a reconnect to the zmq queue if one is not found
