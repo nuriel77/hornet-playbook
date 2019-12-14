@@ -10,4 +10,4 @@
     state: "{% if hornet_ports[item].allow|bool %}enabled{% else %}disabled{% endif %}"
     permanent: true
     immediate: yes
-  with_items: "{{ hornet_ports.keys() }}"
+  with_items: "{{ hornet_ports.keys() | list }}"

@@ -4,7 +4,7 @@
     direction: in
     proto: "{{ hornet_ports[item].proto }}"
     port: "{{ hornet_ports[item].port }}"
-  with_items: "{{ hornet_ports.keys() }}"
+  with_items: "{{ hornet_ports.keys() | list }}"
 
 - name: allow ssh port firewall
   ufw:
