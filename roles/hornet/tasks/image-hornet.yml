@@ -27,12 +27,12 @@
     build:
       path: "{{ hornet_git_dest }}"
       pull: no
+      network: host
     name: "{{ hornet_image }}"
     tag: "{{ hornet_tag }}"
     source: build
   notify:
     - restart hornet
-  tags: hornet_image_build
   register: build_image_status
   until: build_image_status is succeeded
   retries: 3
