@@ -111,7 +111,7 @@ hornet_max_neighbors: 5
 hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
 
 # Hornet ZMQ bind address
-hornet_zmq_bind: "127.0.0.1"
+hornet_zmq_address: "127.0.0.1"
 
 # Set openfiles limit
 hornet_nofile_limit: "65535"

@@ -93,6 +93,11 @@
     "coordinatorsecuritylevel": {{ hornet_coo_security_level | default('2') }},
     "numberofkeysinamilestone": {{ hornet_number_of_keys_in_milestone | default('23') }}
   },
+  "monitor": {
+    "tanglemonitorpath": "tanglemonitor/frontend",
+    "domain": "{{ honet_monitor_domain | default('') }}",
+    "host": "{{ hornet_monitor_address | default('127.0.0.1') }}"
+  },
   "network": {
     "address": "{{ hornet_peering_address | default('0.0.0.0') }}",
     "autotetheringenabled": {{ hornet_auto_peering_enabled | default('false') | lower | string }},
@@ -113,7 +118,16 @@
     "belowmaxdepthtransactionlimit": {{ hornet_belowmax_depth_tx_limit | default('20000') }},
     "maxdepth": {{ hornet_max_depth | default('15') }}
   },
+  "spammer": {
+    "address": "HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999",
+    "depth": {{ hornet_spammer_depth | default('3') }},
+    "message": "Spamming with HORNET tipselect",
+    "tag": "HORNET99INTEGRATED99SPAMMER",
+    "tpsratelimit": {{ hornet_spammer_tpsratelimit | default('0.1') }},
+    "workers": {{ hornet_spammer_workers | default('1') }}
+  },
   "zmq": {
-    "port": {{ hornet_zmq_port | default('5556') }}
+    "port": {{ hornet_zmq_port | default('5556') }},
+    "host": "{{ hornet_zmq_address | default('127.0.0.1') }}"
   }
 }
