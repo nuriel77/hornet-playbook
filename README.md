@@ -28,8 +28,9 @@
 
 Tested on the following operating systems:
 
-* Ubuntu 18.04LTS
 * CentOS 7 and 8
+* Ubuntu 18.04LTS
+* Debian 10 "Buster"
 
 ## Recommendations
 
