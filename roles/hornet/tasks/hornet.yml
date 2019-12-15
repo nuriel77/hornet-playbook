@@ -143,6 +143,7 @@
         repo: '{{ hornet_git_url }}'
         dest: '{{ hornet_git_dest }}'
         version: '{{ hornet_tag }}'
+      when: hornet_profile != 'light'
 
 # User
 - name: add user to run hornet as
@@ -215,7 +216,14 @@
   tags:
     - download_snapshot_db
 
+# Binary
+- name: get hornet binary
+  import_tasks: binary-hornet.yml
+  tags: get_hornet_binary
+  when: hornet_profile == 'light'
+
 # Image
 - name: build hornet image task
   import_tasks: image-hornet.yml
   tags: build_hornet_image
+  when: hornet_profile != 'light'

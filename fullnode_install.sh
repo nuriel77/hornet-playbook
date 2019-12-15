@@ -339,8 +339,8 @@ function set_selections()
 
     RESULTS=$(whiptail --title "Installation Options" --checklist \
         --cancel-button "Exit" \
-        "\nPlease choose additional installation options.\n(It is perfectly okay to leave this as is).\n\
-Select/unselect options using space and click Enter to proceed.\n" 20 78 5 \
+        "\nPlease choose additional installation options.\nDefaults have been set according to your system's configuration:\nit is perfectly okay to leave this as is.\n\
+Select/unselect options using space and click Enter to proceed.\n" 24 78 5 \
         "INSTALL_DOCKER"           "Install Docker runtime ($INSTALL_DOCKER_MSG)" "$INSTALL_DOCKER_DEFAULT" \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
         "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
