@@ -11,7 +11,7 @@ After=network-online.target
 [Service]
 {% if hornet_profile != 'light' %}
 TimeoutStartSec=0
-TimeoutStopSec={{ hornet_timeout_stop | default('120') }}
+TimeoutStopSec=${TIMEOUT_STOP_SEC}
 Restart=always
 EnvironmentFile=-{{ config_dir }}/hornet
 SuccessExitStatus={{ service_success_exit_status | default('143') }}
@@ -42,7 +42,7 @@ ExecStart={{ hornet_home_path }}/bin/hornet-${TAG} $OPTIONS
 Restart=on-failure
 RestartSec=10
 KillMode=process
-TimeoutStopSec={{ hornet_timeout_stop | default('120') }}
+TimeoutStopSec=${TIMEOUT_STOP_SEC}
 LimitNOFILE={{ hornet_nofile_limit }}
 
 StandardOutput=syslog
