@@ -42,6 +42,11 @@
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - ansible_distribution_release == 'bionic'
 
+- name: rasbpian override repository configuration
+  set_fact:
+    docker_apt_repository: "deb [arch=armhf] https://download.docker.com/linux/raspbian {{ ansible_distribution_release }} {{ rasbpian_build | default('stable') }}"
+  when: ansible_lsb.id == 'Raspbian'
+
 - name: Add Docker repository.
   apt_repository:
     repo: "{{ docker_apt_repository }}"
