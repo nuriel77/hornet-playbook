@@ -15,6 +15,10 @@ hornet_config: "{{ hornet_home_path }}/config.json"
 hornet_db_tar: "{{ hornet_home_path }}/latest-export.gz.bin"
 hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
 
+# How long to wait (seconds) for hornet to
+# gracefully stop. This applies for restart/stop.
+hornet_timeout_stop: 600
+
 # Neighbors
 hornet_neighbors:
   - identity: example1.neighbor.com:15600
