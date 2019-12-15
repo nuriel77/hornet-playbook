@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.1.1
+VERSION_TEMP=0.1.2
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -106,9 +106,9 @@ function set_dist() {
 }
 
 function compare_versions() {
-    local FIRST_VERSION=$1
+    local FIRST_VERSION=$(echo "$1" | tr -d 'v')
     local EVAL_STR=$2
-    local SECOND_VERSION=$3
+    local SECOND_VERSION=$(echo "$3" | tr -d 'v')
 
     local GET_BOOL=$(python -c "from distutils.version import StrictVersion; print(StrictVersion('$FIRST_VERSION') $EVAL_STR StrictVersion('$SECOND_VERSION'))")
     if [[ "$GET_BOOL" == "True" ]]
@@ -309,7 +309,7 @@ function get_latest_hornet_commit {
 }
 
 function get_latest_hornet_release {
-    curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name | tr -d '"v,'
+    curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name
 }
 
 function upgrade_hornet() {

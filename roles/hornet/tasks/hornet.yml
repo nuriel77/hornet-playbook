@@ -135,7 +135,7 @@
           {%- if hornet_version == 'latest' -%}
             {{ hornet_release_json.content | from_json | json_query('tag_name') }}
           {%- else -%}
-            {{ hornet_version }}
+            {%- if hornet_version[0] != 'v' -%}v{%- endif -%}{{ hornet_version }}
           {%- endif -%}
 
     - name: clone hornet repository
@@ -178,7 +178,6 @@
   template:
     src: templates/hornet.sysconfig.j2
     dest: "{{ config_dir }}/hornet"
-    force: "{{ overwrite | default('no') }}"
     backup: yes
   notify:
     - restart hornet
