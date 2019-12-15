@@ -125,7 +125,7 @@ You can also replace `start` with `stop` or `restart`.
 Hornet logs follow:
 
 ```sh
-journalctl -u goshimmer -e -f
+journalctl -u hornet -e -f
 ```
 (omit the `-f` for not to follow the logs "live")
 
