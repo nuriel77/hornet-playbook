@@ -8,6 +8,7 @@
    * [Requirements](#requirements)
    * [Recommendations](#recommendations)
    * [Installation](#installation)
+     * [For Development](#for-development)
    * [Docker Usage Commands](#docker-usage-commands)
      * [Docker Images](#docker-images)
      * [View Docker Containers](#view-docker-containers)
@@ -27,8 +28,9 @@
 
 Tested on the following operating systems:
 
-* Ubuntu 18.04LTS
 * CentOS 7 and 8
+* Ubuntu 18.04LTS
+* Debian 10 "Buster"
 
 ## Recommendations
 
@@ -50,6 +52,17 @@ The installation will:
 * Configure basic security (firewalls) and open all required ports for Hornet to operate.
 * Install nginx as a reverse proxy to access Hornet's Dashboard.
 * Add some helpful tools, e.g.: `horc` and `nbctl`.
+
+### For Development
+
+If you are working on a fork in a feature branch or happen to directly contribute to this repository you can run the installer pointing it to the appropriate branch, e.g.:
+```sh
+GIT_OPTIONS="-b new/feature-branch" bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/master/fullnode_install.sh)
+```
+If you are also working on the `fullnode_install.sh` you maybe have to rename `master` in the URL to the branch name as well, e.g.:
+```sh
+GIT_OPTIONS="-b new/feature-branch" bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/new/feature-branch/fullnode_install.sh)
+```
 
 ## Docker Usage Commands
 

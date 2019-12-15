@@ -15,6 +15,10 @@ hornet_config: "{{ hornet_home_path }}/config.json"
 hornet_db_tar: "{{ hornet_home_path }}/latest-export.gz.bin"
 hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
 
+# How long to wait (seconds) for hornet to
+# gracefully stop. This applies for restart/stop.
+hornet_timeout_stop: 900
+
 # Neighbors
 hornet_neighbors:
   - identity: example1.neighbor.com:15600
@@ -107,7 +111,7 @@ hornet_max_neighbors: 5
 hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
 
 # Hornet ZMQ bind address
-hornet_zmq_bind: "127.0.0.1"
+hornet_zmq_address: "127.0.0.1"
 
 # Set openfiles limit
 hornet_nofile_limit: "65535"
