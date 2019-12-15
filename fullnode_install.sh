@@ -37,6 +37,7 @@ fi
 declare -g INSTALL_OPTIONS
 declare -g HORNET_PLAYBOOK_DIR="/opt/hornet-playbook"
 declare -g INSTALLER_OVERRIDE_FILE="${HORNET_PLAYBOOK_DIR}/group_vars/all/z-installer-override.yml"
+declare -g PLAYBOOK_LIGHT="false"
 
 clear
 cat <<'EOF'
@@ -324,15 +325,27 @@ function set_selections()
     local RC RESULTS RESULTS_ARRAY CHOICE SKIP_TAGS
     SKIP_TAGS="--skip-tags=_"
 
+    if [[ "$PLAYBOOK_LIGHT" = true ]]
+    then
+        INSTALL_DOCKER_DEFAULT="OFF"
+        INSTALL_DOCKER_MSG="not recommended on Raspbian"
+        DISABLE_MONITORING_DEFAULT="ON"
+        DISABLE_MONITORING_MSG=" (recommended)"
+    else
+        INSTALL_DOCKER_DEFAULT="ON"
+        INSTALL_DOCKER_MSG="recommended"
+        DISABLE_MONITORING_DEFAULT="OFF"
+    fi
+
     RESULTS=$(whiptail --title "Installation Options" --checklist \
         --cancel-button "Exit" \
         "\nPlease choose additional installation options.\n(It is perfectly okay to leave this as is).\n\
 Select/unselect options using space and click Enter to proceed.\n" 20 78 5 \
-        "INSTALL_DOCKER"           "Install Docker runtime (recommended)" ON \
+        "INSTALL_DOCKER"           "Install Docker runtime ($INSTALL_DOCKER_MSG)" "$INSTALL_DOCKER_DEFAULT" \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
         "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
         "ENABLE_HAPROXY"           "Enable HAProxy (recommended)" ON \
-        "DISABLE_MONITORING"       "Disable node monitoring"    OFF \
+        "DISABLE_MONITORING"       "Disable node monitoring${}" "$DISABLE_MONITORING_DEFAULT" \
         3>&1 1>&2 2>&3)
 
     RC=$?
@@ -399,12 +412,16 @@ function display_requirements_url() {
 function check_arch() {
     # Check architecture
     ARCH=$(uname -m)
-    local REGEXP="x86_64|armv7l"
+    local REGEXP="x86_64|armv7l|armv8l"
     if [[ ! "$ARCH" =~ $REGEXP ]]; then
         echo "ERROR: $ARCH architecture not supported"
         display_requirements_url
         exit 1
     fi
+}
+
+function set_playbook_light() {
+    PLAYBOOK_LIGHT="true"
 }
 
 function set_ssh_port() {
@@ -561,6 +578,7 @@ elif [[ "$OS" =~ ^Raspbian ]]; then
         exit 1
     fi
     check_arch
+    set_playbook_light
     # Same setup for respbian as debian
     init_debian
 else
