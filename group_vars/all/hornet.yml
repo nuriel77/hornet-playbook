@@ -17,7 +17,7 @@ hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
 
 # How long to wait (seconds) for hornet to
 # gracefully stop. This applies for restart/stop.
-hornet_timeout_stop: 600
+hornet_timeout_stop: 900
 
 # Neighbors
 hornet_neighbors:
