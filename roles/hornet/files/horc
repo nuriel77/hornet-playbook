@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.1.2
+VERSION_TEMP=0.1.3
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -444,7 +444,7 @@ function get_db() {
                  --yesno "Download new database from '$DB_SOURCE'?\n\nUpdated: ${LAST_UPDATED}, size: ${FILE_SIZE}\n\n(TIP: for long running tasks consider running hornetc in a screen session)" \
                  16 $WIDTH) then
         # This command will stop hornet, remove older database directories,
-        # extract the database (on the fly) set correct user ownership and start IRI up again.
+        # extract the database (on the fly) set correct user ownership and start HORNET up again.
         echo "Stopping hornet first, removing old database files and commencing download/extract of database files ..."
         systemctl stop hornet \
           && rm -rf /var/lib/hornet/{mainnetdb*,*bin} \
@@ -463,7 +463,7 @@ function get_db() {
             clear
             return 1
         else
-            pause "Done! Please check IRI's status and logs to verify it is error free."
+            pause "Done! Please check HORNET's status and logs to verify it is error free."
             clear
         fi
     fi
@@ -694,6 +694,161 @@ function edit_config() {
         return 0
     else
         return 1
+    fi
+}
+
+### Neighbors ###
+function add_neighbors() {
+    local NEIGHBORS
+    local HEIGHT
+    local NBCTL_OUTPUT
+    local RC
+    local HORNET_CONFIG
+
+    NEIGHBORS=$(whiptail --inputbox "Enter a list of neighbors separated by space:" 8 $WIDTH --title "Add Neighbors" 3>&1 1>&2 2>&3)
+    RC=$?
+    if [[ $RC -ne 0 ]]; then
+        return
+    fi
+
+    ADD_LIST=$(echo "$NEIGHBORS" | sed 's/  */ /g' | sed 's/ / -n /g' | sed 's/^\(.*\)/-n \1/')
+    if ! (echo "$ADD_LIST" | egrep -q "tcp"); then
+        whiptail --title "Invalid Input" \
+                 --msgbox "Invalid input provided. Please check the syntax you provided is valid." \
+                  8 $WIDTH
+        return
+    fi
+
+    HEIGHT=$(expr $(echo "$NEIGHBORS"|tr ' ' '\n'|wc -l) + 8)
+    NEIGHBORS_TO_ADD=$(echo "$NEIGHBORS"|tr ' ' '\n')
+    if (whiptail --title "Add Neighbors" \
+                 --yesno "The following neighbor(s) will be added:\n\n$NEIGHBORS_TO_ADD" \
+                 $HEIGHT $WIDTH) then
+
+        # Set hornet config file if any configured
+        HORNET_CONFIG=$(grep ^file /root/.nbctl | cut -d: -f2)
+        [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
+
+        # Run nbctl command
+        NBCTL_OUTPUT=$(nbctl -a $ADD_LIST $HORNET_CONFIG 2>&1)
+        RC=$?
+        if [[ $RC -eq 0 ]]; then
+            HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 7)
+            whiptail --title "Added Neighbors" \
+                     --msgbox "$NBCTL_OUTPUT" \
+                    $HEIGHT $WIDTH
+        else
+            if echo "$NBCTL_OUTPUT" | grep -q "urllib2.URLError" ; then
+               NBCTL_OUTPUT="Failed to communicate with HORNET API port. Check if HORNET is active and if $HOME/.nbctl is configured correctly."
+            fi
+            HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 10)
+            whiptail --title "Adding Neighbors Failed" \
+                     --msgbox "Failure: $NBCTL_OUTPUT" \
+                     $HEIGHT $WIDTH
+        fi
+    fi
+}
+
+function remove_neighbors() {
+    local NEIGHBORS_ARRAY
+    local NEIGHBORS
+    local NEIGHBOR
+    local HEIGHT
+    local HORNET_CONFIG
+
+    echo "Getting neighbors list..."
+    NEIGHBORS=$(list_neighbors get | awk '{$1=$1}{print}' | tr -d ' ')
+    RC=$?
+    clear
+    if [[ $RC -ne 0 ]]; then
+        whiptail --title "Neighbors Failed" \
+                 --msgbox "Failed to get list of neighbors: $NEIGHBORS" \
+                 8 $WIDTH
+        return
+    fi
+    if [ "$NEIGHBORS" == "" ]; then
+        whiptail --title "No Neighbors" \
+                 --msgbox "There are no neighbors configured" \
+                 8 $WIDTH
+        return
+    fi
+    HEIGHT=$(expr $(echo "$NEIGHBORS"|wc -l) + 5)
+    NEIGHBORS_ARRAY=($(echo "$NEIGHBORS"))
+    local NEIGHBORS_ARRAY_INDEXED=($(echo "$NEIGHBORS" | awk '!/^ / && NF { print NR")"; print $1$2$3}'))
+    local NEIGHBOR_INDEX=$(whiptail --title "Remove neighbors" --menu "Choose a neighbor" 25 $WIDTH 16  "${NEIGHBORS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
+    if [ $? -eq 1 ]; then
+        return
+    fi
+
+    local NEIGHBOR_INX=$(echo "$NEIGHBOR_INDEX" | cut -d')' -f1)
+    local NEIGHBOR_INX=$(expr $NEIGHBOR_INX - 1)
+    local TO_REMOVE="${NEIGHBORS_ARRAY[$NEIGHBOR_INX]}"
+    local SCHEME=$(echo "$TO_REMOVE"|cut -d'/' -f2|cut -d '|' -f1)
+    local ADDRESS=$(echo "$TO_REMOVE"|cut -d'/' -f1)
+    local DOMAIN="($(echo "$TO_REMOVE" | cut -d '|' -f2))"
+    [[ "$DOMAIN" == "(null)" ]] && DOMAIN=""
+
+    if (whiptail --title "Confirm removal" \
+                 --yesno "Are you sure you want to remove:\n\n${SCHEME}://${ADDRESS} ${DOMAIN}" \
+                 --defaultno \
+                 12 $WIDTH)
+    then
+        HORNET_CONFIG=$(grep ^file /root/.nbctl | cut -d: -f2)
+        [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
+        REMOVAL_OUTPUT=$(nbctl -r -n "${SCHEME}://${ADDRESS}" $HORNET_CONFIG 2>&1)
+        if [ $? -eq 0 ];then
+            whiptail --title "Removed successfully" \
+                     --msgbox "$REMOVAL_OUTPUT" \
+                     12 $WIDTH
+        else
+            HEIGHT=$(expr $(echo "$REMOVAL_OUTPUT"|wc -l) + 7)
+            whiptail --title "Remove failed!" \
+                     --msgbox "${REMOVAL_OUTPUT}" \
+                     $HEIGHT $WIDTH
+        fi
+    fi
+}
+
+function list_neighbors() {
+    local NEIGHBORS_QUERY
+    local NEIGHBORS
+    local HEIGHT
+    local RETURN_RES=$1
+
+    NEIGHBORS_QUERY=$(nbctl -l 2>&1)
+    RC=$?
+    if [[ $RC -ne 0 ]]; then
+        if echo "$NEIGHBORS_QUERY" | egrep -q "urllib..URLError|timeout|refused" ; then
+            NEIGHBORS_QUERY="Failed to communicate with HORNET API port. Check if HORNET is active and if $HOME/.nbctl is configured correctly."
+        else
+            NEIGHBORS_QUERY="Unknown error"
+        fi
+        if [ -n "$RETURN_RES" ]; then
+            echo "$NEIGHBORS_QUERY"
+            return 1
+        fi
+        HEIGHT=$(expr $(echo "$NEIGHBORS_QUERY"|wc -l) + 7)
+        whiptail --title "List neighbors failed" \
+                 --msgbox "$NEIGHBORS_QUERY" \
+                 $HEIGHT $WIDTH
+        return 1
+    else
+        NEIGHBORS=$(echo "$NEIGHBORS_QUERY" | jq -r '.neighbors[] | "\(.address)/\(.connectionType) | \(.domain)"' | column -c 80 -t)
+        if [ -n "$RETURN_RES" ]; then
+            echo "$NEIGHBORS"
+            return 0
+        fi
+
+        if [ "$NEIGHBORS" == "" ]; then
+            LENGTH=0
+        else
+            LENGTH=$(echo "$NEIGHBORS"|wc -l)
+            FOR_WINDOW_LENGTH=$(($(echo "$NEIGHBORS"|wc -l)*2))
+        fi
+        local HEIGHT=$(expr $FOR_WINDOW_LENGTH + 8)
+        whiptail --title "List Neighbors" \
+                 --msgbox "Total: ${LENGTH} neighbor(s)\n\n${NEIGHBORS}" \
+                 $HEIGHT $WIDTH
     fi
 }
 
@@ -1101,7 +1256,7 @@ function main_menu() {
     whiptail --title "HORC v${__VERSION__} - Hornet Configuration Menu" \
              --menu "$MENU" \
              --cancel-button "Exit" \
-             24 $WIDTH 15 \
+             25 $WIDTH 15 \
     "a)" "Update Hornet Software" \
     "b)" "Manage Services" \
     "c)" "Configure Files" \
@@ -1114,6 +1269,7 @@ function main_menu() {
     "j)" "Get Node Info" \
     "k)" "Show LatestMilestoneIndex" \
     "l)" "Get new snapshot DB" \
+    "m)" "Neighbors" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1189,6 +1345,11 @@ function run_main_menu() {
 
         "l)")
             get_db
+            run_main_menu
+            ;;
+
+        "m)")
+            neighbors
             run_main_menu
             ;;
 
