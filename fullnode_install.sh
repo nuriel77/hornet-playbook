@@ -345,7 +345,7 @@ Select/unselect options using space and click Enter to proceed.\n" 24 78 5 \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
         "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
         "ENABLE_HAPROXY"           "Enable HAProxy (recommended)" ON \
-        "DISABLE_MONITORING"       "Disable node monitoring${}" "$DISABLE_MONITORING_DEFAULT" \
+        "DISABLE_MONITORING"       "Disable node monitoring${DISABLE_MONITORING_MSG}" "$DISABLE_MONITORING_DEFAULT" \
         3>&1 1>&2 2>&3)
 
     RC=$?
