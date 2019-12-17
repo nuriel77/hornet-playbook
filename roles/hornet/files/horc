@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.1.3
+VERSION_TEMP=0.1.4
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -312,6 +312,20 @@ function get_latest_hornet_release {
     curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name
 }
 
+function check_new_hornet {
+    local HORNET_LATEST
+    local HORNET_VERSION
+
+    HORNET_LATEST=$(get_latest_hornet_release)
+    HORNET_VERSION=$(grep ^TAG "$SYSCONFIG_FILE" | cut -d= -f2)
+
+    if compare_versions $HORNET_VERSION '<' $HORNET_LATEST; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 function upgrade_hornet() {
     echo "Checking for updates..."
     local HORNET_LATEST
@@ -598,7 +612,7 @@ function sort_func() {
 
 function run_custom_updates(){
     # Find pending update files
-    readarray -t TO_RUN_UPDATES < <(find custom_updates/ -maxdepth 1 -type f -name '*_updates.sh')
+    readarray -t TO_RUN_UPDATES < <(find /opt/hornet-playbook/custom_updates/ -maxdepth 1 -type f -name '*_updates.sh')
 
     # Return if nothing to update
     ((${#TO_RUN_UPDATES[@]} == 0)) && { clear; return; }
@@ -1251,6 +1265,10 @@ function main_menu() {
     local MENU="Choose an option"
     if check_new_horc; then
         MENU="${MENU}\n(*HORC update available)"
+    fi
+
+    if check_new_hornet; then
+        MENU="${MENU}\n(*HORNET update available)"
     fi
 
     whiptail --title "HORC v${__VERSION__} - Hornet Configuration Menu" \
