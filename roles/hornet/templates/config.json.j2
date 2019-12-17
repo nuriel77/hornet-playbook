@@ -78,8 +78,8 @@
     "dev": {{ hornet_dashboard_dev | default('false') | lower | string }},
     "basic_auth": {
       "enabled": {{ hornet_dashboard_basic_auth | default('false') | lower | string }},
-      "username": "{{ fullnode_user_password }}",
-      "password": "{{ fullnode_user }}"
+      "password": "{{ fullnode_user_password }}",
+      "username": "{{ fullnode_user }}"
     }
   },
   "db": {
@@ -122,7 +122,7 @@
     "address": "HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999",
     "depth": {{ hornet_spammer_depth | default('3') }},
     "message": "Spamming with HORNET tipselect",
-    "tag": "HORNET99INTEGRATED99SPAMMER",
+    "tag": "HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES",
     "tpsratelimit": {{ hornet_spammer_tpsratelimit | default('0.1') }},
     "workers": {{ hornet_spammer_workers | default('1') }}
   },
