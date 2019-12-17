@@ -35,13 +35,17 @@ hornet_profile: default
 hornet_api_auth_enabled: false
 
 # Hornet plugins
-hornet_disable_plugins: []
 hornet_enable_plugins: []
 # Example:
 #hornet_enable_plugins:
 #  - ZeroMQ
 #  - Spammer
-#  - Monitor
+
+# By default disable all
+hornet_disable_plugins:
+  - ZeroMQ
+  - Spammer
+  - Monitor
 
 hornet_permit_remote_access_list:
   - getNodeInfo
