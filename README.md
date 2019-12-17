@@ -175,7 +175,6 @@ On the otherhand, you could probably run hornet-playbook alongside goshimmer-pla
 
 # Known Issues
 
-* The management/controller app `horc` neighbors' configuration cannot persist to file. This is still work in progress.
 * Due to the rapid development and changes to Hornet, the configuration file can break the existing configuration when upgrading.
 
 
