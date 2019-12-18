@@ -20,11 +20,11 @@ hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
 hornet_timeout_stop: 900
 
 # Neighbors
-hornet_neighbors:
-  - identity: example1.neighbor.com:15600
-    preferIPv6: false
-  - identity: example2.neighbor.com:15600
-    preferIPv6: false
+hornet_neighbors: []
+#  - identity: example1.neighbor.com:15600
+#    preferIPv6: false
+#  - identity: example2.neighbor.com:15600
+#    preferIPv6: false
 
 # Hornet run profile (e.g. default or light)
 # 'light' will consume less memory.
