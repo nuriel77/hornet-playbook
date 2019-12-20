@@ -121,7 +121,7 @@ grep ^TAG /etc/default/hornet
 
 In the file below we can specify the image and tag to use. In addition we can configure which command line arguments to pass to hornet:
 
-* On Ubuntu: `/etc/default/hornet`
+* On Ubuntu/Debian/Raspbian: `/etc/default/hornet`
 
 * On CentOS: `/etc/sysconfig/hornet`
 
@@ -164,6 +164,14 @@ The second step is to enable HTTPS certificate. Note that you must already have 
 Enabling a certificate will allow you to connect to your node with IOTA's official Trinity wallet.
 
 # Appendix
+
+## Hornet Plugins
+
+Some of Hornet's plugins can be enabled and disabled using the `horc` tool via the menu.
+
+Note about the Tangle Monitor plugin: it uses two ports: 4433 and 4434 where the first is for the API and the latter for the webserver/ws.
+
+You can access the Tangle Monitor using `https://[your-server's-address]:4434`. Once your node is fully synced you will start seeing data.
 
 ## Install Alongside IRI-Playbook
 
