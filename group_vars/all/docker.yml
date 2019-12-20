@@ -1,3 +1,5 @@
+install_docker: false
+
 # source: https://github.com/geerlingguy/ansible-role-docker/blob/dd0c6e0f8ee3aa5a9638d5318593fc80f2eaacfb/defaults/main.yml
 
 # Edition can be 'ce' (Community Edition) or 'ee' (Enterprise Edition).

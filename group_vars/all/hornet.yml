@@ -1,5 +1,7 @@
-hornet_git_url: https://github.com/gohornet/hornet.git
-hornet_releases_url: https://api.github.com/repos/gohornet/hornet/releases
+hornet_repo_name: gohornet/hornet
+hornet_git_url: "https://github.com/{{ hornet_repo_name }}.git"
+hornet_releases_url: "https://api.github.com/repos/{{ hornet_repo_name }}/releases"
+hornet_releases_download_url: "https://github.com/{{ hornet_repo_name }}/releases/download"
 hornet_git_dest: /opt/hornet
 
 # Docker image

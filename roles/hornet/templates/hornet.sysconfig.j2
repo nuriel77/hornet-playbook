@@ -3,12 +3,17 @@ TAG={{ hornet_tag }}
 
 # How long to wait for hornet to gracefully stop
 TIMEOUT_STOP_SEC={{ hornet_timeout_stop }}
-
+{% if hornet_profile != 'light' %}
 # hornet base image
 HORNET_IMAGE={{ hornet_image }}
 
 # Command line options to pass to hornet executable
-OPTIONS=""
+OPTIONS="-c config"
 
 # Optional options for Docker
 DOCKER_OPTS=""
+{% else %}
+
+# Command line options to pass to hornet executable
+OPTIONS="-c {{ hornet_home_path }}/config"
+{% endif %}

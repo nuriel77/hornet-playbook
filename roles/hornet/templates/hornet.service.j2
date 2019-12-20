@@ -1,9 +1,15 @@
 [Unit]
 Description=Hornet IOTA
+{% if hornet_profile != 'light' %}
 After=docker.service
 Requires=docker.service
+{% else %}
+Wants=network-online.target
+After=network-online.target
+{% endif %}
 
 [Service]
+{% if hornet_profile != 'light' %}
 TimeoutStartSec=0
 TimeoutStopSec=${TIMEOUT_STOP_SEC}
 Restart=always
@@ -25,6 +31,30 @@ ExecStart=/usr/bin/docker run \
   $OPTIONS
 ExecStop=/usr/bin/docker stop %p
 ExecReload=/usr/bin/docker restart %p
+{% else %}
+User={{ hornet_username }}
+Group={{ hornet_username }}
+WorkingDirectory={{ hornet_home_path }}
+Type=simple
+EnvironmentFile=-{{ config_dir }}/hornet
+ExecStart={{ hornet_home_path }}/bin/hornet-${TAG} $OPTIONS
+
+Restart=on-failure
+RestartSec=10
+KillMode=process
+TimeoutStopSec=${TIMEOUT_STOP_SEC}
+LimitNOFILE={{ hornet_nofile_limit }}
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=hornet
+
+# Restrict process
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=yes
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

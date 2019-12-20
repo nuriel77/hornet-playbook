@@ -1,0 +1,43 @@
+- name: set arch
+  set_fact:
+    hornet_arch: >-
+      {%- if ansible_architecture == "aarch64" or "armv8" in ansible_architecture -%}
+      ARM64
+      {%- elif ansible_architecture == "aarch32" or "armv7" in ansible_architecture -%}
+      ARM
+      {%- elif 'x86_64' in ansible_architecture -%}
+      x86_64
+      {%- endif -%}
+
+# E.g.: https://github.com/gohornet/hornet/releases/download/v0.2.3/HORNET-0.2.3_Linux_ARM64.tar.gz
+- name: set release download url for binary
+  set_fact:
+    hornet_bin_download_url: "{{ hornet_releases_download_url }}/{{ hornet_tag }}/HORNET-{{ hornet_tag | regex_replace('v') }}_Linux_{{ hornet_arch }}.tar.gz"
+
+- name: create hornet binary directory
+  file:
+    state: directory
+    path: "{{ hornet_home_path }}/bin"
+    mode: 0755
+
+- name: download and unarchive hornet binary release
+  unarchive:
+    src: "{{ hornet_bin_download_url }}"
+    dest: /tmp
+    remote_src: True
+  args:
+    creates: "{{ hornet_home_path }}/bin/hornet-{{ hornet_tag }}"
+  register: hornet_downloaded
+
+- name: move binary to hornet's binary directory
+  shell: "mv -- /tmp/hornet {{ hornet_home_path }}/bin/hornet-{{ hornet_tag }}"
+  when: hornet_downloaded and hornet_downloaded.changed
+
+- name: link to hornet's binary
+  file:
+    path: "{{ hornet_home_path }}/bin/hornet"
+    src: "{{ hornet_home_path }}/bin/hornet-{{ hornet_tag }}"
+    owner: root
+    group: "{{ hornet_username }}"
+    force: yes
+    state: link
