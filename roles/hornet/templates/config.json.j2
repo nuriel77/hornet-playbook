@@ -96,9 +96,12 @@
   "monitor": {
     "tanglemonitorpath": "tanglemonitor/frontend",
     "domain": "{{ honet_monitor_domain | default('') }}",
-    "host": "{{ hornet_monitor_address | default('127.0.0.1') }}"
+    "host": "{{ hornet_monitor_address | default('127.0.0.1') }}",
+    "port": {{ hornet_monitor_port | default('14434') }},
+    "apiPort": {{ hornet_monitor_api_port | default('14433') }}
   },
   "network": {
+    "preferIPv6": false,
     "address": "{{ hornet_peering_address | default('0.0.0.0') }}",
     "autotetheringenabled": {{ hornet_auto_peering_enabled | default('false') | lower | string }},
     "maxneighbors": {{ hornet_max_neighbors | default('5') }},
@@ -109,7 +112,7 @@
   "node": {
     "disableplugins": {{ hornet_disable_plugins | to_nice_json(indent=4) }},
     "enableplugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }},
-    "loglevel": {{ hornet_log_level | default('3') }}
+    "loglevel": {{ hornet_log_level | default('127') }}
   },
   "protocol": {
     "mwm": {{ hornet_protocol_mwm | default('14') }}
