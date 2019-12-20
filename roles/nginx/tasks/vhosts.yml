@@ -29,3 +29,11 @@
     validate: "/usr/local/bin/validate_nginx_config.sh -t %s -d alertmanager.conf"
   notify:
     - reload nginx
+
+- name: copy tanglemonitor nginx config
+  template:
+    src: ../shared-files/tanglemonitor.conf.j2
+    dest: /etc/nginx/conf.d/tanglemonitor.conf
+    validate: "/usr/local/bin/validate_nginx_config.sh -t %s -d tanglemonitor.conf"
+  notify:
+    - reload nginx
