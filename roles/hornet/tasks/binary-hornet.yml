@@ -1,12 +1,12 @@
 - name: set arch
   set_fact:
     hornet_arch: >-
-      {%- if 'armv7' in ansible_architecture -%}
-        ARM
-      {%- elif 'armv8' in ansible_architecture -%}
-        ARM64
+      {%- if ansible_architecture == "aarch64" or "armv8" in ansible_architecture -%}
+      ARM64
+      {%- elif ansible_architecture == "aarch32" or "armv7" in ansible_architecture -%}
+      ARM
       {%- elif 'x86_64' in ansible_architecture -%}
-        x86_64
+      x86_64
       {%- endif -%}
 
 # E.g.: https://github.com/gohornet/hornet/releases/download/v0.2.3/HORNET-0.2.3_Linux_ARM64.tar.gz
