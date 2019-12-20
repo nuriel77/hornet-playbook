@@ -60,6 +60,12 @@
         dest: /usr/bin/nbctl
         mode: 0755
 
+    - name: download iritop
+      get_url:
+        url: https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/iritop.py
+        dest: /usr/bin/iritop
+        mode: 0755
+
     - name: download ps_mem
       get_url:
         url: https://raw.githubusercontent.com/pixelb/ps_mem/master/ps_mem.py

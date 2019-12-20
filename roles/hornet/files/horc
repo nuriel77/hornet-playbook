@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.2.0
+VERSION_TEMP=0.2.1
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -1162,6 +1162,19 @@ function cleanup_docker_images() {
     fi
 }
 
+### IRITop ###
+function view_iritop() {
+    which iritop >/dev/null 2>&1
+    if [[ $? -ne 0 ]]; then
+         whiptail --title "Missing iritop" \
+         --msgbox "Error: cannot find 'iritop' utility!" \
+         8 $WIDTH
+         return 1
+    fi
+
+    iritop
+}
+
 ### Notice ###
 function how_to_setup() {
     whiptail --title "HORC v${VERSION} - Instructions" \
@@ -1372,7 +1385,7 @@ function main_menu() {
     whiptail --title "HORC v${__VERSION__} - Hornet Configuration Menu" \
              --menu "$MENU" \
              --cancel-button "Exit" \
-             25 $WIDTH 15 \
+             26 $WIDTH 16 \
     "a)" "Update Hornet Software" \
     "b)" "Hornet Plugins" \
     "c)" "Manage Services" \
@@ -1387,6 +1400,7 @@ function main_menu() {
     "l)" "Show LatestMilestoneIndex" \
     "m)" "Get new snapshot DB" \
     "n)" "Neighbors" \
+    "o)" "View IRITOP" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1472,6 +1486,11 @@ function run_main_menu() {
 
         "n)")
             neighbors
+            run_main_menu
+            ;;
+
+        "o)")
+            view_iritop
             run_main_menu
             ;;
 
