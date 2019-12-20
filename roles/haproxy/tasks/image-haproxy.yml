@@ -1,15 +1,6 @@
-- name: architecture appender
-  set_fact:
-    image_arch: >-
-      {%- if ansible_architecture == "aarch64" or "armv8" in ansible_architecture -%}
-      arm64v8/
-      {%- elif ansible_architecture == "aarch32" or "armv7" in ansible_architecture -%}
-      arm32v7/
-      {%- endif -%}
-
 - name: 'download haproxy docker image (on master), this can take a moment...'
   docker_image:
-    name: "{{ image_arch | default('') }}{{ haproxy_image }}"
+    name: "{{ haproxy_image }}"
     tag: "{{ haproxy_tag }}"
     force_source: "{{ force_pull_image | default('no') }}"
     source: pull
