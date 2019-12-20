@@ -1,6 +1,4 @@
-# Hornet Playbook (alpha) - IOTA
-
-**NOTICE** This is an alpha release. There's still a lot of work in progress.
+# Hornet Playbook (beta) - IOTA
 
 *Table of contents*
 
@@ -26,11 +24,11 @@
 
 ## Requirements
 
-Tested on the following operating systems:
+Tested on the following operating systems/architectures:
 
-* CentOS 7 and 8
-* Ubuntu 18.04LTS
-* Debian 10 "Buster"
+* CentOS 7 and 8 (x86_64)
+* Ubuntu 18.04LTS (x86_64, aarch64/arm64)
+* Debian 10 "Buster" (x86_64, aarch64/arm64)
 
 ## Recommendations
 
