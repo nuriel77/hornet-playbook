@@ -20,7 +20,7 @@ export NEWT_COLORS='
 window=,
 '
 
-if grep -q 'HORNET PLAYBOOK' /etc/motd; then
+if test -e /etc/motd && grep -q 'HORNET PLAYBOOK' /etc/motd; then
     :>/etc/motd
 else
     if [ -f "$INSTALLER_OVERRIDE_FILE" ] && [ "$1" != "rerun" ]
