@@ -26,9 +26,9 @@ hornet_neighbors: []
 #  - identity: example2.neighbor.com:15600
 #    preferIPv6: false
 
-# Hornet run profile (e.g. default or light)
+# Hornet run profile (e.g. auto or light)
 # 'light' will consume less memory.
-hornet_profile: default
+hornet_profile: auto
 
 # Enable hornet API auth.
 # The default node's username and password are used.
@@ -63,9 +63,6 @@ hornet_permit_remote_access_list:
 # Unprivileged user to run hornet with
 hornet_username: hornet
 
-# Base directory where hornet is installed and runs from
-hornet_basedir: /var/lib/hornet
-
 # Ports used by hornet
 # For now only peering port is not
 # running behind a proxy. Therefore
@@ -89,6 +86,14 @@ hornet_ports:
     port: 8081
     proto: tcp
     allow: yes
+  tanglemonitor:
+    port: 4434
+    proto: tcp
+    allow: yes
+  tanglemonitor_api:
+    port: 4433
+    proto: tcp
+    allow: yes
 
 # Hornet API port address bind.
 # If you are using a proxy, leave
@@ -110,6 +115,15 @@ hornet_auto_peering_enabled: false
 
 # Hornet max neighbors
 hornet_max_neighbors: 5
+
+# Tanglemonitor ports external
+# Those best be kept on these ports
+# because the frontend has them hardcoded
+hornet_monitor_port_ext: "{{ hornet_ports.tanglemonitor.port }}"
+hornet_api_monitor_port_ext: "{{ hornet_ports.tanglemonitor_api.port }}"
+tanglemonitor_internal_address: "127.0.0.1"
+tanglemonitor_git_url: "https://github.com/unioproject/tanglemonitor.git"
+tanglemonitor_path: "{{ hornet_home_path }}/tanglemonitor"
 
 # Hornet ZMQ port
 hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
