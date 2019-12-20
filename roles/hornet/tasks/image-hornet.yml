@@ -24,6 +24,7 @@
 
 - name: build hornet image, this can take a moment...
   docker_image:
+    dockerfile: '{% if ansible_architecture == "aarch64" or "armv8" in ansible_architecture %}Dockerfile.arm64{% else %}Dockerfile{% endif %}'
     build:
       path: "{{ hornet_git_dest }}"
       pull: no
