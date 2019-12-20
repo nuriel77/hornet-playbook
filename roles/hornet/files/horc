@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.1.2
+VERSION_TEMP=0.2.0
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -312,6 +312,20 @@ function get_latest_hornet_release {
     curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name
 }
 
+function check_new_hornet {
+    local HORNET_LATEST
+    local HORNET_VERSION
+
+    HORNET_LATEST=$(get_latest_hornet_release)
+    HORNET_VERSION=$(grep ^TAG "$SYSCONFIG_FILE" | cut -d= -f2)
+
+    if compare_versions $HORNET_VERSION '<' $HORNET_LATEST; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 function upgrade_hornet() {
     echo "Checking for updates..."
     local HORNET_LATEST
@@ -444,7 +458,7 @@ function get_db() {
                  --yesno "Download new database from '$DB_SOURCE'?\n\nUpdated: ${LAST_UPDATED}, size: ${FILE_SIZE}\n\n(TIP: for long running tasks consider running hornetc in a screen session)" \
                  16 $WIDTH) then
         # This command will stop hornet, remove older database directories,
-        # extract the database (on the fly) set correct user ownership and start IRI up again.
+        # extract the database (on the fly) set correct user ownership and start HORNET up again.
         echo "Stopping hornet first, removing old database files and commencing download/extract of database files ..."
         systemctl stop hornet \
           && rm -rf /var/lib/hornet/{mainnetdb*,*bin} \
@@ -463,7 +477,7 @@ function get_db() {
             clear
             return 1
         else
-            pause "Done! Please check IRI's status and logs to verify it is error free."
+            pause "Done! Please check HORNET's status and logs to verify it is error free."
             clear
         fi
     fi
@@ -598,7 +612,7 @@ function sort_func() {
 
 function run_custom_updates(){
     # Find pending update files
-    readarray -t TO_RUN_UPDATES < <(find custom_updates/ -maxdepth 1 -type f -name '*_updates.sh')
+    readarray -t TO_RUN_UPDATES < <(find /opt/hornet-playbook/custom_updates/ -maxdepth 1 -type f -name '*_updates.sh')
 
     # Return if nothing to update
     ((${#TO_RUN_UPDATES[@]} == 0)) && { clear; return; }
@@ -694,6 +708,161 @@ function edit_config() {
         return 0
     else
         return 1
+    fi
+}
+
+### Neighbors ###
+function add_neighbors() {
+    local NEIGHBORS
+    local HEIGHT
+    local NBCTL_OUTPUT
+    local RC
+    local HORNET_CONFIG
+
+    NEIGHBORS=$(whiptail --inputbox "Enter a list of neighbors separated by space:" 8 $WIDTH --title "Add Neighbors" 3>&1 1>&2 2>&3)
+    RC=$?
+    if [[ $RC -ne 0 ]]; then
+        return
+    fi
+
+    ADD_LIST=$(echo "$NEIGHBORS" | sed 's/  */ /g' | sed 's/ / -n /g' | sed 's/^\(.*\)/-n \1/')
+    if ! (echo "$ADD_LIST" | egrep -q "tcp"); then
+        whiptail --title "Invalid Input" \
+                 --msgbox "Invalid input provided. Please check the syntax you provided is valid." \
+                  8 $WIDTH
+        return
+    fi
+
+    HEIGHT=$(expr $(echo "$NEIGHBORS"|tr ' ' '\n'|wc -l) + 8)
+    NEIGHBORS_TO_ADD=$(echo "$NEIGHBORS"|tr ' ' '\n')
+    if (whiptail --title "Add Neighbors" \
+                 --yesno "The following neighbor(s) will be added:\n\n$NEIGHBORS_TO_ADD" \
+                 $HEIGHT $WIDTH) then
+
+        # Set hornet config file if any configured
+        HORNET_CONFIG=$(grep ^file /root/.nbctl | cut -d: -f2)
+        [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
+
+        # Run nbctl command
+        NBCTL_OUTPUT=$(nbctl -a $ADD_LIST $HORNET_CONFIG 2>&1)
+        RC=$?
+        if [[ $RC -eq 0 ]]; then
+            HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 7)
+            whiptail --title "Added Neighbors" \
+                     --msgbox "$NBCTL_OUTPUT" \
+                    $HEIGHT $WIDTH
+        else
+            if echo "$NBCTL_OUTPUT" | grep -q "urllib2.URLError" ; then
+               NBCTL_OUTPUT="Failed to communicate with HORNET API port. Check if HORNET is active and if $HOME/.nbctl is configured correctly."
+            fi
+            HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 10)
+            whiptail --title "Adding Neighbors Failed" \
+                     --msgbox "Failure: $NBCTL_OUTPUT" \
+                     $HEIGHT $WIDTH
+        fi
+    fi
+}
+
+function remove_neighbors() {
+    local NEIGHBORS_ARRAY
+    local NEIGHBORS
+    local NEIGHBOR
+    local HEIGHT
+    local HORNET_CONFIG
+
+    echo "Getting neighbors list..."
+    NEIGHBORS=$(list_neighbors get | awk '{$1=$1}{print}' | tr -d ' ')
+    RC=$?
+    clear
+    if [[ $RC -ne 0 ]]; then
+        whiptail --title "Neighbors Failed" \
+                 --msgbox "Failed to get list of neighbors: $NEIGHBORS" \
+                 8 $WIDTH
+        return
+    fi
+    if [ "$NEIGHBORS" == "" ]; then
+        whiptail --title "No Neighbors" \
+                 --msgbox "There are no neighbors configured" \
+                 8 $WIDTH
+        return
+    fi
+    HEIGHT=$(expr $(echo "$NEIGHBORS"|wc -l) + 5)
+    NEIGHBORS_ARRAY=($(echo "$NEIGHBORS"))
+    local NEIGHBORS_ARRAY_INDEXED=($(echo "$NEIGHBORS" | awk '!/^ / && NF { print NR")"; print $1$2$3}'))
+    local NEIGHBOR_INDEX=$(whiptail --title "Remove neighbors" --menu "Choose a neighbor" 25 $WIDTH 16  "${NEIGHBORS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
+    if [ $? -eq 1 ]; then
+        return
+    fi
+
+    local NEIGHBOR_INX=$(echo "$NEIGHBOR_INDEX" | cut -d')' -f1)
+    local NEIGHBOR_INX=$(expr $NEIGHBOR_INX - 1)
+    local TO_REMOVE="${NEIGHBORS_ARRAY[$NEIGHBOR_INX]}"
+    local SCHEME=$(echo "$TO_REMOVE"|cut -d'/' -f2|cut -d '|' -f1)
+    local ADDRESS=$(echo "$TO_REMOVE"|cut -d'/' -f1)
+    local DOMAIN="($(echo "$TO_REMOVE" | cut -d '|' -f2))"
+    [[ "$DOMAIN" == "(null)" ]] && DOMAIN=""
+
+    if (whiptail --title "Confirm removal" \
+                 --yesno "Are you sure you want to remove:\n\n${SCHEME}://${ADDRESS} ${DOMAIN}" \
+                 --defaultno \
+                 12 $WIDTH)
+    then
+        HORNET_CONFIG=$(grep ^file /root/.nbctl | cut -d: -f2)
+        [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
+        REMOVAL_OUTPUT=$(nbctl -r -n "${SCHEME}://${ADDRESS}" $HORNET_CONFIG 2>&1)
+        if [ $? -eq 0 ];then
+            whiptail --title "Removed successfully" \
+                     --msgbox "$REMOVAL_OUTPUT" \
+                     12 $WIDTH
+        else
+            HEIGHT=$(expr $(echo "$REMOVAL_OUTPUT"|wc -l) + 7)
+            whiptail --title "Remove failed!" \
+                     --msgbox "${REMOVAL_OUTPUT}" \
+                     $HEIGHT $WIDTH
+        fi
+    fi
+}
+
+function list_neighbors() {
+    local NEIGHBORS_QUERY
+    local NEIGHBORS
+    local HEIGHT
+    local RETURN_RES=$1
+
+    NEIGHBORS_QUERY=$(nbctl -l 2>&1)
+    RC=$?
+    if [[ $RC -ne 0 ]]; then
+        if echo "$NEIGHBORS_QUERY" | egrep -q "urllib..URLError|timeout|refused" ; then
+            NEIGHBORS_QUERY="Failed to communicate with HORNET API port. Check if HORNET is active and if $HOME/.nbctl is configured correctly."
+        else
+            NEIGHBORS_QUERY="Unknown error"
+        fi
+        if [ -n "$RETURN_RES" ]; then
+            echo "$NEIGHBORS_QUERY"
+            return 1
+        fi
+        HEIGHT=$(expr $(echo "$NEIGHBORS_QUERY"|wc -l) + 7)
+        whiptail --title "List neighbors failed" \
+                 --msgbox "$NEIGHBORS_QUERY" \
+                 $HEIGHT $WIDTH
+        return 1
+    else
+        NEIGHBORS=$(echo "$NEIGHBORS_QUERY" | jq -r '.neighbors[] | "\(.address)/\(.connectionType) | \(.domain)"' | column -c 80 -t)
+        if [ -n "$RETURN_RES" ]; then
+            echo "$NEIGHBORS"
+            return 0
+        fi
+
+        if [ "$NEIGHBORS" == "" ]; then
+            LENGTH=0
+        else
+            LENGTH=$(echo "$NEIGHBORS"|wc -l)
+            FOR_WINDOW_LENGTH=$(($(echo "$NEIGHBORS"|wc -l)*2))
+        fi
+        local HEIGHT=$(expr $FOR_WINDOW_LENGTH + 8)
+        whiptail --title "List Neighbors" \
+                 --msgbox "Total: ${LENGTH} neighbor(s)\n\n${NEIGHBORS}" \
+                 $HEIGHT $WIDTH
     fi
 }
 
@@ -1049,6 +1218,104 @@ function configure_files() {
 
 }
 
+### Hornet Plugins ###
+function hornet_plugins() {
+    local RESULTS=
+    local ORIGINAL_NODE_OBJ=
+    local NEW_NODE_OBJ=
+    local JSON_OUTPUT=
+    local CONFIG_FILE=
+
+    # By default list all the existing plugins as disabled
+    export ENABLE_PLUGINS=""
+    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor"
+
+    CONFIG_FILE=$(grep ^file "$HOME/.nbctl" | awk {'print $2'})
+
+    # Save current config state
+    ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enableplugins) \(.disableplugins)"' < "$CONFIG_FILE")
+
+    IFS=', ' read -r -a DISABLE_PLUGINS_ARRAY <<< "$DISABLE_PLUGINS"
+
+    # Get current states (TODO: use associative array and loop)
+    if jq -e -r '.node.enableplugins | index("Spammer")' < "$CONFIG_FILE" >/dev/null
+    then
+        PLUGIN_SPAMMER_STATE="ON"
+    else
+        PLUGIN_SPAMMER_STATE="OFF"
+    fi
+
+    if jq -e -r '.node.enableplugins | index("ZeroMQ")' < "$CONFIG_FILE" >/dev/null
+    then
+        PLUGIN_ZMQ_STATE="ON"
+    else
+        PLUGIN_ZMQ_STATE="OFF"
+    fi
+
+    if jq -e -r '.node.enableplugins | index("Monitor")' < "$CONFIG_FILE" >/dev/null
+    then
+        PLUGIN_TANGLEMONITOR_STATE="ON"
+    else
+        PLUGIN_TANGLEMONITOR_STATE="OFF"
+    fi
+
+    RESULTS=$(whiptail --title "HORC v${__VERSION__} - Plugins" \
+        --checklist \
+        --cancel-button "Exit" \
+        "\nPlease choose plugins to enable or disable.\n\
+Select/unselect options using space and\nclick Enter to proceed.\n" 14 50 "${#DISABLE_PLUGINS_ARRAY[@]}" \
+        "Spammer"           "...         Spammer" "$PLUGIN_SPAMMER_STATE" \
+        "ZMQ"               "...         ZeroMQ" "$PLUGIN_ZMQ_STATE" \
+        "Monitor"           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
+        3>&1 1>&2 2>&3)
+
+    RC=$?
+    [[ $RC -ne 0 ]] && return
+
+    read -a RESULTS_ARRAY <<< "$RESULTS"
+    for CHOICE in "${RESULTS_ARRAY[@]}"
+    do
+        case $CHOICE in
+            '"Spammer"')
+                ENABLE_PLUGINS+=",Spammer"
+                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Spammer/}")
+                ;;
+            '"ZMQ"')
+                ENABLE_PLUGINS+=",ZeroMQ"
+                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/ZeroMQ/}")
+                ;;
+            '"Monitor"')
+                ENABLE_PLUGINS+=",Monitor"
+                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Monitor/}")
+                ;;
+            *)
+                ;;
+        esac
+    done
+
+    DISABLE_PLUGINS=$(printf "%s,"  "${DISABLE_PLUGINS_ARRAY[@]}")
+    JSON_OUTPUT=$(cat "$CONFIG_FILE" | python -c '
+import json, sys, os
+obj = json.load(sys.stdin)
+enable_plugins = os.environ["ENABLE_PLUGINS"]
+disable_plugins = os.environ["DISABLE_PLUGINS"]
+obj["node"]["enableplugins"] = [p for p in enable_plugins.split(",") if p != ""]
+obj["node"]["disableplugins"] = [p for p in disable_plugins.split(",") if p != ""]
+print(json.dumps(obj))
+')
+
+    NEW_NODE_OBJ=$(jq -r '.node | "\(.enableplugins) \(.disableplugins)"' <<<"$JSON_OUTPUT")
+    [[ "$ORIGINAL_NODE_OBJ" == "$NEW_NODE_OBJ" ]] && return
+
+    if (whiptail --title "Restart Hornet" \
+             --yesno "You've made changes to the plugins. A restart of HORNET is needed to load the new configuration.\n\nRestart now?" \
+             --defaultno \
+             10 $WIDTH) then
+        jq . <<< "$JSON_OUTPUT" > "$CONFIG_FILE"
+        /bin/systemctl restart hornet
+    fi
+}
+
 ### Neighbors ###
 function neighbors_menu(){
     whiptail --title "HORC v${__VERSION__} - Neighbors" \
@@ -1098,22 +1365,28 @@ function main_menu() {
         MENU="${MENU}\n(*HORC update available)"
     fi
 
+    if check_new_hornet; then
+        MENU="${MENU}\n(*HORNET update available)"
+    fi
+
     whiptail --title "HORC v${__VERSION__} - Hornet Configuration Menu" \
              --menu "$MENU" \
              --cancel-button "Exit" \
-             24 $WIDTH 15 \
+             25 $WIDTH 15 \
     "a)" "Update Hornet Software" \
-    "b)" "Manage Services" \
-    "c)" "Configure Files" \
-    "d)" "View Per Processes Memory Usage" \
-    "e)" "Rerun Playbook Installation" \
-    "f)" "Clean Unused Docker Images" \
-    "g)" "Update HORC and node scripts" \
-    "h)" "Enable HAProxy Access" \
-    "i)" "Enable HTTPS / Certificate" \
-    "j)" "Get Node Info" \
-    "k)" "Show LatestMilestoneIndex" \
-    "l)" "Get new snapshot DB" \
+    "b)" "Hornet Plugins" \
+    "c)" "Manage Services" \
+    "d)" "Configure Files" \
+    "e)" "View Per Processes Memory Usage" \
+    "f)" "Rerun Playbook Installation" \
+    "g)" "Clean Unused Docker Images" \
+    "h)" "Update HORC and node scripts" \
+    "i)" "Enable HAProxy Access" \
+    "j)" "Enable HTTPS / Certificate" \
+    "k)" "Get Node Info" \
+    "l)" "Show LatestMilestoneIndex" \
+    "m)" "Get new snapshot DB" \
+    "n)" "Neighbors" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1138,57 +1411,67 @@ function run_main_menu() {
             ;;
 
         "b)")
-            services
+            hornet_plugins
             run_main_menu
             ;;
 
         "c)")
-            configure_files
+            services
             run_main_menu
             ;;
 
         "d)")
-            view_ps_mem
+            configure_files
             run_main_menu
             ;;
 
         "e)")
-            rerun_playbook
+            view_ps_mem
             run_main_menu
             ;;
 
         "f)")
-            cleanup_docker_images
+            rerun_playbook
             run_main_menu
             ;;
 
         "g)")
-            update_horc
+            cleanup_docker_images
             run_main_menu
             ;;
 
         "h)")
-            enable_haproxy
+            update_horc
             run_main_menu
             ;;
 
         "i)")
-            enable_https
+            enable_haproxy
             run_main_menu
             ;;
 
         "j)")
-            get_node_info
+            enable_https
             run_main_menu
             ;;
 
         "k)")
-            show_lmsi
+            get_node_info
             run_main_menu
             ;;
 
         "l)")
+            show_lmsi
+            run_main_menu
+            ;;
+
+        "m)")
             get_db
+            run_main_menu
+            ;;
+
+        "n)")
+            neighbors
             run_main_menu
             ;;
 

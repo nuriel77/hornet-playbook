@@ -4,3 +4,4 @@
     state: restarted
     daemon_reload: yes
     enabled: yes
+  when: not skip_hornet_restart|default(False)|bool

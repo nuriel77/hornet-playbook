@@ -91,7 +91,11 @@
     - name: config default ~/.nbctl
       copy:
         dest: "{{ ansible_env.HOME }}/.nbctl"
-        content: "api_version: {{ hornet_api_version | default('1') }}\nhost: http://127.0.0.1:{{ hornet_api_port }}\nfile: {{ hornet_home_path }}/config.json\n"
+        content: |-
+          api_version: {{ hornet_api_version | default('1') }}
+          host: http://127.0.0.1:{{ hornet_api_port }}
+          file: {{ hornet_home_path }}/config.json
+          hornet: true
         force: "{{ overwrite | default('no') }}"
         backup: yes
       tags:
