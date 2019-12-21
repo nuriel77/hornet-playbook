@@ -1,4 +1,4 @@
-# Kubernetes (WIP)
+# Kubernetes
 
 Example:
 
@@ -8,7 +8,7 @@ Example:
 
 Here you will find a template to run a Hornet node on a kubernetes clusters.
 
-Note: There's a helm chart available [here](../contrib/charts/hornet)
+Or you can deploy using a helm chart available [here](../contrib/charts/hornet), but first you must configure the `config.json` as shown below.
 
 A few things to take into account:
 
