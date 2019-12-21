@@ -1,0 +1,98 @@
+# Default values for hornet.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: hornet
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: "hornet"
+fullnameOverride: "hornet"
+
+service:
+  type: NodePort
+  ports:
+    api:
+      protocol: TCP
+      port: 14265
+      nodePort: 31115
+    dashboard:
+      protocol: TCP
+      port: 8081
+      nodePort: 31111
+    peering:
+      protocol: TCP
+      port: 31200
+      nodePort: 31200
+
+# Hornet Secret config name.
+# Create this secret first as suggested here: https://github.com/nuriel77/hornet-playbook/blob/master/docs/kubernetes.md#prepare
+# Use the example JSON from above URL. Make sure the ports match the configuration here.
+hornetConfig: hornet-config
+
+# URL to d/l the initial DB from
+latestExportDB: 'https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin'
+
+# Use persistent storage
+persistence:
+  useStorage: true
+  # Set to your storageClass name
+  storageClass: "microk8s-hostpath"
+  pvcName: "mainnetdb"
+  accessMode: "ReadWriteOnce"
+  size: "20Gi"
+
+# Ingress
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: hornet
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000

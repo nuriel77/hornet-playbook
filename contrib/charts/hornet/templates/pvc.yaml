@@ -1,0 +1,20 @@
+{{- if .Values.persistence.useStorage }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: "{{ .Values.persistence.pvcName }}"
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "{{ .Values.persistence.storageClass }}"
+  labels:
+    app: {{ .Values.name }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Values.name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  accessModes:
+    - {{ .Values.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size | quote }}
+  storageClassName: "{{ .Values.persistence.storageClass }}"
+{{- end }}

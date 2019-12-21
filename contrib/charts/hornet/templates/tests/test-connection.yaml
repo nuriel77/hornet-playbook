@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "hornet.fullname" . }}-test-connection"
+  labels:
+{{ include "hornet.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ include "hornet.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

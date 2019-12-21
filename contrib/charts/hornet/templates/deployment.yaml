@@ -1,0 +1,96 @@
+{{- $root := . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hornet.fullname" . }}
+  labels:
+{{ include "hornet.labels" . | indent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hornet.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "hornet.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- if .Values.serviceAccount.create -}}
+      serviceAccountName: {{ template "hornet.serviceAccountName" . }}
+    {{ end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+        {{- range $name, $data := .Values.service.ports }}
+            - name: {{ $name }}
+          {{- with $data }}
+              containerPort: {{ .port }}
+              protocol: {{ .protocol }}
+          {{- end -}}
+        {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.api.port }}
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 2
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.peering.port }}
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 10
+            failureThreshold: 2
+          command:
+            - "/bin/sh"
+            - "-ec"
+            - |
+              cp -- /app/config/config.json /app/config.json
+              wget -O /app/latest-export.gz.bin {{ .Values.latestExportDB }}
+              exec /tini -s -- /app/hornet -c config
+          volumeMounts:
+            - name: mainnetdb
+              mountPath: "/app/mainnetdb"
+            - name: mainconfig
+              mountPath: "/app/config"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      {{- if .Values.persistence.useStorage }}
+        - name: mainnetdb
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.pvcName | quote }}
+      {{ else }}
+        - name: mainnetdb
+          emptyDir: {}
+      {{ end }}
+        - name: mainconfig
+          secret:
+            secretName: {{ .Values.hornetConfig }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

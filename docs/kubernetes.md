@@ -8,6 +8,8 @@ Example:
 
 Here you will find a template to run a Hornet node on a kubernetes clusters.
 
+Note: There's a helm chart available [here](../contrib/charts/hornet)
+
 A few things to take into account:
 
 - This configuration uses NodePort. Another alternative is hostNetwork but this will not work well on a real cluster.
@@ -295,3 +297,10 @@ kubectl logs -n hornet hornet-xxxxxxxx-xxxxx -f
 If you make any changes to `config.json` you can use the command you've used to create the secret in order to update it.
 You will also have to delete the existing pod in order for it to pick up the new changes.
 
+## Get Neighbors
+
+You might have to allow getNeighbors in the `config.json`, else you need to run the command from within the pod (it doesn't have curl so you'll have to build an image with curl in it).
+
+```sh
+curl  http://127.0.0.1:31115 -X POST -H 'Content-Type: application/json' -H 'X-IOTA-API-Version: 1' -d '{"command":"getNeighbors"}'
+```
