@@ -20,6 +20,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet HTTPS](#hornet-https)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
+     * [Related Documentation(#docs/)
    * [Known Issues](#known-issues)
    * [Donations](#donations)
 <!--te-->
