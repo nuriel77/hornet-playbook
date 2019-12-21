@@ -578,7 +578,7 @@ elif [[ "$OS" =~ ^Raspbian ]]; then
         exit 1
     fi
     check_arch
-    set_playbook_light
+    #set_playbook_light
     # Same setup for respbian as debian
     init_debian
 else
