@@ -1,0 +1,24 @@
+{{- $root := . -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hornet.fullname" . }}
+  labels:
+{{ include "hornet.labels" . | indent 4 }}
+spec:
+{{- if .Values.externalTrafficPolicy }}
+  externalTrafficPolicy: "Local"
+{{- end }}
+  type: {{ .Values.service.type }}
+  ports:
+{{- range $name, $data := .Values.service.ports }}
+    - name: {{ $name }}
+  {{- with $data }}
+      port: {{ .port }}
+      nodePort: {{ .nodePort }}
+      protocol: {{ .protocol }}
+  {{- end -}}
+{{ end }}
+  selector:
+    app.kubernetes.io/name: {{ include "hornet.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
