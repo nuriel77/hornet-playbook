@@ -1,5 +1,7 @@
 # Hornet Playbook (beta) - IOTA
 
+This repository installs a fully operational [IOTA HORNET](https://github.com/gohornet/hornet.git) node.
+
 *Table of contents*
 
 <!--ts-->
