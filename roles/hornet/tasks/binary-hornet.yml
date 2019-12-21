@@ -29,8 +29,9 @@
     creates: "{{ hornet_home_path }}/bin/hornet-{{ hornet_tag }}"
   register: hornet_downloaded
 
+# e.g. /tmp/HORNET-0.2.9_Linux_ARM/hornet
 - name: move binary to hornet's binary directory
-  shell: "mv -- /tmp/hornet {{ hornet_home_path }}/bin/hornet-{{ hornet_tag }}"
+  shell: "mv -- /tmp/HORNET-{{ hornet_tag | regex_replace('v') }}_Linux_{{ hornet_arch }}/hornet {{ hornet_home_path }}/bin/hornet-{{ hornet_tag }}"
   when: hornet_downloaded and hornet_downloaded.changed
 
 - name: link to hornet's binary
