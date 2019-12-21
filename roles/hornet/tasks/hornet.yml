@@ -15,7 +15,7 @@
 - name: Set light profile for Raspbian
   set_fact:
     hornet_profile: 'light'
-  when: ansible_distribution == 'Raspbian' or ansible_memtotal_mb|int <= 1024
+  when: ansible_lsb.id == 'Raspbian' or ansible_memtotal_mb|int <= 1024
   tags: always
 
 - name: scripts block
