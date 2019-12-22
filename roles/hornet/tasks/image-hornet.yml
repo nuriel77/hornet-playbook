@@ -24,11 +24,11 @@
 
 - name: build hornet image, this can take a moment...
   docker_image:
-    dockerfile: 'Dockerfile'
     build:
       path: "{{ hornet_git_dest }}"
       pull: no
       network: host
+      dockerfile: '{{ hornet_dockerfile | default(omit) }}'
       buildargs:
         ARCH: "{{ hornet_arch | default('amd64') }}"
     name: "{{ hornet_image }}"
