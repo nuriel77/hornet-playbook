@@ -37,6 +37,7 @@
       when: ipe_image_stat.rc == 1
       args:
         creates: "/tmp/ipe_Dockerfile"
+        warn: false
 
     - name: "build iota_prom_exporter image, this is going to take a while (get a cup of coffee) ..."
       docker_image:
