@@ -29,7 +29,7 @@
       pull: no
       network: host
       dockerfile: '{{ hornet_dockerfile | default(omit) }}'
-      buildargs:
+      args:
         ARCH: "{{ hornet_arch | default('amd64') }}"
     name: "{{ hornet_image }}"
     tag: "{{ hornet_tag }}"
