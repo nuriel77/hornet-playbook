@@ -26,6 +26,8 @@ iota_prom_exporter_port: "9311"
 iota_prom_exporter_bind: 127.0.0.1
 iota_prom_exporter_market_data: true
 iota_prom_exporter_db_days_retention: 14
+ipe_git_url: https://github.com/crholliday/iota-prom-exporter.git
+ipe_git_dest: /opt/iota-prom-exporter
 
 # Alertmanager
 alertmanager_basedir: /opt/prometheus/alertmanager
