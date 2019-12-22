@@ -62,7 +62,7 @@ GIT_OPTIONS="-b new/feature-branch" bash <(curl -s https://raw.githubusercontent
 ```
 If you are also working on the `fullnode_install.sh` you maybe have to rename `master` in the URL to the branch name as well, e.g.:
 ```sh
-GIT_OPTIONS="-b new/feature-branch" bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/new/feature-branch/fullnode_install.sh)
+GIT_OPTIONS="-b feature-branch" bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/feature-branch/fullnode_install.sh)
 ```
 
 ## Docker Usage Commands
