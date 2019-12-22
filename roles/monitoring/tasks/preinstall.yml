@@ -26,6 +26,7 @@
   changed_when: false
   register: promuser_uid
   tags:
+    - always
     - prom_user
 
 - name: remove existing prometheus basedir
