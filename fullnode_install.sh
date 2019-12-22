@@ -320,8 +320,7 @@ function set_admin_username() {
 }
 
 # Installation selection menu
-function set_selections()
-{
+function set_selections() {
     local RC RESULTS RESULTS_ARRAY CHOICE SKIP_TAGS
     SKIP_TAGS="--skip-tags=_"
 
@@ -386,6 +385,15 @@ Select/unselect options using space and click Enter to proceed.\n" 24 78 5 \
         fi
     fi
     INSTALL_OPTIONS+=" $SKIP_TAGS"
+}
+
+function set_defaults() {
+    cat <<EOF >>"$INSTALLER_OVERRIDE_FILE"
+install_docker: true
+install_nginx: true
+configure_firewall: false
+lb_bind_addresses: ['0.0.0.0']
+EOF
 }
 
 # Get primary IP from ICanHazIP, if it does not validate, fallback to local hostname
@@ -622,8 +630,13 @@ then
     set_playbook_light
 fi
 
-# Let user choose installation add-ons
-set_selections
+# Let user choose installation add-ons or set defaults
+if [[ "$SET_DEFAULTS" = true ]]
+then
+    set_defaults
+else
+    set_selections
+fi
 
 # Get the administrators username
 set_admin_username
