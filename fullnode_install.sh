@@ -327,13 +327,10 @@ function set_selections()
 
     if [[ "$PLAYBOOK_LIGHT" = true ]]
     then
-        INSTALL_DOCKER_DEFAULT="OFF"
-        INSTALL_DOCKER_MSG="not recommended on Raspbian"
         DISABLE_MONITORING_DEFAULT="ON"
         DISABLE_MONITORING_MSG=" (recommended)"
+        echo "hornet_profile: light" >>"$INSTALLER_OVERRIDE_FILE"
     else
-        INSTALL_DOCKER_DEFAULT="ON"
-        INSTALL_DOCKER_MSG="recommended"
         DISABLE_MONITORING_DEFAULT="OFF"
     fi
 
@@ -341,7 +338,7 @@ function set_selections()
         --cancel-button "Exit" \
         "\nPlease choose additional installation options.\nDefaults have been set according to your system's configuration:\nit is perfectly okay to leave this as is.\n\
 Select/unselect options using space and click Enter to proceed.\n" 24 78 5 \
-        "INSTALL_DOCKER"           "Install Docker runtime ($INSTALL_DOCKER_MSG)" "$INSTALL_DOCKER_DEFAULT" \
+        "INSTALL_DOCKER"           "Install Docker runtime (recommended)" ON \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
         "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
         "ENABLE_HAPROXY"           "Enable HAProxy (recommended)" ON \
@@ -412,11 +409,20 @@ function display_requirements_url() {
 function check_arch() {
     # Check architecture
     ARCH=$(uname -m)
-    local REGEXP="x86_64|armv7l|armv8l|aarch64"
+    local REGEXP="x86_64|armv7l|armv8l|aarch64|aarch32|armhf"
     if [[ ! "$ARCH" =~ $REGEXP ]]; then
         echo "ERROR: $ARCH architecture not supported"
         display_requirements_url
         exit 1
+    fi
+}
+
+function check_total_ram_min_kb() {
+    MIN_RAM=$1
+    MEM_TOTAL=$(grep ^MemTotal /proc/meminfo | awk {'print $2'})
+    if [[ "$MEM_TOTAL" -gt "$MIN_RAM" ]]
+    then
+        return 1
     fi
 }
 
@@ -578,7 +584,6 @@ elif [[ "$OS" =~ ^Raspbian ]]; then
         exit 1
     fi
     check_arch
-    #set_playbook_light
     # Same setup for respbian as debian
     init_debian
 else
@@ -611,6 +616,11 @@ fi
 # Clone the repository (optional branch)
 git clone $GIT_OPTIONS https://github.com/nuriel77/hornet-playbook.git
 cd "${HORNET_PLAYBOOK_DIR}"
+
+if check_total_ram_min_kb 1572864
+then
+    set_playbook_light
+fi
 
 # Let user choose installation add-ons
 set_selections
