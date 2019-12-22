@@ -36,7 +36,7 @@
       armhf
       {%- elif ansible_architecture in ["armv8l", "aarch64"] -%}
       arm64
-      {% elif ansible_architecture == "x86_64" -%}
+      {%- elif ansible_architecture == "x86_64" -%}
       amd64
       {%- endif -%}
   tags: always
