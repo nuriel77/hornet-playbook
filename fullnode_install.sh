@@ -39,6 +39,9 @@ declare -g HORNET_PLAYBOOK_DIR="/opt/hornet-playbook"
 declare -g INSTALLER_OVERRIDE_FILE="${HORNET_PLAYBOOK_DIR}/group_vars/all/z-installer-override.yml"
 declare -g PLAYBOOK_LIGHT="false"
 
+# Set minimum ram, used to set light profile.
+: "${MIN_RAM_KB:=1572864}"
+
 clear
 cat <<'EOF'
 
@@ -625,7 +628,7 @@ fi
 git clone $GIT_OPTIONS https://github.com/nuriel77/hornet-playbook.git
 cd "${HORNET_PLAYBOOK_DIR}"
 
-if check_total_ram_min_kb 1572864
+if check_total_ram_min_kb "$MIN_RAM_KB"
 then
     set_playbook_light
 fi
