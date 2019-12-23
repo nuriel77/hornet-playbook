@@ -461,7 +461,7 @@ function get_db() {
         # extract the database (on the fly) set correct user ownership and start HORNET up again.
         echo "Stopping hornet first, removing old database files and commencing download/extract of database files ..."
         systemctl stop hornet \
-          && rm -rf /var/lib/hornet/{mainnetdb*,*bin} \
+          && rm -rf /var/lib/hornet/mainnetdb* \
           && mkdir -p /var/lib/hornet/mainnetdb \
           && cd /var/lib/hornet \
           && wget -N "$DB_SOURCE" \
