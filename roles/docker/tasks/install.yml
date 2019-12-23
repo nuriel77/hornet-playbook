@@ -23,9 +23,3 @@
     name: docker
     state: started
     enabled: yes
-
-- name: "Fix for No module named ssl_match_hostname"
-  shell: "cp -r /usr/local/lib/python2.7/dist-packages/backports/ssl_match_hostname/ /usr/lib/python2.7/dist-packages/backports"
-  args:
-    creates: "/usr/lib/python2.7/dist-packages/backports/ssl_match_hostname/__init__.py"
-  when: ansible_distribution == 'Debian'

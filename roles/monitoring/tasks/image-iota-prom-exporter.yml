@@ -1,3 +1,67 @@
+- name: remove iota_prom_exporter image
+  block:
+
+    - name: "stopping iota_prom_exporter service, this might take a moment..."
+      systemd:
+        name: iota-prom-exporter.service
+        state: stopped
+      ignore_errors: yes
+
+    - name: delete iota_prom_exporter image
+      docker_image:
+        name: "{{ iota_prom_exporter_image }}"
+        tag: "{{ iota_prom_exporter_tag }}"
+        state: absent
+        force_absent: yes
+
+  when: remove_ipe_image|default(False)|bool
+
+- name: build iota_prom_exporter locally
+  block:
+
+    - name: check iota_prom_exporter image exists
+      shell: "/usr/bin/docker images {{ iota_prom_exporter_image }}:{{ iota_prom_exporter_tag }} | grep -q ^bambash"
+      changed_when: False
+      register: ipe_image_stat
+      failed_when: "ipe_image_stat.rc > 1"
+
+    - name: get iota_prom_exporter repository
+      git:
+        repo: '{{ ipe_git_url }}'
+        dest: '{{ ipe_git_dest }}'
+        version: '{{ ipe_git_version | default("master") }}'
+      when: ipe_image_stat.rc == 1
+
+    - name: edit the Dockerfile
+      shell: "sed 's/libzmq curl/libzmq curl cmake/' {{ ipe_git_dest }}/Dockerfile >/tmp/ipe_Dockerfile"
+      when: ipe_image_stat.rc == 1
+      args:
+        creates: "/tmp/ipe_Dockerfile"
+        warn: false
+
+    - name: "build iota_prom_exporter image, this is going to take a while (get a cup of coffee) ..."
+      docker_image:
+        build:
+          path: "{{ ipe_git_dest }}"
+          pull: no
+          network: host
+          dockerfile: '/tmp/ipe_Dockerfile'
+        name: "{{ iota_prom_exporter_image }}"
+        tag: "{{ iota_prom_exporter_tag }}"
+        source: build
+      notify:
+        - restart iota-prom-exporter
+      register: build_image_status
+      until: build_image_status is succeeded
+      retries: 3
+      delay: 2
+      when: >
+            ipe_image_stat.rc == 1 and
+            (images_from_master is not defined or
+             images_from_master|bool == False)
+
+  when: ansible_architecture != "x86_64"
+
 - name: 'download iota_prom_exporter docker image (on master), this can take a moment...'
   docker_image:
     name: "{{ iota_prom_exporter_image }}"

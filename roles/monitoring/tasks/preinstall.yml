@@ -12,6 +12,13 @@
   tags: always
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+- name: check cfs support in the kernel
+  shell: "grep '^CONFIG_CFS_BANDWIDTH=y' /boot/config*"
+  register: cfs_support
+  changed_when: false
+  failed_when: "cfs_support.rc > 1"
+  tags: always
+
 - name: add user to run prometheus as
   user:
     name: "{{ prom_username }}"
@@ -26,6 +33,7 @@
   changed_when: false
   register: promuser_uid
   tags:
+    - always
     - prom_user
 
 - name: remove existing prometheus basedir
