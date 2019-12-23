@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.2.2
+VERSION_TEMP=0.2.3
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -464,7 +464,7 @@ function get_db() {
           && rm -rf /var/lib/hornet/{mainnetdb*,*bin} \
           && mkdir -p /var/lib/hornet/mainnetdb \
           && cd /var/lib/hornet \
-          && wget -N "$SNAPSHOT_FILENAME" "$DB_SOURCE" \
+          && wget -N "$DB_SOURCE" \
           && chown hornet.hornet /var/lib/hornet -RL \
           && systemctl start hornet
 
