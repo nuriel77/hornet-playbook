@@ -6,3 +6,4 @@ inventory-multi
 custom_updates/*.completed
 roles/docker
 roles/haproxy
+roles/nginx
