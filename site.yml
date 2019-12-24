@@ -12,6 +12,14 @@
         - check_version
       run_once: yes
       ignore_errors: "{{ ignore_assert_errors }}"
+
+    - name: run gilt overlay
+      shell: "gilt overlay"
+      changed_when: false
+      run_once: yes
+      ignore_errors: "{{ ignore_assert_errors }}"
+      tags: always
+
   vars:
     ansible_connection: local
 
