@@ -8,3 +8,4 @@ gilt.dev.yml
 roles/docker
 roles/haproxy
 roles/nginx
+roles/monitoring
