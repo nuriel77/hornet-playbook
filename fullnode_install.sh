@@ -161,7 +161,7 @@ function init_centos_8(){
 
     echo "Installing Ansible, git and other requirements..."
     dnf install git expect newt python3-pip cracklib newt -y
-    pip3 --disable-pip-version-check install ansible
+    pip3 --disable-pip-version-check install ansible jmespath
 }
 
 function init_ubuntu(){
