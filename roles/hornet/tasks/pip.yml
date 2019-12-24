@@ -1,7 +1,9 @@
+# TODO: when Ansible switch to python3
+# have to add to the evaluation: 'and ansible_distribution_major_version == "7" -%}'
 - name: install python deps via pip
   pip:
     executable: >-
-      {%- if ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" -%}
+      {%- if ansible_distribution == "CentOS" -%}
       /usr/bin/pip
       {%- else -%}
       /usr/bin/pip3
