@@ -1,0 +1,3 @@
+- git: https://github.com/nuriel77/ansible-docker.git
+  version: master
+  dst: roles/docker/
