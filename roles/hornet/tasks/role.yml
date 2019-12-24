@@ -1,5 +1,5 @@
 - set_fact:
-    hornet_arch: >-
+    server_arch: >-
       {%- if ansible_architecture in ["armv7l", "armhf", "aarch32"] -%}
       armhf
       {%- elif ansible_architecture in ["armv8l", "aarch64"] -%}
