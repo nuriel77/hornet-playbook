@@ -1,3 +1,4 @@
+playbook_basename: hornet
 hornet_repo_name: gohornet/hornet
 hornet_git_url: "https://github.com/{{ hornet_repo_name }}.git"
 hornet_releases_url: "https://api.github.com/repos/{{ hornet_repo_name }}/releases"
@@ -150,3 +151,10 @@ hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
 
 # Only needs enabling if not served via nginx
 hornet_dashboard_basic_auth: false
+
+# Aliases used in generic roles (e.g. ansible-monitoring)
+node_db_path: "{{ hornet_db_path }}"
+node_zmq_port: "{{ hornet_zmq_port }}"
+node_enable_plugins: "{{ hornet_enable_plugins }}"
+node_api_port: "{{ hornet_api_port }}"
+node_api_port_remote: "14267"

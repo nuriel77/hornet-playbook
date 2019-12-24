@@ -30,7 +30,7 @@
       network: host
       dockerfile: '{{ hornet_dockerfile | default(omit) }}'
       args:
-        ARCH: "{{ hornet_arch | default('amd64') }}"
+        ARCH: "{{ server_arch | default('amd64') }}"
     name: "{{ hornet_image }}"
     tag: "{{ hornet_tag }}"
     source: build
