@@ -1,10 +1,10 @@
 - name: install python deps via pip
   pip:
     executable: >-
-      {%- if ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" -%}
-      /usr/bin/pip
-      {%- else -%}
+      {%- if ansible_distribution == "CentOS" and ansible_distribution_major_version == "8" -%}
       /usr/bin/pip3
+      {%- else -%}
+      /usr/bin/pip
       {%- endif -%}
     name:
      - docker
