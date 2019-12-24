@@ -18,6 +18,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet Controller App](#hornet-controller-app)
    * [Hornet Dashboard](#hornet-dashboard)
    * [Hornet HTTPS](#hornet-https)
+   * [Troubleshooting](#troubleshooting)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
      * [Related Documentation](docs/)
@@ -166,6 +167,24 @@ The second step is to enable HTTPS certificate. Note that you must already have 
 
 Enabling a certificate will allow you to connect to your node with IOTA's official Trinity wallet.
 
+# Troubleshooting
+
+If something isn't working as expected, try to gather as much data as possible, as this can help someone who is able to help you finding out the cause of the issue.
+
+If anything is wrong related to Hornet, first thing to look at are Hornet's logs. See how to get logs in [Control Hornet](#control-hornet) chapter.
+
+To check if Hornet's API port is listening you can use the command to see if any output:
+```sh
+sudo lsof -Pni:14265
+```
+Note that after restarting Hornet it takes it some time to make the port available (e.g. when loading snapshot file).
+
+If Hornet wasn't shut down properly there is a good chance that the DB is corrupted and you will have to remove it and start all over again.
+
+In the following link you can read more about how to collect logs from your system. Although this documentation is for IRI, the commands are similar (just replace iri with hornet if needed):
+
+https://iri-playbook.readthedocs.io/en/master/troubleshooting.html#troubleshooting
+
 # Appendix
 
 ## Hornet Plugins
@@ -185,7 +204,6 @@ On the otherhand, you could probably run hornet-playbook alongside goshimmer-pla
 # Known Issues
 
 * Due to the rapid development and changes to Hornet, the configuration file can break the existing configuration when upgrading.
-
 
 # Donations
 
