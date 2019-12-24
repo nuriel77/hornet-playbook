@@ -32,6 +32,11 @@
         packages: "{{ centos_packages['ver' + ansible_distribution_major_version] }}"
       when: ansible_distribution == 'CentOS'
 
+    - name: install gilt
+      pip:
+        name: python-gilt
+        state: present
+
     - name: run gilt overlay
       command: "gilt --config {{ gilt_config | default('gilt.yml') }} overlay"
       changed_when: false
