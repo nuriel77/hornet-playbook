@@ -1,7 +1,7 @@
 - name: install python deps via pip
   pip:
     executable: >-
-      {%- if ansible_distribution == "CentOS" and "ansible_distribution_major_version == '7'" -%}
+      {%- if ansible_distribution == "CentOS" and ansible_distribution_major_version == "7" -%}
       /usr/bin/pip
       {%- else -%}
       /usr/bin/pip3
