@@ -4,3 +4,4 @@ _site/
 group_vars/all/z-*.yml
 inventory-multi
 custom_updates/*.completed
+roles/docker
