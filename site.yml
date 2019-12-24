@@ -15,7 +15,7 @@
       ignore_errors: "{{ ignore_assert_errors }}"
 
     - name: run gilt overlay
-i      command: "gilt --config {{ gilt_config | default('gilt.yml') }} overlay"
+      command: "gilt --config {{ gilt_config | default('gilt.yml') }} overlay"
       changed_when: false
       run_once: yes
       ignore_errors: "{{ ignore_assert_errors }}"
