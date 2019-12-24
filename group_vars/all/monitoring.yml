@@ -1,0 +1,6 @@
+grafana_port: "3000"
+prom_port: "9090"
+prom_proxy_port: "8999"
+grafana_proxy_port: "5555"
+alertmanager_port: "9093"
+alertmanager_proxy_port: "9993"
