@@ -9,3 +9,7 @@
 - git: https://github.com/nuriel77/ansible-nginx.git
   version: master
   dst: roles/nginx/
+
+- git: https://github.com/nuriel77/ansible-monitoring.git
+  version: master
+  dst: roles/monitoring/
