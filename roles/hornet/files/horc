@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.2.3
+VERSION_TEMP=0.2.4
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -1172,7 +1172,7 @@ function view_iritop() {
          return 1
     fi
 
-    iritop
+    python3 $(which iritop)
 }
 
 ### Notice ###
