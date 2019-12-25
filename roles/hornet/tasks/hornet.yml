@@ -54,12 +54,6 @@
         dest: /usr/bin/nbctl
         mode: 0755
 
-    - name: download iritop
-      get_url:
-        url: https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/iritop.py
-        dest: /usr/bin/iritop
-        mode: 0755
-
     - name: download ps_mem
       get_url:
         url: https://raw.githubusercontent.com/pixelb/ps_mem/master/ps_mem.py
@@ -67,11 +61,22 @@
         mode: 0755
       ignore_errors: yes
 
+    - name: download iritop
+      get_url:
+        url: https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/iritop.py
+        dest: /usr/bin/iritop
+        mode: 0755
+
     - name: download iritop requirements
       get_url:
         url: https://raw.githubusercontent.com/maeck70/iritop/master/requirements.txt
         dest: /tmp/iritop-requirements.txt
         force: yes
+      ignore_errors: yes
+
+    - name: install iritop requirements
+      pip:
+        requirements: /tmp/iritop-requirements.txt
       ignore_errors: yes
 
     - name: link python3 to python
