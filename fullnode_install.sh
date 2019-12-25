@@ -195,16 +195,17 @@ function init_ubuntu(){
     fi
 
     echo "Installing Ansible and git..."
-    apt-get update -y
-    apt-get install git\
-                    expect-dev\
-                    tcl\
-                    libcrack2\
-                    cracklib-runtime\
-                    whiptail\
-                    python3-pip\
-                    python3-wheel\
-                    python3-setuptools -y
+    apt remove -y ansible || true
+    apt update -y
+    apt install git\
+                expect-dev\
+                tcl\
+                libcrack2\
+                cracklib-runtime\
+                whiptail\
+                python3-pip\
+                python3-wheel\
+                python3-setuptools -y
     pip3 --disable-pip-version-check install ansible jmespath
 }
 
@@ -223,19 +224,19 @@ function init_debian(){
     echo "Installing Ansible and git..."
     local ANSIBLE_SOURCE="deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
     grep -q "$ANSIBLE_SOURCE" /etc/apt/sources.list || echo "$ANSIBLE_SOURCE" >> /etc/apt/sources.list
-    apt-get install dirmngr --install-recommends -y
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-    apt-get update -y
-    apt-get install git\
-                    expect-dev\
-                    tcl\
-                    libcrack2\
-                    cracklib-runtime\
-                    whiptail\
-                    lsb-release\
-                    python3-pip\
-                    python3-wheel\
-                    python3-setuptool -y
+    apt install dirmngr --install-recommends -y
+    apt remove -y ansible || true
+    apt update -y
+    apt install git\
+                expect-dev\
+                tcl\
+                libcrack2\
+                cracklib-runtime\
+                whiptail\
+                lsb-release\
+                python3-pip\
+                python3-wheel\
+                python3-setuptool -y
     pip3 --disable-pip-version-check install ansible jmespath
 }
 

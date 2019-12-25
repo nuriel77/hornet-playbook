@@ -1172,7 +1172,7 @@ function view_iritop() {
          return 1
     fi
 
-    python3 $(which iritop)
+    iritop
 }
 
 ### Notice ###
