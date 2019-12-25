@@ -224,7 +224,6 @@ function init_debian(){
     echo "Installing Ansible and git..."
     apt remove -y ansible || true
     apt install dirmngr --install-recommends -y
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
     apt update -y
     apt install git\
                 expect-dev\
