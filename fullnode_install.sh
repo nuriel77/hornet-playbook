@@ -138,7 +138,10 @@ function init_centos_7(){
     set -e
 
     echo "Installing Python3, Ansible and git..."
-    yum install -y "https://centos7.iuscommunity.org/ius-release.rpm"
+    if ! rpm -q ius-release >/dev/null 2>&1
+    then
+        yum install -y "https://centos7.iuscommunity.org/ius-release.rpm"
+    fi
     yum update -y
     yum install git\
                 expect-devel\
