@@ -211,7 +211,7 @@ function init_ubuntu(){
                     whiptail\
                     python3-pip\
                     python3-wheel\
-                    python3-setuptool -y
+                    python3-setuptools -y
     pip3 install --upgrade pip
     pip3 install ansible jmespath
 }
