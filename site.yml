@@ -36,6 +36,7 @@
       pip:
         name: python-gilt
         state: present
+      tags: local_deps
 
     - name: run gilt overlay
       command: "gilt --config {{ gilt_config | default('gilt.yml') }} overlay"
