@@ -27,6 +27,10 @@
   tags:
     - py_docker
 
+- import_tasks: tanglemonitor.yml
+  tags:
+    - tanglemonitor_role
+
 - name: set ip variable if not set
   set_fact:
     ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
@@ -53,7 +57,3 @@
 - import_tasks: ssl.yml
   tags:
     - hornet_ssl
-
-- import_tasks: tanglemonitor.yml
-  tags:
-    - tanglemonitor_role
