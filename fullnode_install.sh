@@ -138,23 +138,19 @@ function init_centos_7(){
     set -e
 
     echo "Installing Python3, Ansible and git..."
-    if ! rpm -q ius-release >/dev/null 2>&1
-    then
-        yum install -y "https://centos7.iuscommunity.org/ius-release.rpm"
-    fi
     yum remove -y ansible || true
     yum update -y
     yum install git\
                 expect-devel\
                 cracklib\
                 newt\
-                python36u\
-                python36u-libs\
-                python36u-devel\
-                python36u-pip\
-                python36u-wheel\
-                python36u-setuptools -y
-    /usr/local/bin/pip3 --disable-pip-version-check install ansible jmespath
+                python3\
+                python3-libs\
+                python3-devel\
+                python3-pip\
+                python3-wheel\
+                python3-setuptools -y
+    pip3 --disable-pip-version-check install ansible jmespath
 }
 
 function init_centos_8(){
@@ -209,7 +205,7 @@ function init_ubuntu(){
                     python3-pip\
                     python3-wheel\
                     python3-setuptools -y
-    pip3 install ansible jmespath
+    pip3 --disable-pip-version-check install ansible jmespath
 }
 
 function init_debian(){
@@ -240,7 +236,7 @@ function init_debian(){
                     python3-pip\
                     python3-wheel\
                     python3-setuptool -y
-    pip3 install ansible jmespath
+    pip3 --disable-pip-version-check install ansible jmespath
 }
 
 function inform_reboot() {
