@@ -150,8 +150,9 @@ function init_centos_7(){
                 python36u-pip\
                 python36u-wheel\
                 python36u-setuptools -y
-    pip3 install --upgrade pip
-    pip3 --disable-pip-version-check install ansible jmespath
+    echo "export PATH=$PATH:/usr/local/bin" >> /root/.bas
+    /usr/local/bin/pip3 install --upgrade pip
+    /usr/local/bin/pip3 --disable-pip-version-check install ansible jmespath
 }
 
 function init_centos_8(){
