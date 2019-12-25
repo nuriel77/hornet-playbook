@@ -24,6 +24,12 @@ declare -g HORNET_PLAYBOOK_DIR="/opt/hornet-playbook"
 declare -g INSTALLER_OVERRIDE_FILE="${HORNET_PLAYBOOK_DIR}/group_vars/all/z-installer-override.yml"
 declare -g PLAYBOOK_LIGHT="false"
 
+# Configurable install options passed to ansible-playbook command
+: "${INSTALL_OPTIONS:=}"
+
+# Set minimum ram, used to set light profile.
+: "${MIN_RAM_KB:=1572864}"
+
 if test -e /etc/motd && grep -q 'HORNET PLAYBOOK' /etc/motd; then
     :>/etc/motd
 else
@@ -37,12 +43,6 @@ else
         fi
     fi
 fi
-
-# Configurable install options passed to ansible-playbook command
-: "${INSTALL_OPTIONS:=}"
-
-# Set minimum ram, used to set light profile.
-: "${MIN_RAM_KB:=1572864}"
 
 clear
 cat <<'EOF'
