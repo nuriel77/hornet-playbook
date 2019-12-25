@@ -234,7 +234,7 @@ function init_debian(){
                 lsb-release\
                 python3-pip\
                 python3-wheel\
-                python3-setuptool -y
+                python3-setuptools -y
     pip3 --disable-pip-version-check install ansible jmespath
 }
 
