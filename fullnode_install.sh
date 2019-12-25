@@ -141,7 +141,8 @@ function init_centos_7(){
     yum install ansible git expect-devel cracklib newt python-pip -y
     if [ -e /usr/bin/pip ]; then
         /usr/bin/pip install jmespath
-    elif [ -e /usr/bin/pip3 ]; then
+    fi
+    if [ -e /usr/bin/pip3 ]; then
         /usr/bin/pip3 install jmespath
     fi
 }
@@ -189,7 +190,8 @@ function init_ubuntu(){
     apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail python3-pip -y
     if [ -e /usr/bin/pip ]; then
         /usr/bin/pip install jmespath
-    elif [ -e /usr/bin/pip3 ]; then
+    fi
+    if [ -e /usr/bin/pip3 ]; then
         /usr/bin/pip3 install jmespath
     fi
 }
@@ -215,7 +217,8 @@ function init_debian(){
     apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail lsb-release python3-pip -y
     if [ -e /usr/bin/pip ]; then
         /usr/bin/pip install jmespath
-    elif [ -e /usr/bin/pip3 ]; then
+    fi
+    if [ -e /usr/bin/pip3 ]; then
         /usr/bin/pip3 install jmespath
     fi
 }
