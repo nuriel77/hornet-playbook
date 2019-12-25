@@ -15,16 +15,6 @@
     name: software-properties-common
     update_cache: yes
 
-- name: add ansible repository Ubuntu
-  apt_repository:
-    repo: ppa:ansible/ansible
-  when: ansible_distribution == 'Ubuntu'
-
-- name: add ansible repository Debian
-  apt_repository:
-    repo: deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main
-    state: present
-
 - name: Install some packages
   apt:
     name: "{{ packages }}"
@@ -49,11 +39,11 @@
       - openssl
       - bsdmainutils
       - whiptail
-      - python-pip
       - python3-pip
-      - python-passlib
+      - python3-wheel
+      - python3-setuptools
+      - python3-passlib
       - apache2-utils
-      - ansible
   tags:
     - deps
     - scripts

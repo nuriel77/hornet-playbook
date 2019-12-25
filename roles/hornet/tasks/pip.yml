@@ -1,21 +1,9 @@
-- name: install python deps via pip centos8
+- name: install python deps via pip
   pip:
-    executable: /usr/bin/pip3
+    executable: pip3
     name:
      - docker
      - jmespath
-  when:
-    - ansible_distribution == "CentOS"
-    - ansible_distribution_major_version == "8"
-
-- name: install python deps via pip centos8
-  pip:
-    name:
-     - docker
-     - jmespath
-  when:
-    - ansible_distribution != "CentOS"
-    - ansible_distribution_major_version != "8"
 
 - name: "Fix for No module named ssl_match_hostname"
   shell: "test -d /usr/local/lib/python2.7/dist-packages/backports/ssl_match_hostname/ && cp -r /usr/local/lib/python2.7/dist-packages/backports/ssl_match_hostname/ /usr/lib/python2.7/dist-packages/backports || /bin/true"

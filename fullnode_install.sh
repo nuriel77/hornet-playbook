@@ -137,13 +137,21 @@ function init_centos_7(){
     set -o pipefail
     set -e
 
-    echo "Installing Ansible and git..."
-    yum install ansible git expect-devel cracklib newt python-pip -y
-    if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath
-    elif [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath
-    fi
+    echo "Installing Python3, Ansible and git..."
+    yum install -y "https://centos7.iuscommunity.org/ius-release.rpm"
+    yum update -y
+    yum install git\
+                expect-devel\
+                cracklib\
+                newt\
+                python36u\
+                python36u-libs\
+                python36u-devel\
+                python36u-pip\
+                python36u-wheel\
+                python36u-setuptools -y
+    pip3 install --upgrade pip
+    pip3 --disable-pip-version-check install ansible jmespath
 }
 
 function init_centos_8(){
@@ -165,7 +173,14 @@ function init_centos_8(){
     fi
 
     echo "Installing Ansible, git and other requirements..."
-    dnf install git expect newt python3-pip cracklib newt -y
+    dnf install git\
+                expect\
+                newt\
+                cracklib\
+                python3-pip\
+                python3-wheel\
+                python3-setuptools -y
+    pip3 install --upgrade pip
     pip3 --disable-pip-version-check install ansible jmespath
 }
 
@@ -182,16 +197,18 @@ function init_ubuntu(){
     fi
 
     echo "Installing Ansible and git..."
-    apt-get install software-properties-common -y
-    apt-add-repository ppa:ansible/ansible -y
-    add-apt-repository universe -y
     apt-get update -y
-    apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail python3-pip -y
-    if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath
-    elif [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath
-    fi
+    apt-get install git\
+                    expect-dev\
+                    tcl\
+                    libcrack2\
+                    cracklib-runtime\
+                    whiptail\
+                    python3-pip\
+                    python3-wheel\
+                    python3-setuptool -y
+    pip3 install --upgrade pip
+    pip3 install ansible jmespath
 }
 
 function init_debian(){
@@ -212,12 +229,18 @@ function init_debian(){
     apt-get install dirmngr --install-recommends -y
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
     apt-get update -y
-    apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail lsb-release python3-pip -y
-    if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath
-    elif [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath
-    fi
+    apt-get install git\
+                    expect-dev\
+                    tcl\
+                    libcrack2\
+                    cracklib-runtime\
+                    whiptail\
+                    lsb-release\
+                    python3-pip\
+                    python3-wheel\
+                    python3-setuptool -y
+    pip3 install --upgrade pip
+    pip3 install ansible jmespath
 }
 
 function inform_reboot() {
