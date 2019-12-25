@@ -139,7 +139,7 @@ function init_centos_7(){
 
     echo "Installing Ansible and git..."
     yum install ansible git expect-devel cracklib newt python-pip -y
-    test -x /usr/bin/pip && /usr/bin/pip install jmespath
+    test -e /usr/bin/pip && /usr/bin/pip install jmespath
 }
 
 function init_centos_8(){
@@ -183,7 +183,7 @@ function init_ubuntu(){
     add-apt-repository universe -y
     apt-get update -y
     apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail python3-pip -y
-    test -x /usr/bin/pip && /usr/bin/pip install jmespath
+    test -e /usr/bin/pip && /usr/bin/pip install jmespath
 }
 
 function init_debian(){
@@ -205,7 +205,7 @@ function init_debian(){
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
     apt-get update -y
     apt-get install ansible git expect-dev tcl libcrack2 cracklib-runtime whiptail lsb-release python3-pip -y
-    test -x /usr/bin/pip && /usr/bin/pip install jmespath
+    test -e /usr/bin/pip && /usr/bin/pip install jmespath
 }
 
 function inform_reboot() {
