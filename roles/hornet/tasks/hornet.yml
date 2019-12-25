@@ -228,3 +228,11 @@
 - name: build hornet image task
   import_tasks: image-hornet.yml
   tags: build_hornet_image
+
+- name: start hornet
+  systemd:
+    name: hornet.service
+    state: started
+    daemon_reload: yes
+    enabled: yes
+  register: hornet_started
