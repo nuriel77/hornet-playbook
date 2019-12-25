@@ -85,7 +85,9 @@
         dest: /usr/bin/python
         force: no
         state: link
-      when: "ansible_distribution_major_version == '8'"
+      when:
+        - ansible_distribution == "CentOS"
+        - ansible_distribution_major_version == '8'
 
     - name: ensure ~/.horc exists
       copy:
