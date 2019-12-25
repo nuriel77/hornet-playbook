@@ -142,6 +142,7 @@ function init_centos_7(){
     then
         yum install -y "https://centos7.iuscommunity.org/ius-release.rpm"
     fi
+    yum remove -y ansible || true
     yum update -y
     yum install git\
                 expect-devel\
