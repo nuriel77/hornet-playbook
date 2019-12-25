@@ -19,6 +19,9 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet Dashboard](#hornet-dashboard)
    * [Hornet HTTPS](#hornet-https)
    * [Troubleshooting](#troubleshooting)
+     * [502 Bad Gateway](#502-bad-gateway)
+     * [DB Corruption](#db-corruption)
+     * [Logs](#logs)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
      * [Related Documentation](docs/)
@@ -179,8 +182,21 @@ sudo lsof -Pni:14265
 ```
 Note that after restarting Hornet it takes it some time to make the port available (e.g. when loading snapshot file).
 
+## 502 Bad Gateway
+
+If you receive this error when trying to browse to the dashboard:
+
+* nginx (the webserver/proxy) is working properly
+* the back end to which it is trying to connect isn't working properly.
+
+Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io:8081` would tell nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly as described in the beginning of this chapter.
+
+## DB Corruption
+
 If Hornet wasn't shut down properly there is a good chance that the DB is corrupted and you will have to remove it and start all over again.
 
+
+## Logs
 In the following link you can read more about how to collect logs from your system. Although this documentation is for IRI, the commands are similar (just replace iri with hornet if needed):
 
 https://iri-playbook.readthedocs.io/en/master/troubleshooting.html#troubleshooting
