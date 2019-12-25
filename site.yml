@@ -52,6 +52,7 @@
       ver8:
         - python3-pip
     deb_packages:
+      - python-setuptools
       - python-pip
 
 - hosts: all
