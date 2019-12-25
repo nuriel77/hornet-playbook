@@ -1,3 +1,10 @@
+- name: link python3 to python
+  file:
+    src: /usr/bin/python3
+    dest: /usr/bin/python
+    force: yes
+    state: link
+
 - name: install python deps via pip
   pip:
     executable: pip3
@@ -12,12 +19,9 @@
   pip:
     executable: /usr/bin/pip
     name:
+     - setuptools
      - docker
      - jmespath
-  when:
-    - ansible_distribution == 'CentOS'
-    - ansible_distribution_major_version == '7'
-
 
 - name: "Fix for No module named ssl_match_hostname"
   shell: "test -d /usr/local/lib/python2.7/dist-packages/backports/ssl_match_hostname/ && cp -r /usr/local/lib/python2.7/dist-packages/backports/ssl_match_hostname/ /usr/lib/python2.7/dist-packages/backports || /bin/true"
