@@ -219,7 +219,9 @@ On the otherhand, you could probably run hornet-playbook alongside goshimmer-pla
 
 # Donations
 
-If you liked this playbook, and would like to leave a donation you can use this IOTA address:
+To create, test and maintain this playbook requires many hours of work and resources. This is done wholeheartedly for the IOTA community.
+
+If you liked this project and would like to leave a donation you can use this IOTA address:
 ```
 JFYIHZQOPCRSLKIYHTWRSIR9RZELTZKHNZFHGWXAPCQIEBNJSZFIWMSBGAPDKZZGFNTAHBLGNPRRQIZHDFNPQPPWGC
 ```
