@@ -36,7 +36,13 @@ else
     if [ -f "$INSTALLER_OVERRIDE_FILE" ] && [ "$1" != "rerun" ]
     then
         if ! (whiptail --title "Confirmation" \
-                 --yesno "It looks like a previous installation already exists.\n\nRunning the installer on an already working node is not recommended.\n\nIf you want to re-run only the playbook check the documentation or ask for assistance on Discord #fullnodes channel.\n\nPlease confirm you want to proceed with the installation?" \
+                 --yesno "
+It looks like a previous installation already exists.
+
+Running the installer on an already working node is not recommended.
+If you want to re-run only the playbook check the documentation or ask for assistance on Discord #fullnodes channel.
+
+Please confirm you want to proceed with the installation?" \
                  --defaultno \
                  16 78); then
             exit 1
@@ -273,7 +279,11 @@ EOF
 
 function set_admin_password_a() {
     whiptail --title "Admin Password" \
-             --passwordbox "Please enter the password with which you will connect to services (IOTA Peer manager, Grafana, etc). Use a stong password!!! Not 'hello123' or 'iota8181', you get the point ;). Only valid ASCII characters are allowed." \
+             --passwordbox "
+Please enter the password with which you will connect to services (IOTA Peer manager, Grafana, etc).
+
+Use a stong password!!! Not 'hello123' or 'iota8181', you get the point ;).
+Only valid ASCII characters are allowed." \
              10 78 3>&1 1>&2 2>&3
 
     if [[ $? -ne 0 ]]; then
@@ -301,7 +311,10 @@ function get_admin_password() {
     case "${PASSWORD_A}" in
         *[![:cntrl:][:print:]]*)
             whiptail --title "Invalid characters!!" \
-                     --msgbox "Only ASCII characters are allowed:\n\n!\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|}~" \
+                     --msgbox "
+Only ASCII characters are allowed:
+
+!\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|}~" \
                      12 78
             get_admin_password
             return
@@ -339,7 +352,11 @@ function get_admin_password() {
 }
 
 function set_admin_username() {
-    ADMIN_USER=$(whiptail --inputbox "Choose an administrator's username.\nOnly valid ASCII characters are allowed:" 10 $WIDTH "$ADMIN_USER" --title "Choose Admin Username" 3>&1 1>&2 2>&3)
+    ADMIN_USER=$(whiptail --inputbox "
+Choose an administrator's username.
+Only valid ASCII characters are allowed:" \
+                 10 $WIDTH "$ADMIN_USER" \
+                 --title "Choose Admin Username" 3>&1 1>&2 2>&3)
     if [[ $? -ne 0 ]]; then
         echo "Installation cancelled"
     fi
@@ -348,7 +365,10 @@ function set_admin_username() {
     case "${ADMIN_USER}" in
         *[![:cntrl:][:print:]]*)
             whiptail --title "Invalid characters!!" \
-                     --msgbox "Only ASCII characters are allowed:\n\n!\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|}~" \
+                     --msgbox "
+Only ASCII characters are allowed:
+
+!\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_\`abcdefghijklmnopqrstuvwxyz{|}~" \
                      12 78
             set_admin_username
             return
@@ -363,20 +383,26 @@ function set_admin_username() {
 function set_selections() {
     local RC RESULTS RESULTS_ARRAY CHOICE SKIP_TAGS
     SKIP_TAGS="--skip-tags=_"
+    DISABLE_MONITORING_DEFAULT="ON"
+    DISABLE_MONITORING_MSG=" (recommended)"
 
     if [[ "$PLAYBOOK_LIGHT" = true ]]
     then
-        DISABLE_MONITORING_DEFAULT="ON"
-        DISABLE_MONITORING_MSG=" (recommended)"
         echo "hornet_profile: light" >>"$INSTALLER_OVERRIDE_FILE"
-    else
+    elif [[ ! "$OS" =~ ^Raspbian ]]
+    then
         DISABLE_MONITORING_DEFAULT="OFF"
+        DISABLE_MONITORING_MSG=""
     fi
 
     RESULTS=$(whiptail --title "Installation Options" --checklist \
         --cancel-button "Exit" \
-        "\nPlease choose additional installation options.\nDefaults have been set according to your system's configuration:\nit is perfectly okay to leave this as is.\n\
-Select/unselect options using space and click Enter to proceed.\n" 24 78 5 \
+        "
+Please choose additional installation options.
+Note that defaults have been set according to your system's configuration.
+
+Select/unselect options using space and click Enter to proceed.
+        " 24 78 5 \
         "INSTALL_DOCKER"           "Install Docker runtime (recommended)" ON \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
         "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
@@ -418,7 +444,12 @@ Select/unselect options using space and click Enter to proceed.\n" 24 78 5 \
     if [[ -n "$RESULTS" ]]; then
         RESULTS_MSG=$(echo "$RESULTS"|sed 's/ /\n/g')
         if ! (whiptail --title "Confirmation" \
-                 --yesno "You chose:\n\n$RESULTS_MSG\n\nPlease confirm you want to proceed with the installation?" \
+                 --yesno "
+You chose:
+
+$RESULTS_MSG
+
+Please confirm you want to proceed with the installation?" \
                  --defaultno \
                  16 78); then
             exit 1
@@ -434,6 +465,11 @@ install_nginx: true
 configure_firewall: false
 lb_bind_addresses: ['0.0.0.0']
 EOF
+
+    if [[ "$PLAYBOOK_LIGHT" = true ]] || [[ "$OS" =~ ^Raspbian ]]
+    then
+        echo "disable_monitoring: true" >>"$INSTALLER_OVERRIDE_FILE"
+    fi
 }
 
 # Get primary IP from ICanHazIP, if it does not validate, fallback to local hostname
@@ -479,7 +515,11 @@ function set_playbook_light() {
 }
 
 function set_ssh_port() {
-    SSH_PORT=$(whiptail --inputbox "Please verify this is your active SSH port:" 8 78 "$SSH_PORT" --title "Verify SSH Port" 3>&1 1>&2 2>&3)
+    SSH_PORT=$(whiptail --inputbox "
+Please verify this is your active SSH port:" \
+               8 78 \
+               "$SSH_PORT" \
+               --title "Verify SSH Port" 3>&1 1>&2 2>&3)
     if [[ $? -ne 0 ]] || [[ "$SSH_PORT" == "" ]]; then
         set_ssh_port
     elif [[ "$SSH_PORT" =~ [^0-9] ]] || [[ $SSH_PORT -gt 65535 ]] || [[ $SSH_PORT -lt 1 ]]; then
@@ -518,7 +558,7 @@ function run_playbook(){
     LOGFILE=/var/log/hornet-playbook-$(date +%Y%m%d%H%M).log
 
     # Override ssh_port
-    [[ $SSH_PORT -ne 22 ]] && echo "ssh_port: \"${SSH_PORT}\"" > group_vars/all/z-ssh-port.yml
+    [[ $SSH_PORT -ne 22 ]] && echo "ssh_port: \"${SSH_PORT}\"" > "${HORNET_PLAYBOOK_DIR}/group_vars/all/z-ssh-port.yml"
 
     # Run the playbook
     echo "*** Running playbook command: ansible-playbook -i inventory -v site.yml -e "memory_autoset=true" $INSTALL_OPTIONS" | tee -a "$LOGFILE"
@@ -574,15 +614,20 @@ EOF
     # This could happen on script re-run
     # due to reboot, therefore the variable is empty
     if [ -z "$ADMIN_USER" ]; then
-        ADMIN_USER=$(grep "^fullnode_user:" $INSTALLER_OVERRIDE_FILE | awk {'print $2'})
+        ADMIN_USER=$(grep "^fullnode_user:" "$INSTALLER_OVERRIDE_FILE" | awk {'print $2'})
+    fi
+
+    if ! grep -q "^disable_monitoring: true" "$INSTALLER_OVERRIDE_FILE"; then
+        MONITORING_MSG=" and Grafana"
+        MONITORING_URL=" and https://${PRIMARY_IP}:5555"
     fi
 
     OUTPUT=$(cat <<EOF
 * A log of this installation has been saved to: $LOGFILE
 
-* You should be able to connect to Hornet's Dashboard and Grafana:
+* You should be able to connect to Hornet Dashboard${MONITORING_MS}:
 
-https://${PRIMARY_IP}:8081 and https://${PRIMARY_IP}:5555
+https://${PRIMARY_IP}:8081${MONITORING_URL}
 
 * Note that your IP might be different as this one has been auto-detected in best-effort.
 
@@ -653,13 +698,15 @@ fi
 
 echo "Verifying Ansible version..."
 ANSIBLE_VERSION=$(ansible --version|head -1|awk {'print $2'}|cut -d. -f1-2)
-if (( $(awk 'BEGIN {print ("'2.6'" > "'$ANSIBLE_VERSION'")}') )); then
-    echo "Error: Ansible minimum version 2.6 required."
-    echo "Please remove Ansible: (yum remove ansible -y for CentOS, or apt-get remove -y ansible for Ubuntu)."
-    echo
-    echo "Then refer to the documentation on how to get latest Ansible installed:"
-    echo "http://docs.ansible.com/ansible/latest/intro_installation.html#latest-release-via-yum"
-    echo "Note that for CentOS you may need to install Ansible from Epel to get version 2.6 or higher."
+if (( $(awk 'BEGIN {print ("'2.8'" > "'$ANSIBLE_VERSION'")}') )); then
+    cat <<EOF
+Error: Ansible minimum version 2.8 required.
+Please remove Ansible: (yum remove ansible -y for CentOS, or apt-get remove -y ansible for Ubuntu).
+
+Then refer to the documentation on how to get latest Ansible installed.
+http://docs.ansible.com/ansible/latest/intro_installation.html
+Note that for CentOS you may need to install Ansible from Epel to get version 2.8 or higher.
+EOF
     exit 1
 fi
 
