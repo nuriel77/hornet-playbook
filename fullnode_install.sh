@@ -230,6 +230,7 @@ function init_debian(){
     apt-get update -y
     apt-get install ansible\
                     git\
+                    less\
                     expect-dev\
                     tcl\
                     libcrack2\
