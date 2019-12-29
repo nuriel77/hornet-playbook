@@ -100,7 +100,7 @@ function set_dist() {
     # Set path to hornet's configuration file
     if [[ "$OS" =~ ^(CentOS|Red) ]]; then
         export SYSCONFIG_FILE=/etc/sysconfig/hornet
-    elif [[ "$OS" =~ ^(Ubuntu|Debian) ]]; then
+    elif [[ "$OS" =~ ^(Ubuntu|Debian|Raspbian) ]]; then
         export SYSCONFIG_FILE=/etc/default/hornet
     fi
 }
