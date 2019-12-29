@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.2.5
+VERSION_TEMP=0.2.6
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
