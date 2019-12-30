@@ -1,11 +1,3 @@
-- name: start hornet
-  systemd:
-    name: hornet.service
-    state: started
-    daemon_reload: yes
-    enabled: yes
-  register: hornet_started
-
 - name: restart hornet
   systemd:
     name: hornet.service
@@ -14,4 +6,4 @@
     enabled: yes
   when:
     - not skip_hornet_restart|default(False)|bool
-    - not hornet_started.changed
+    - hornet_started is not defined or not hornet_started.changed

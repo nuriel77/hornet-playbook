@@ -191,7 +191,6 @@
     dest: "{{ config_dir }}/hornet"
     backup: yes
   notify:
-    - start hornet
     - restart hornet
 
 - name: copy hornet systemd file
@@ -201,7 +200,6 @@
   tags:
     - hornet_service_file
   notify:
-    - start hornet
     - restart hornet
 
 - name: copy hornet config file
@@ -215,7 +213,6 @@
     backup: yes
   tags: hornet_config_file
   notify:
-    - start hornet
     - restart hornet
 
 - name: download hornet snapshot DB (can take a while)
@@ -227,7 +224,6 @@
     group: "{{ hornet_group }}"
     force: "{{ overwrite | default('no') }}"
   notify:
-    - start hornet
     - restart hornet
   tags:
     - download_snapshot_db
@@ -236,3 +232,11 @@
 - name: build hornet image task
   import_tasks: image-hornet.yml
   tags: build_hornet_image
+
+- name: start hornet
+  systemd:
+    name: hornet.service
+    state: started
+    daemon_reload: yes
+    enabled: yes
+  register: hornet_started
