@@ -6,7 +6,7 @@ Requires=docker.service
 [Service]
 TimeoutStartSec=0
 TimeoutStopSec=900
-Restart=always
+Restart=no
 EnvironmentFile=-{{ config_dir }}/hornet
 ExecStartPre=-/bin/bash -c "/usr/bin/docker rm %p || /bin/true"
 ExecStart=/usr/bin/docker run \
