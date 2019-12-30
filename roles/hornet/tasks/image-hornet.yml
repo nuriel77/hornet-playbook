@@ -35,6 +35,7 @@
     tag: "{{ hornet_tag }}"
     source: build
   notify:
+    - start hornet
     - restart hornet
   register: build_image_status
   until: build_image_status is succeeded

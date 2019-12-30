@@ -1,3 +1,11 @@
+- name: start hornet
+  systemd:
+    name: hornet.service
+    state: started
+    daemon_reload: yes
+    enabled: yes
+  register: hornet_started
+
 - name: restart hornet
   systemd:
     name: hornet.service
