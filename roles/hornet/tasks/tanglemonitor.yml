@@ -1,4 +1,4 @@
-- name: clone hornet repository
+- name: clone tanglemonitor repository
   git:
     repo: '{{ tanglemonitor_git_url }}'
     dest: '{{ tanglemonitor_path }}'

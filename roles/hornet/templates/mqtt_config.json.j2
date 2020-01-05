@@ -1,7 +1,7 @@
 {
   "workerNum": {{ hornet_mqtt_worker_number | default('4096') }},
   "port": "{{ hornet_mqtt_port | default('11883') }}",
-  "host": "{{ hornet_mqtt_address | default('127.0.0.1') }}",
+  "host": "{{ hornet_mqtt_internal_address | default('127.0.0.1') }}",
   "cluster": {
     "host": "",
     "port": ""

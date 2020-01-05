@@ -4,3 +4,4 @@ nginx_vhost_files:
   - src: '../shared-files/prometheus.conf.j2'
   - src: '../shared-files/alertmanager.conf.j2'
   - src: '../shared-files/tanglemonitor.conf.j2'
+  - src: '../shared-files/tanglevisualiser.conf.j2'
