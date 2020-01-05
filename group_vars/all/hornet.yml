@@ -51,6 +51,7 @@ hornet_disable_plugins:
   - ZeroMQ
   - Spammer
   - Monitor
+  - MQTT
 
 hornet_permit_remote_access_list:
   - getNodeInfo

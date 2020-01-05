@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.0
+VERSION_TEMP=0.3.1
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -692,7 +692,7 @@ function edit_config() {
     local CONFIG_FILE=$1
     local SERVICE=$2
     local RELOAD=$3
-    if [ ! -f $CONFIG_FILE ]; then
+    if [ ! -f "$CONFIG_FILE" ]; then
         whiptail --title "Missing File" \
                  --msgbox "Error: cannot find '$CONFIG_FILE'" \
                  8 $WIDTH
@@ -700,11 +700,11 @@ function edit_config() {
     fi
 
     # Make backup for restores
-    if [ ! -f ${CONFIG_FILE}.original ]; then
-        cp ${CONFIG_FILE} ${CONFIG_FILE}.original
+    if [ ! -f "${CONFIG_FILE}.original" ]; then
+        cp -- "${CONFIG_FILE}" "${CONFIG_FILE}.original"
     fi
 
-    if edit_config_file ${CONFIG_FILE} ${SERVICE} ${RELOAD}; then
+    if edit_config_file "${CONFIG_FILE}" "${SERVICE}" "${RELOAD}"; then
         return 0
     else
         return 1
@@ -1253,9 +1253,9 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor"
+    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT"
 
-    CONFIG_FILE=$(grep ^file "$HOME/.nbctl" | awk {'print $2'})
+    CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
     # Save current config state
     ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enableplugins) \(.disableplugins)"' < "$CONFIG_FILE")
@@ -1284,13 +1284,22 @@ function hornet_plugins() {
         PLUGIN_TANGLEMONITOR_STATE="OFF"
     fi
 
+    if jq -e -r '.node.enableplugins | index("MQTT")' < "$CONFIG_FILE" >/dev/null
+    then
+        PLUGIN_MQTT_STATE="ON"
+    else
+        PLUGIN_MQTT_STATE="OFF"
+    fi
+
+
     RESULTS=$(whiptail --title "HORC v${__VERSION__} - Plugins" \
         --checklist \
         --cancel-button "Exit" \
         "\nPlease choose plugins to enable or disable.\n\
-Select/unselect options using space and\nclick Enter to proceed.\n" 14 50 "${#DISABLE_PLUGINS_ARRAY[@]}" \
+Select/unselect options using space and\nclick Enter to proceed.\n" 15 50 "${#DISABLE_PLUGINS_ARRAY[@]}" \
         "Spammer"           "...         Spammer" "$PLUGIN_SPAMMER_STATE" \
         "ZMQ"               "...         ZeroMQ" "$PLUGIN_ZMQ_STATE" \
+        "MQTT"              "...         MQTT" "$PLUGIN_MQTT_STATE" \
         "Monitor"           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
         3>&1 1>&2 2>&3)
 
@@ -1308,6 +1317,10 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 14 50 "${#DI
             '"ZMQ"')
                 ENABLE_PLUGINS+=",ZeroMQ"
                 DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/ZeroMQ/}")
+                ;;
+            '"MQTT"')
+                ENABLE_PLUGINS+=",MQTT"
+                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/MQTT/}")
                 ;;
             '"Monitor"')
                 ENABLE_PLUGINS+=",Monitor"
