@@ -101,7 +101,7 @@
         content: |-
           api_version: {{ hornet_api_version | default('1') }}
           host: http://127.0.0.1:{{ hornet_api_port }}
-          file: {{ hornet_home_path }}/config.json
+          file: {{ hornet_home_path }}/neighbors.json
           hornet: true
         force: "{{ overwrite | default('no') }}"
         backup: yes
@@ -202,16 +202,20 @@
   notify:
     - restart hornet
 
-- name: copy hornet config file
+- name: copy hornet config files
   template:
-    src: templates/config.json.j2
-    dest: "{{ hornet_home_path }}/config.json"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     mode: 0600
     owner: "{{ hornet_user }}"
     group: "{{ hornet_group }}"
     force: "{{ overwrite | default('no') }}"
     backup: yes
-  tags: hornet_config_file
+  with_items:
+    - {"src": "templates/config.json.j2", "dest": "{{ hornet_home_path }}/config.json"}
+    - {"src": "templates/neighbors.json.j2", "dest": "{{ hornet_home_path }}/neighbors.json"}
+    - {"src": "templates/mqtt_config.json.j2", "dest": "{{ hornet_home_path }}/mqtt_config.json"}
+  tags: hornet_config_files
   notify:
     - restart hornet
 
