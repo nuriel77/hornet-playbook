@@ -13,8 +13,10 @@ hornet_version: latest
 hornet_user: hornet
 hornet_group: hornet
 hornet_home_path: /var/lib/hornet
-hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
 hornet_config: "{{ hornet_home_path }}/config.json"
+hornet_neighbor_config: "{{ hornet_home_path }}/neighbors.json"
+hornet_mqtt_config_file: mqtt_config.json
+hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
 hornet_db_tar: "{{ hornet_home_path }}/latest-export.gz.bin"
 hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
 
@@ -81,8 +83,16 @@ hornet_ports:
     port: 14265
     proto: tcp
     allow: no
+  graph:
+    port: 8083
+    proto: tcp
+    allow: yes
   zmq:
     port: 5556
+    proto: tcp
+    allow: no
+  mqtt:
+    port: 1883
     proto: tcp
     allow: no
   dashboard:
@@ -132,7 +142,7 @@ tanglemonitor_path: "{{ hornet_home_path }}/tanglemonitor"
 hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
 
 # Hornet ZMQ bind address
-hornet_zmq_address: "127.0.0.1"
+hornet_zmq_address: 127.0.0.1
 
 # Set openfiles limit
 hornet_nofile_limit: "65535"
@@ -148,6 +158,16 @@ hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
 hornet_dashboard_address: 127.0.0.1
 hornet_dashboard_internal_port: "8087"
 hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
+
+# Graph config
+hornet_graph_address: 127.0.0.1
+hornet_graph_internal_port: "18083"
+hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
+
+# MQTT config
+hornet_mqtt_address: 127.0.0.1
+hornet_mqtt_internal_port: "11883"
+hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
 
 # Only needs enabling if not served via nginx
 hornet_dashboard_basic_auth: false

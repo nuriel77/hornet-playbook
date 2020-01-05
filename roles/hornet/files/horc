@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.2.6
+VERSION_TEMP=0.3.0
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -744,7 +744,7 @@ function add_neighbors() {
         [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
 
         # Run nbctl command
-        NBCTL_OUTPUT=$(nbctl -a $ADD_LIST $HORNET_CONFIG 2>&1)
+        NBCTL_OUTPUT=$(nbctl -a $ADD_LIST $HORNET_CONFIG --hornet 2>&1)
         RC=$?
         if [[ $RC -eq 0 ]]; then
             HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 7)
@@ -809,7 +809,7 @@ function remove_neighbors() {
     then
         HORNET_CONFIG=$(grep ^file /root/.nbctl | cut -d: -f2)
         [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
-        REMOVAL_OUTPUT=$(nbctl -r -n "${SCHEME}://${ADDRESS}" $HORNET_CONFIG 2>&1)
+        REMOVAL_OUTPUT=$(nbctl -r -n "${SCHEME}://${ADDRESS}" $HORNET_CONFIG --hornet 2>&1)
         if [ $? -eq 0 ];then
             whiptail --title "Removed successfully" \
                      --msgbox "$REMOVAL_OUTPUT" \
@@ -874,7 +874,7 @@ function show_lmsi() {
                  8 $WIDTH
         return
     fi
-    HORNET_HOST=$(grep ^host $HOME/.nbctl | cut -d: -f2-)
+    HORNET_HOST=$(grep ^host "$HOME/.nbctl" | cut -d: -f2-)
     local HORNET_API_VERSION=$(grep ^api_version $HOME/.nbctl | cut -d: -f2-)
     local LSMI_LOCAL=$(curl -f -m 5 -s $HORNET_HOST -X POST -H "X-IOTA-API-Version: $HORNET_API_VERSION" -H 'Content-Type: application/json' -d '{"command": "getNodeInfo"}'| python -m json.tool|egrep "latestSolidSubtangleMilestoneIndex|latestMilestoneIndex"| sed 's/,//'|sed -e 's/^[ \t]*//'|sed 's/"//g')
     if [ $? -ne 0 ]; then
@@ -1178,7 +1178,7 @@ function view_iritop() {
 ### Notice ###
 function how_to_setup() {
     whiptail --title "HORC v${VERSION} - Instructions" \
-             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/config.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
+             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/neighbors.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
              15 $WIDTH
 }
 
@@ -1189,8 +1189,10 @@ function configure_files_menu() {
              --cancel-button "Back" \
               22 48 12 \
     "a)" "Hornet System Config" \
-    "b)" "Hornet Configuration" \
-    "c)" "HAProxy Config" \
+    "b)" "Hornet Main Config" \
+    "c)" "Hornet Neighbors Config" \
+    "d)" "Hornet MQTT Config" \
+    "e)" "HAProxy Config" \
     "Z)" "Choose Editor" \
     3>&1 1>&2 2>&3
 }
@@ -1215,6 +1217,16 @@ function configure_files() {
             ;;
 
         "c)")
+            edit_config "/var/lib/hornet/neighbors.json" "hornet"
+            configure_files
+            ;;
+
+        "d)")
+            edit_config "/var/lib/hornet/mqtt_config.json" "hornet"
+            configure_files
+            ;;
+
+        "e)")
             edit_config "/etc/haproxy/haproxy.cfg" "haproxy" "reload"
             configure_files
             ;;

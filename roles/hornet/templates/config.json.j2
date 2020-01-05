@@ -93,6 +93,14 @@
     "coordinatorsecuritylevel": {{ hornet_coo_security_level | default('2') }},
     "numberofkeysinamilestone": {{ hornet_number_of_keys_in_milestone | default('23') }}
   },
+  "graph": {
+    "webrootPath": "IOTAtangle/webroot",
+    "socketiopath": "socket.io-client/dist/socket.io.js",
+    "domain": "{{ honet_graph_domain | default('') }}",
+    "host": "{{ hornet_graph_address | default('127.0.0.1') }}",
+    "port": {{ hornet_graph_internal_port | default('18083') }},
+    "networkName": "meets HORNET"
+  },
   "monitor": {
     "tanglemonitorpath": "tanglemonitor/frontend",
     "domain": "{{ honet_monitor_domain | default('') }}",
@@ -100,12 +108,12 @@
     "port": {{ hornet_monitor_port | default('14434') }},
     "apiPort": {{ hornet_monitor_api_port | default('14433') }}
   },
+  "mqtt": {
+    "config": "{{ hornet_mqtt_config_file | default('mqtt_config.json') }}"
+  },
   "network": {
     "preferIPv6": false,
     "address": "{{ hornet_peering_address | default('0.0.0.0') }}",
-    "autotetheringenabled": {{ hornet_auto_peering_enabled | default('false') | lower | string }},
-    "maxneighbors": {{ hornet_max_neighbors | default('5') }},
-    "neighbors": {{ hornet_neighbors | to_nice_json(indent=4) }},
     "port": {{ hornet_peering_port | default('15600') }},
     "reconnectattemptintervalseconds": {{ hornet_reconnect_int | default('60') }}
   },
