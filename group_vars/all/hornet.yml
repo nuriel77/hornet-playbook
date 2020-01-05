@@ -52,6 +52,7 @@ hornet_disable_plugins:
   - Spammer
   - Monitor
   - MQTT
+  - Graph
 
 hornet_permit_remote_access_list:
   - getNodeInfo
@@ -156,17 +157,22 @@ hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
 # Dashboard config
 # Keep the dashboard on 127.0.0.1 when running behind
 # a proxy like nginx.
-hornet_dashboard_address: 127.0.0.1
+hornet_dashboard_internal_address: 127.0.0.1
 hornet_dashboard_internal_port: "8087"
 hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
 
-# Graph config
-hornet_graph_address: 127.0.0.1
+# Tangle Visualiser/Graph config
+hornet_graph_internal_address: 127.0.0.1
 hornet_graph_internal_port: "18083"
 hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
+tanglevisualiser_git_url: "https://github.com/glumb/IOTAtangle.git"
+socketio_git_url: "https://github.com/socketio/socket.io-client.git"
+tanglevisualiser_path: "{{ hornet_home_path }}/tanglevisualiser"
+socketio_path: "{{ hornet_home_path }}/socket.io-client"
+hornet_mqtt_ws_path: '/ws'
 
 # MQTT config
-hornet_mqtt_address: 127.0.0.1
+hornet_mqtt_internal_address: 127.0.0.1
 hornet_mqtt_internal_port: "11883"
 hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
 

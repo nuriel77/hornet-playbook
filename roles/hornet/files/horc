@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.1
+VERSION_TEMP=0.3.2
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -1253,7 +1253,7 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT"
+    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph"
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
@@ -1291,6 +1291,12 @@ function hornet_plugins() {
         PLUGIN_MQTT_STATE="OFF"
     fi
 
+    if jq -e -r '.node.enableplugins | index("Graph")' < "$CONFIG_FILE" >/dev/null
+    then
+        PLUGIN_GRAPH_STATE="ON"
+    else
+        PLUGIN_GRAPH_STATE="OFF"
+    fi
 
     RESULTS=$(whiptail --title "HORC v${__VERSION__} - Plugins" \
         --checklist \
@@ -1301,6 +1307,7 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 15 50 "${#DI
         "ZMQ"               "...         ZeroMQ" "$PLUGIN_ZMQ_STATE" \
         "MQTT"              "...         MQTT" "$PLUGIN_MQTT_STATE" \
         "Monitor"           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
+        "Graph"             "...         Tangle Visualiser" "$PLUGIN_GRAPH_STATE" \
         3>&1 1>&2 2>&3)
 
     RC=$?
@@ -1325,6 +1332,10 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 15 50 "${#DI
             '"Monitor"')
                 ENABLE_PLUGINS+=",Monitor"
                 DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Monitor/}")
+                ;;
+            '"Graph"')
+                ENABLE_PLUGINS+=",Graph"
+                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Graph/}")
                 ;;
             *)
                 ;;
