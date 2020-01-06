@@ -5,7 +5,7 @@ Requires=docker.service
 
 [Service]
 TimeoutStartSec=0
-TimeoutStopSec=900
+TimeoutStopSec={{ hornet_wait_stop_sec | default('1200') }}
 Restart=no
 EnvironmentFile=-{{ config_dir }}/hornet
 ExecStartPre=-/bin/bash -c "/usr/bin/docker rm %p || /bin/true"
@@ -27,8 +27,8 @@ ExecStart=/usr/bin/docker run \
   $DOCKER_OPTS \
   ${HORNET_IMAGE}:${TAG} \
   $OPTIONS
-ExecStop=/usr/bin/docker stop %p
-ExecReload=/usr/bin/docker restart %p
+ExecStop=/usr/bin/docker stop --time {{ hornet_wait_stop_sec | default('1200') }} %p
+ExecReload=/usr/bin/docker restart --time {{ hornet_wait_stop_sec | default('1200') }} %p
 
 [Install]
 WantedBy=multi-user.target
