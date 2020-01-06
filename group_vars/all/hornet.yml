@@ -66,6 +66,8 @@ hornet_permit_remote_access_list:
   - findTransactions
   - storeTransactions
   - getTrytes
+  - attachToTangle
+  - interruptAttachingToTangle
 
 # Unprivileged user to run hornet with
 hornet_username: hornet
