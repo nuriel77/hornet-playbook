@@ -7,6 +7,13 @@
 # By Nuriel Shem-Tov (https://github.com/nuriel77), December 2019
 # Copyright (c) 2019 Nuriel Shem-Tov
 
+# Some options can be passed via environment variables:
+# SET_DEFAULTS="true"   ..... set default option selections
+# SKIP_PASSWORD="true"  ..... skip user and password selection (sets defaults)
+# SKIP_REBOOT="true"    ..... skip require reboot (except on selinux/centos)
+# SKIP_CONFIRM="true"   ..... skip installer confirmation
+# INSTALL_OPTIONS       ..... additional command line arguments to pass to ansible-playbook
+
 set -o pipefail
 set -e
 
@@ -138,7 +145,7 @@ function init_centos_7(){
     set +e
     set +o pipefail
     if $(needs-restarting -r 2>&1 | grep -q "Reboot is required"); then
-        [ -z "$SKIP_REBOOT" ] && { inform_reboot; exit 0; }
+        [[ "$SKIP_REBOOT" != true ]] && { inform_reboot; exit 0; }
     fi
     set -o pipefail
     set -e
@@ -168,7 +175,7 @@ function init_centos_8(){
 
     local OUTPUT=$(needs-restarting)
     if [[ "$OUTPUT" != "" ]]; then
-        [ -z "$SKIP_REBOOT" ] && { inform_reboot; exit 0; }
+        [[ "$SKIP_REBOOT" != true ]] && { inform_reboot; exit 0; }
     fi
 
     echo "Installing Ansible, git and other requirements..."
@@ -185,7 +192,7 @@ function init_ubuntu(){
 
     echo "Check reboot required..."
     if [ -f /var/run/reboot-required ]; then
-        [ -z "$SKIP_REBOOT" ] && { inform_reboot; exit 0; }
+        [[ "$SKIP_REBOOT" != true ]] && { inform_reboot; exit 0; }
     fi
 
     echo "Installing Ansible and git..."
@@ -219,7 +226,7 @@ function init_debian(){
 
     echo "Check reboot required..."
     if [ -f /var/run/reboot-required ]; then
-        [ -z "$SKIP_REBOOT" ] && { inform_reboot; exit 0; }
+        [[ "$SKIP_REBOOT" != true ]] && { inform_reboot; exit 0; }
     fi
 
     echo "Installing Ansible and git..."
