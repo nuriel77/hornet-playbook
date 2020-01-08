@@ -40,7 +40,7 @@ declare -g PLAYBOOK_LIGHT="false"
 if test -e /etc/motd && grep -q 'HORNET PLAYBOOK' /etc/motd; then
     :>/etc/motd
 else
-    if [ -f "$INSTALLER_OVERRIDE_FILE" ] && [ "$1" != "rerun" ]
+    if [ -f "$INSTALLER_OVERRIDE_FILE" ] && [[ "$1" != "rerun" ]] && [[ "$SKIP_CONFIRM" != true ]]
     then
         if ! (whiptail --title "Confirmation" \
                  --yesno "
@@ -86,10 +86,13 @@ Welcome to HORNET IOTA FullNode Installer!
 
 EOF
 
-read -p "Do you wish to proceed? [y/N] " yn
-if echo "$yn" | grep -v -iq "^y"; then
-    echo Cancelled
-    exit 1
+if [[ "$SKIP_CONFIRM" != true ]]
+then
+    read -p "Do you wish to proceed? [y/N] " yn
+    if echo "$yn" | grep -v -iq "^y"; then
+        echo Cancelled
+        exit 1
+    fi
 fi
 
 #################
