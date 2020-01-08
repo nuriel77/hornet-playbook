@@ -16,31 +16,41 @@
 
   when: remove_hornet_image|default(False)|bool
 
-- name: check hornet image exists
-  shell: "/usr/bin/docker images {{ hornet_image }}:{{ hornet_tag }} | grep -q ^hornet"
-  changed_when: False
-  register: hornet_image_stat
-  failed_when: "hornet_image_stat.rc > 1"
-
-- name: build hornet image, this can take a moment...
+- name: download hornet from dockerhub (for arch amd64 only)
+  when: "server_arch == 'amd64'"
   docker_image:
-    build:
-      path: "{{ hornet_git_dest }}"
-      pull: no
-      network: host
-      dockerfile: '{{ hornet_dockerfile | default(omit) }}'
-      args:
-        ARCH: "{{ server_arch | default('amd64') }}"
-    name: "{{ hornet_image }}"
-    tag: "{{ hornet_tag }}"
-    source: build
-  notify:
-    - restart hornet
-  register: build_image_status
-  until: build_image_status is succeeded
-  retries: 3
-  delay: 2
-  when: >
-        hornet_image_stat.rc == 1 and
-        (images_from_master is not defined or
-         images_from_master|bool == False)
+    name: "{{ hornet_image }}:{{ hornet_tag }}"
+    source: pull
+
+- name: build hornet image
+  when: "server_arch != 'amd64'"
+  block:
+
+    - name: check hornet image exists
+      shell: "/usr/bin/docker images {{ hornet_image }}:{{ hornet_tag }} | grep -q ^hornet"
+      changed_when: False
+      register: hornet_image_stat
+      failed_when: "hornet_image_stat.rc > 1"
+
+    - name: build hornet image, this can take a moment...
+      docker_image:
+        build:
+          path: "{{ hornet_git_dest }}"
+          pull: no
+          network: host
+          dockerfile: '{{ hornet_dockerfile | default(omit) }}'
+          args:
+            ARCH: "{{ server_arch | default('amd64') }}"
+        name: "{{ hornet_image }}"
+        tag: "{{ hornet_tag }}"
+        source: build
+      notify:
+        - restart hornet
+      register: build_image_status
+      until: build_image_status is succeeded
+      retries: 3
+      delay: 2
+      when: >
+            hornet_image_stat.rc == 1 and
+            (images_from_master is not defined or
+             images_from_master|bool == False)

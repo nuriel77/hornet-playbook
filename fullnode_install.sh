@@ -741,11 +741,14 @@ else
     set_selections
 fi
 
-# Get the administrators username
-set_admin_username
+if [[ "$SKIP_PASSWORD" != true ]]
+then
+    # Get the administrators username
+    set_admin_username
 
-# web access (ipm, haproxy, grafana, etc)
-get_admin_password
+    # web access (ipm, haproxy, grafana, etc)
+    get_admin_password
+fi
 
 echo -e "\nRunning playbook..."
 run_playbook
