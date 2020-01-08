@@ -33,7 +33,7 @@ hornet_neighbors: []
 
 # Hornet run profile (e.g. auto or light)
 # 'light' will consume less memory.
-hornet_profile: auto
+hornet_profile: light
 
 # Enable hornet API auth.
 # The default node's username and password are used.
