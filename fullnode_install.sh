@@ -498,7 +498,7 @@ function set_primary_ip()
 }
 
 function display_requirements_url() {
-    echo "Only Debian, Ubuntu 18.04LTS, Raspbian, CentOS 7 and 8 are supported."
+    echo "Only Debian, Ubuntu 18.04LTS, Ubuntu 19.x, Raspbian, CentOS 7 and 8 are supported."
 }
 
 function check_arch() {
@@ -678,7 +678,7 @@ if [[ "$OS" =~ ^(CentOS|Red) ]]; then
     check_arch
     init_centos_$VER
 elif [[ "$OS" =~ ^Ubuntu ]]; then
-    if [[ ! "$VER" =~ ^(16|17|18) ]]; then
+    if [[ ! "$VER" =~ ^(16|17|18|19) ]]; then
         echo "ERROR: $OS version $VER not supported"
         display_requirements_url
         exit 1
