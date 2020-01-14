@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.3
+VERSION_TEMP=0.3.4
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -717,7 +717,6 @@ function add_neighbors() {
     local HEIGHT
     local NBCTL_OUTPUT
     local RC
-    local HORNET_CONFIG
 
     NEIGHBORS=$(whiptail --inputbox "Enter a list of neighbors separated by space:" 8 $WIDTH --title "Add Neighbors" 3>&1 1>&2 2>&3)
     RC=$?
@@ -739,12 +738,8 @@ function add_neighbors() {
                  --yesno "The following neighbor(s) will be added:\n\n$NEIGHBORS_TO_ADD" \
                  $HEIGHT $WIDTH) then
 
-        # Set hornet config file if any configured
-        HORNET_CONFIG=$(grep ^file /root/.nbctl | cut -d: -f2)
-        [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
-
         # Run nbctl command
-        NBCTL_OUTPUT=$(nbctl -a $ADD_LIST $HORNET_CONFIG --hornet 2>&1)
+        NBCTL_OUTPUT=$(nbctl -a $ADD_LIST --hornet 2>&1)
         RC=$?
         if [[ $RC -eq 0 ]]; then
             HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 7)
@@ -768,7 +763,6 @@ function remove_neighbors() {
     local NEIGHBORS
     local NEIGHBOR
     local HEIGHT
-    local HORNET_CONFIG
 
     echo "Getting neighbors list..."
     NEIGHBORS=$(list_neighbors get | awk '{$1=$1}{print}' | tr -d ' ')
@@ -807,9 +801,7 @@ function remove_neighbors() {
                  --defaultno \
                  12 $WIDTH)
     then
-        HORNET_CONFIG=$(grep ^file /root/.nbctl | cut -d: -f2)
-        [ -n "$HORNET_CONFIG" ] && HORNET_CONFIG="-f $HORNET_CONFIG"
-        REMOVAL_OUTPUT=$(nbctl -r -n "${SCHEME}://${ADDRESS}" $HORNET_CONFIG --hornet 2>&1)
+        REMOVAL_OUTPUT=$(nbctl -r -n "${SCHEME}://${ADDRESS}" --hornet 2>&1)
         if [ $? -eq 0 ];then
             whiptail --title "Removed successfully" \
                      --msgbox "$REMOVAL_OUTPUT" \

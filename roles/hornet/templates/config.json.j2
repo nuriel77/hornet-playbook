@@ -85,8 +85,25 @@
   "db": {
     "path": "mainnetdb"
   },
+  "pruning": {
+    "enabled": {{ hornet_pruning_enabled | default('true') | lower | string }},
+    "delay": {{ hornet_pruning_delay | default('40000') }}
+  },
   "localsnapshots": {
+    "enabled": {{ hornet_local_snapshots | default('true') | lower | string }},
+    "depth": {{ hornet_local_snapshots_depth | default('50') }},
+    "intervalsynced": {{ hornet_local_snapshots_intervalsynced | default('50') }},
+    "intervalunsynced": {{ hornet_local_snapshots_intervalunsynced | default('1000') }},
     "path": "latest-export.gz.bin"
+   },
+  "globalsnapshot": {
+    "load": {{ hornet_globalsnapshot_load | default('false') | lower | string }},
+    "path": "snapshotMainnet.txt",
+    "spentaddressespaths": {{ hornet_globalsnapshot_spentaddressespaths | default([]) | to_nice_json(indent=4) }},
+    "index": {{ hornet_global_snapshot_index | default('1050000') }}
+  },
+  "privatetangle": {
+    "ledgerstatepath": "balances.txt"
   },
   "milestones": {
     "coordinator": "{{ hornet_coo_address | default('EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9') }}",
@@ -119,8 +136,15 @@
   },
   "node": {
     "disableplugins": {{ hornet_disable_plugins | to_nice_json(indent=4) }},
-    "enableplugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }},
-    "loglevel": {{ hornet_log_level | default('127') }}
+    "enableplugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }}
+  },
+  "logger": {
+    "level": "{{ hornet_log_level | default('info') }}",
+    "disableCaller": true,
+    "encoding": "console",
+    "outputPaths": [
+      "stdout"
+    ]
   },
   "protocol": {
     "mwm": {{ hornet_protocol_mwm | default('14') }}
