@@ -35,7 +35,7 @@ declare -g PLAYBOOK_LIGHT="false"
 : "${INSTALL_OPTIONS:=}"
 
 # Set minimum ram, used to set light profile.
-: "${MIN_RAM_KB:=1572864}"
+: "${MIN_RAM_KB:=1048576}"
 
 if test -e /etc/motd && grep -q 'HORNET PLAYBOOK' /etc/motd; then
     :>/etc/motd
@@ -154,7 +154,14 @@ function init_centos_7(){
     set -e
 
     echo "Installing Ansible and git..."
-    yum install ansible git expect-devel cracklib newt python-pip -y
+    yum install -y\
+      ansible\
+      redhat-lsb-core\
+      git\
+      expect-devel\
+      cracklib\
+      newt\
+      python-pip
     if [ -e /usr/bin/pip ]; then
         /usr/bin/pip install jmespath
     fi
@@ -182,7 +189,13 @@ function init_centos_8(){
     fi
 
     echo "Installing Ansible, git and other requirements..."
-    dnf install git expect newt python3-pip cracklib newt -y
+    dnf install -y\
+      git\
+      expect\
+      newt\
+      python3-pip\
+      cracklib\
+      redhat-lsb-core
     pip3 --disable-pip-version-check install ansible jmespath
 }
 
