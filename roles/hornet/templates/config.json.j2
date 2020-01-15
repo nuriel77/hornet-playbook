@@ -94,7 +94,7 @@
     "depth": {{ hornet_local_snapshots_depth | default('50') }},
     "intervalsynced": {{ hornet_local_snapshots_intervalsynced | default('50') }},
     "intervalunsynced": {{ hornet_local_snapshots_intervalunsynced | default('1000') }},
-    "path": "latest-export.gz.bin"
+    "path": "snapshot/latest-export.gz.bin"
    },
   "globalsnapshot": {
     "load": {{ hornet_globalsnapshot_load | default('false') | lower | string }},
