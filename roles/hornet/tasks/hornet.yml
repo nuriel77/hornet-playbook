@@ -163,6 +163,8 @@
     shell: /sbin/nologin
     createhome: no
     home: "{{ hornet_home_path }}"
+    # Hardcoded for now
+    uid: "39999"
   tags:
     - hornet_user
 
@@ -184,6 +186,7 @@
   with_items:
     - "{{ hornet_home_path }}"
     - "{{ hornet_db_path }}"
+    - "{{ hornet_home_path }}/snapshot"
 
 # hornet system config
 - name: copy hornet environment config file
