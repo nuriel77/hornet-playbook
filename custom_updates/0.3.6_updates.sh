@@ -2,7 +2,7 @@
 set -e
 
 echo "Ensure latest playbook ..."
-cd /opt/ansible-playbook && git pull
+cd /opt/hornet-playbook && git pull
 
 echo "Stopping hornet for uid/gid change ..."
 /bin/systemctl stop hornet
