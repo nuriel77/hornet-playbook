@@ -35,7 +35,7 @@ declare -g PLAYBOOK_LIGHT="false"
 : "${INSTALL_OPTIONS:=}"
 
 # Set minimum ram, used to set light profile.
-: "${MIN_RAM_KB:=1048576}"
+: "${MIN_RAM_KB:=2097152}"
 
 if test -e /etc/motd && grep -q 'HORNET PLAYBOOK' /etc/motd; then
     :>/etc/motd
