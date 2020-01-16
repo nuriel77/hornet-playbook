@@ -218,7 +218,7 @@ function init_centos_8(){
 }
 
 function init_ubuntu(){
-    wait_apt
+    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
@@ -254,7 +254,7 @@ function init_ubuntu(){
 }
 
 function init_debian(){
-    wait_apt
+    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
