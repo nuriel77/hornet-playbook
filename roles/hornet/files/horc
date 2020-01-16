@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.6
+VERSION_TEMP=0.3.7
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -756,6 +756,8 @@ function add_neighbors() {
 }
 
 function remove_neighbors() {
+    local NEIGHBORS_ARRAY_INDEXED
+    local NEIGHBOR_INDEX
     local NEIGHBORS_ARRAY
     local NEIGHBORS
     local NEIGHBOR
@@ -779,8 +781,8 @@ function remove_neighbors() {
     fi
     HEIGHT=$(expr $(echo "$NEIGHBORS"|wc -l) + 5)
     NEIGHBORS_ARRAY=($(echo "$NEIGHBORS"))
-    local NEIGHBORS_ARRAY_INDEXED=($(echo "$NEIGHBORS" | awk '!/^ / && NF { print NR")"; print $1$2$3}'))
-    local NEIGHBOR_INDEX=$(whiptail --title "Remove neighbors" --menu "Choose a neighbor" 25 $WIDTH 16  "${NEIGHBORS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
+    NEIGHBORS_ARRAY_INDEXED=($(echo "$NEIGHBORS" | awk '!/^ / && NF { print NR")"; print $1$2$3}'))
+    NEIGHBOR_INDEX=$(whiptail --title "Remove neighbors" --menu "Choose a neighbor" 25 $WIDTH 16  "${NEIGHBORS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
     if [ $? -eq 1 ]; then
         return
     fi
