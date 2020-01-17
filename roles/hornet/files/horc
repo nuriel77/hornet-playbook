@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.7
+VERSION_TEMP=0.3.8
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -408,7 +408,7 @@ function get_db() {
     DEFAULT_SOURCE=$(grep ^hornet_db_source /opt/hornet-playbook/group_vars/all/hornet.yml | awk {'print $2'} | tr -d '"')
 
     # Create array of available DB resources
-    SOURCES_ARRAY=("$DEFAULT_SOURCE" "Custom")
+    SOURCES_ARRAY=("https://ls.manapotion.io/latest-export.gz.bin" "$DEFAULT_SOURCE" "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
@@ -452,7 +452,7 @@ function get_db() {
     [ -z "$FILE_SIZE" ] && FILE_SIZE="unknown"
 
     if (whiptail --title "Confirm DB Download" \
-                 --yesno "Download new database from '$DB_SOURCE'?\n\nUpdated: ${LAST_UPDATED}, size: ${FILE_SIZE}\n\n(TIP: for long running tasks consider running hornetc in a screen session)" \
+                 --yesno "Download new database from '$DB_SOURCE'?\n\nUpdated: ${LAST_UPDATED}, size: ${FILE_SIZE}\n\n" \
                  16 $WIDTH) then
         # This command will stop hornet, remove older database directories,
         # extract the database (on the fly) set correct user ownership and start HORNET up again.
