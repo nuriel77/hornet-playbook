@@ -283,7 +283,8 @@ function init_debian(){
                     whiptail\
                     lsb-release\
                     python3-pip\
-                    python-pip -y
+                    python-pip \
+                    python-backports.functools-lru-cache -y
     if [ -e /usr/bin/pip ]; then
         /usr/bin/pip install jmespath
     fi
