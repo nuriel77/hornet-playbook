@@ -736,8 +736,16 @@ elif [[ "$OS" =~ ^Raspbian ]]; then
         exit 1
     fi
     check_arch
+
+    # Workaround to make sure we detect
+    # if reboot is needed
+    apt install unattended-upgrades -y
+
     # Same setup for respbian as debian
     init_debian
+
+    # remove workaround
+    apt remove unattended-upgrades -y
 else
     echo "$OS not supported"
     exit 1
