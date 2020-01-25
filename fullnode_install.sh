@@ -54,6 +54,7 @@ Please confirm you want to proceed with the installation?" \
                  16 78); then
             exit 1
         fi
+        SKIP_CONFIRM="true"
     fi
 fi
 
