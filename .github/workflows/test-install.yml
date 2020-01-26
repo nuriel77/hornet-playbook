@@ -14,7 +14,7 @@ jobs:
       - name: Run Playbook
         timeout-minutes: 720
         shell: bash
-        run: sudo su; echo EUID: $EUID
+        run: "sudo su; echo EUID: $EUID"
         env:
           SET_DEFAULTS: "true"
           SKIP_PASSWORD: "true"
