@@ -14,7 +14,7 @@ jobs:
       - name: Run Playbook
         timeout-minutes: 720
         shell: bash
-        run: sudo bash -c ./fullnode_install.sh
+        run: sudo bash -c bash ./fullnode_install.sh
         env:
           SET_DEFAULTS: "true"
           SKIP_PASSWORD: "true"
