@@ -1,0 +1,23 @@
+name: Install Playbook
+on: [push, pull_request]
+jobs:
+
+  build:
+
+    name: Install Hornet Playbook - Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Prepare Playbook Environment
+        uses: actions/checkout@v2
+
+      - name: Run Playbook
+        timeout-minutes: 720
+        shell: bash
+        run: bash fullnode_install.sh
+        env:
+          SET_DEFAULTS: "true"
+          SKIP_PASSWORD: "true"
+          SKIP_REBOOT: "true"
+          SKIP_CONFIRM: "true"
+          INSTALL_OPTIONS: "-e disable_monitoring=yes"
