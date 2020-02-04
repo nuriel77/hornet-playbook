@@ -5,7 +5,7 @@
 
 # Hornet playbook: https://github.com/nuriel77/hornet-playbook
 # By Nuriel Shem-Tov (https://github.com/nuriel77), December 2019
-# Copyright (c) 2019 Nuriel Shem-Tov
+# Copyright (c) 2020 Nuriel Shem-Tov
 
 # Some options can be passed via environment variables:
 # SET_DEFAULTS="true"   ..... set default option selections
