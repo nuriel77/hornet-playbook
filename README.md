@@ -225,3 +225,5 @@ If you liked this project and would like to leave a donation you can use this IO
 ```
 JFYIHZQOPCRSLKIYHTWRSIR9RZELTZKHNZFHGWXAPCQIEBNJSZFIWMSBGAPDKZZGFNTAHBLGNPRRQIZHDFNPQPPWGC
 ```
+
+No IOTA? :star: the project is also a way of saying thank you! :sunglasses:
