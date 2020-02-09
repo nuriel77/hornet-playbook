@@ -1,3 +1,6 @@
+# Overview
+See [kubernetes](https://github.com/nuriel77/hornet-playbook/blob/master/docs/kubernetes.md)
+
 # Configure
 
 1. Create this secret first as suggested here: https://github.com/nuriel77/hornet-playbook/blob/master/docs/kubernetes.md#prepare
