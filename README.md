@@ -36,6 +36,7 @@ Tested on the following operating systems/architectures:
 * CentOS 7 and 8 (x86_64)
 * Ubuntu 18.04LTS (x86_64, aarch64/arm64) and 19.10.x for Raspberry
 * Debian 10 "Buster" (x86_64, aarch64/arm64)
+* Raspbian 10 (64 bit)
 
 ## Recommendations
 
