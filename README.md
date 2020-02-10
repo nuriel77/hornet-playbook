@@ -44,9 +44,10 @@ Tested on the following operating systems/architectures:
 
 ## Installation
 
-Run (as root):
+You can first download the script to inspect it before running it, or run it directly:
+
 ```sh
-bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/master/fullnode_install.sh)
+sudo bash -c "bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/master/fullnode_install.sh)"
 ```
 
 This pulls the installation file from the root of this repository and executes it.
