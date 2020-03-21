@@ -180,7 +180,7 @@ Enabling a certificate will allow you to connect to your node with IOTA's offici
 Here's a list of ports configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy, or `HAproxy` for the API port. The internal ports are not accessible externally.
 
 NAME         | PORT INTERNAL | PORT EXTERNAL
---------------------------------------------
+-------------|---------------|--------------
 Dashboard    | 8087          | 8081
 Monitor      | 14434         | 4434
 Monitor API  | 14433         | 4433
