@@ -179,15 +179,24 @@ Enabling a certificate will allow you to connect to your node with IOTA's offici
 
 Here's a list of ports configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy, or `HAproxy` for the API port. The internal ports are not accessible externally.
 
-NAME         | PORT INTERNAL | PORT EXTERNAL
--------------|---------------|--------------
-Dashboard    | 8087          | 8081
-Monitor      | 14434         | 4434
-Monitor API  | 14433         | 4433
-Visualiser   | 18083         | 8083
-Grafana      | 3000          | 5555
-Prometheus   | 9090          | 8999
-Alertmanager | 9093          | 9993
+NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL
+-------------------|---------------|-------------------------
+Hornet API         | 14265         | 14267         | TCP
+Hornet autopeering | 14626         | 14626         | UDP
+Hornet peering     | 15600         | 15600         | TCP
+Dashboard          | 8087          | 8081          | TCP
+Monitor            | 14434         | 4434          | TCP
+Monitor API        | 14433         | 4433          | TCP
+Visualiser         | 18083         | 8083          | TCP
+Grafana            | 3000          | 5555          | TCP
+Prometheus         | 9090          | 8999          | TCP
+Alertmanager       | 9093          | 9993          | TCP
+
+All the external ports have been made accessible in the firewall. There is no need to configure the firewall on the node.
+
+If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
+
+Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
 
 # Troubleshooting
 
