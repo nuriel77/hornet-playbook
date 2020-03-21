@@ -68,6 +68,12 @@ If you are working on a fork in a feature branch or happen to directly contribut
 BRANCH="dev-branch"; GIT_OPTIONS="-b $BRANCH" bash <(curl -s "https://raw.githubusercontent.com/nuriel77/hornet-playbook/$BRANCH/fullnode_install.sh")
 ```
 
+To update the playbook to use a different hornet tag/version, for example hornet prerelease version `v0.4.0-rc2`:
+```sh
+ansible-playbook -i inventory site.yml -v -e hornet_version=v0.4.0-rc2 -e overwrite=yes
+```
+Note that a Hornet prerelease might require changes on the playbook's code.
+
 ## Docker Usage Commands
 
 These are just a few helpful commands to help you find your way around docker:
