@@ -18,6 +18,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet Controller App](#hornet-controller-app)
    * [Hornet Dashboard](#hornet-dashboard)
    * [Hornet HTTPS](#hornet-https)
+   * [Ports](#ports)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
      * [DB Corruption](#db-corruption)
@@ -167,6 +168,20 @@ A first step is to enable HAProxy via `horc`. By default the API port is not exp
 The second step is to enable HTTPS certificate. Note that you must already have a fully qualified domain name A record pointing to your server's IP.
 
 Enabling a certificate will allow you to connect to your node with IOTA's official Trinity wallet.
+
+## Ports
+
+Here's a list of ports configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy, or `HAproxy` for the API port. The internal ports are not accessible externally.
+
+NAME         | PORT INTERNAL | PORT EXTERNAL
+--------------------------------------------
+Dashboard    | 8087          | 8081
+Monitor      | 14434         | 4434
+Monitor API  | 14433         | 4433
+Visualiser   | 18083         | 8083
+Grafana      | 3000          | 5555
+Prometheus   | 9090          | 8999
+Alertmanager | 9093          | 9993
 
 # Troubleshooting
 

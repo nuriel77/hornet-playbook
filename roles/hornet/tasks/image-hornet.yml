@@ -1,12 +1,11 @@
 - name: remove hornet image
+  when: remove_hornet_image|default(False)|bool
   block:
-
     - name: "stopping hornet service, this might take a moment..."
       systemd:
         name: hornet.service
         state: stopped
       ignore_errors: yes
-
     - name: delete hornet image
       docker_image:
         name: "{{ hornet_image }}"
@@ -14,16 +13,21 @@
         state: absent
         force_absent: yes
 
-  when: remove_hornet_image|default(False)|bool
-
 - name: download hornet from dockerhub (for arch amd64 only)
-  when: "server_arch == 'amd64'"
+  when:
+    - "server_arch == 'amd64'"
+    - not build_image|default(False)|bool
   docker_image:
     name: "{{ hornet_image }}:{{ hornet_tag }}"
     source: pull
+  register: image_built
+  ignore_errors: yes
 
 - name: build hornet image
-  when: "server_arch != 'amd64'"
+  when: >
+        server_arch != 'amd64' or
+        ('failed' in image_built and image_built.failed) or
+        build_image|default(False)|bool
   block:
 
     - name: check hornet image exists
@@ -32,15 +36,29 @@
       register: hornet_image_stat
       failed_when: "hornet_image_stat.rc > 1"
 
+    - name: set dockerfile
+      set_fact:
+        hornet_dockerfile: >-
+          {%- if hornet_tag == "v0.3.0" -%}
+          Dockerfile
+          {%- else -%}
+            {%- if server_arch == 'amd64' -%}
+            docker/Dockerfile
+            {%- else -%}
+            docker/Dockerfile.{{ server_arch }}
+            {%- endif -%}
+          {%- endif -%}
+
     - name: build hornet image, this can take a moment...
       docker_image:
         build:
           path: "{{ hornet_git_dest }}"
           pull: no
           network: host
-          dockerfile: '{{ hornet_dockerfile | default(omit) }}'
+          dockerfile: "{{ hornet_dockerfile }}"
           args:
-            ARCH: "{{ server_arch | default('amd64') }}"
+            ARCH: "{% if server_arch == 'amd64' %}x86_64{% else %}{{ server_arch | upper }}{% endif %}"
+            TAG: "{{ hornet_tag }}"
         name: "{{ hornet_image }}"
         tag: "{{ hornet_tag }}"
         source: build

@@ -216,8 +216,9 @@
     force: "{{ overwrite | default('no') }}"
     backup: yes
   with_items:
-    - {"src": "templates/config.json.j2", "dest": "{{ hornet_home_path }}/config.json"}
-    - {"src": "templates/mqtt_config.json.j2", "dest": "{{ hornet_home_path }}/mqtt_config.json"}
+    - {"src": "templates/config.json.j2", "dest": "{{ hornet_config }}"}
+    - {"src": "templates/{{ hornet_mqtt_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_mqtt_config_file }}"}
+    - {"src": "templates/{{ hornet_profiles_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_profiles_config_file }}"}
   tags: hornet_config_files
   notify:
     - restart hornet
@@ -229,11 +230,11 @@
     mode: 0600
     owner: "{{ hornet_user }}"
     group: "{{ hornet_group }}"
-    force: no
+    force: "{{ overwrite | default('no') }}"
     backup: yes
   tags: hornet_config_files
   with_items:
-    - {"src": "templates/neighbors.json.j2", "dest": "{{ hornet_home_path }}/neighbors.json"}
+    - {"src": "templates/neighbors.json.j2", "dest": "{{ hornet_neighbor_config }}"}
 
 - name: download hornet snapshot DB (can take a while)
   get_url:

@@ -16,9 +16,10 @@ hornet_home_path: /var/lib/hornet
 hornet_config: "{{ hornet_home_path }}/config.json"
 hornet_neighbor_config: "{{ hornet_home_path }}/neighbors.json"
 hornet_mqtt_config_file: mqtt_config.json
+hornet_profiles_config_file: profiles.json
 hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
-hornet_db_tar: "{{ hornet_home_path }}/snapshot/latest-export.gz.bin"
-hornet_db_source: "https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin"
+hornet_db_tar: "{{ hornet_home_path }}/snapshot/export.bin"
+hornet_db_source: "https://ls.manapotion.io/export.bin"
 
 # How long to wait (seconds) for hornet to
 # gracefully stop. This applies for restart/stop.
@@ -28,7 +29,9 @@ hornet_timeout_stop: 900
 hornet_neighbors: []
 #  - identity: example1.neighbor.com:15600
 #    preferIPv6: false
+#    alias: first_node
 #  - identity: example2.neighbor.com:15600
+#    alias: second_node
 #    preferIPv6: false
 
 # Hornet run profile (e.g. auto or light)
@@ -37,7 +40,7 @@ hornet_profile: light
 
 # Enable hornet API auth.
 # The default node's username and password are used.
-hornet_api_auth_enabled: false
+hornet_httpapi_basic_auth: false
 
 # Hornet plugins
 hornet_enable_plugins: []
@@ -83,6 +86,10 @@ hornet_ports:
     port: 15600
     proto: tcp
     allow: yes
+  autopeering:
+    port: 14626
+    proto: udp
+    allow: yes
   api:
     port: 14265
     proto: tcp
@@ -127,11 +134,26 @@ hornet_peering_address: "0.0.0.0"
 # The TCP neighbor peering port
 hornet_peering_port: "{{ hornet_ports.peering.port }}"
 
-# Hornet autopeering enabled
-hornet_auto_peering_enabled: false
+hornet_accept_any_neighbor_connection: false
+
+# Hornet autopeering port
+hornet_network_autopeering_address: "0.0.0.0"
+hornet_network_autopeering_port: "{{ hornet_ports.autopeering.port }}"
 
 # Hornet max neighbors
 hornet_max_neighbors: 5
+
+# Hornet's API IP whitelist to bypass limitations
+hornet_httpapi_whitelist: []
+
+hornet_globalsnapshot_spentaddressespaths: 
+  - previousEpochsSpentAddresses1.txt
+  - previousEpochsSpentAddresses2.txt
+  - previousEpochsSpentAddresses3.txt
+
+hornet_network_entrynodes:
+  - "LehlDBPJ6kfcfLOK6kAU4nD7B/BdR7SJhai7yFCbCCM=@enter.hornet.zone:14626"
+  - "zEiNuQMDfZ6F8QDisa1ndX32ykBTyYCxbtkO0vkaWd0=@enter.manapotion.io:18626"
 
 # Tanglemonitor ports external
 # Those best be kept on these ports
@@ -168,9 +190,7 @@ hornet_graph_internal_address: 127.0.0.1
 hornet_graph_internal_port: "18083"
 hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
 tanglevisualiser_git_url: "https://github.com/glumb/IOTAtangle.git"
-socketio_git_url: "https://github.com/socketio/socket.io-client.git"
 tanglevisualiser_path: "{{ hornet_home_path }}/tanglevisualiser"
-socketio_path: "{{ hornet_home_path }}/socket.io-client"
 hornet_mqtt_ws_path: '/ws'
 
 # MQTT config

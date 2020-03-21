@@ -1,168 +1,131 @@
 {
-  "useProfile": "{{ hornet_profile }}",
-  "profiles": {
-    "custom": {
-      "caches": {
-        "requestQueue": {
-          "size": 100000
-        },
-        "approvers": {
-          "size": 100000,
-          "evictionSize": 1000
-        },
-        "bundles": {
-          "size": 20000,
-          "evictionSize": 1000
-        },
-        "milestones": {
-          "size": 1000,
-          "evictionSize": 100
-        },
-        "spentAddresses": {
-          "size": 5000,
-          "evictionSize": 1000
-        },
-        "transactions": {
-          "size": 50000,
-          "evictionSize": 1000
-        },
-        "incomingTransactionFilter": {
-          "size": 5000
-        },
-        "refsInvalidBundle": {
-          "size": 10000
-        }
-      },
-      "badger": {
-        "levelOneSize": 268435456,
-        "levelSizeMultiplier": 10,
-        "tableLoadingMode": 2,
-        "valueLogLoadingMode": 2,
-        "maxLevels": 7,
-        "maxTableSize": 67108864,
-        "numCompactors": 2,
-        "numLevelZeroTables": 5,
-        "numLevelZeroTablesStall": 10,
-        "numMemtables": 5,
-        "numVersionsToKeep": 1,
-        "syncWrites": true,
-        "compactLevel0OnClose": true,
-        "valueLogFileSize": 1073741823,
-        "valueLogMaxEntries": 1000000,
-        "valueThreshold": 32,
-        "logRotatesToFlush": 2,
-        "maxCacheSize": 50000000
-      }
-    }
-  },
-  "api": {
-    "auth": {
-      "username": "{% if hornet_api_auth_enabled|bool %}{{ fullnode_user_password }}{% endif %}",
-      "password": "{% if hornet_api_auth_enabled|bool %}{{ fullnode_user }}{% endif %}"
+  "useProfile": "{{ hornet_profile | default('auto') }}",
+  "httpAPI": {
+    "basicAuth": {
+      "enabled": {{ hornet_httpapi_basic_auth | default('false') | bool | lower | string }},
+      "username": "{% if hornet_httpapi_basic_auth|bool %}{{ fullnode_user }}{% endif %}",
+      "passwordHash": "{% if hornet_httpapi_basic_auth|bool %}{{ fullnode_user_password | hash('sha256') }}{% endif %}",
+      "passwordSalt": ""
     },
     "permitRemoteAccess": {{ hornet_permit_remote_access_list | to_nice_json(indent=6) }},
-    "host": "{{ hornet_api_address | default('0.0.0.0') }}",
-    "maxbodylength": {{ hornet_max_body_length | default('1000000') }},
-    "maxfindtransactions": {{ hornet_max_find_transactions | default('100000') }},
-    "maxgettrytes": {{ hornet_max_get_trytes | default('1000') }},
-    "maxrequestslist": {{ hornet_max_requests_list | default('1000') }},
-    "port": {{ hornet_api_port | default('14265') }},
-    "remoteauth": ""
+    "whitelistedAddresses": {{ hornet_httpapi_whitelist | default([]) | to_nice_json(indent=6) }},
+    "bindAddress": "{{ hornet_api_address | default('0.0.0.0') }}:{{ hornet_api_port | default('14265') }}",
+    "limits": {
+      "bodyLengthBytes": {{ hornet_max_body_length | default('1000000') }},
+      "findTransactions": {{ hornet_max_find_transactions | default('100000') }},
+      "getTrytes": {{ hornet_max_get_trytes | default('1000') }},
+      "requestsList": {{ hornet_max_requests_list | default('1000') }}
+    }
   },
   "compass": {
     "loadLSMIAsLMI": false
   },
   "dashboard": {
-    "host": "{{ hornet_dashboard_internal_address | default('127.0.0.1') }}",
-    "port": {{ hornet_dashboard_internal_port | default('8087') }},
-    "dev": {{ hornet_dashboard_dev | default('false') | lower | string }},
-    "basic_auth": {
-      "enabled": {{ hornet_dashboard_basic_auth | default('false') | lower | string }},
-      "password": "{{ fullnode_user_password }}",
-      "username": "{{ fullnode_user }}"
+    "bindAddress": "{{ hornet_dashboard_internal_address | default('127.0.0.1') }}:{{ hornet_dashboard_internal_port | default('8087') }}",
+    "theme": "{{ hornet_dashboard_theme | default('default') }}",
+    "dev": {{ hornet_dashboard_dev | default('false') | bool | lower | string }},
+    "basicAuth": {
+      "enabled": {{ hornet_dashboard_basic_auth | default('false') | bool | lower | string }},
+      "username": "{{ fullnode_user }}",
+      "passwordHash": "{{ fullnode_user_password | hash('sha256') }}",
+      "passwordSalt": ""
     }
   },
   "db": {
     "path": "mainnetdb"
   },
-  "pruning": {
-    "enabled": {{ hornet_pruning_enabled | default('true') | lower | string }},
-    "delay": {{ hornet_pruning_delay | default('40000') }}
+  "snapshots": {
+    "loadType": "{{ hornet_snapshots_load_type | default('local') }}",
+    "local": {
+      "enabled": "{{ hornet_snapshots_local_enabled | default('true') | bool | lower | string }}",
+      "depth": {{ hornet_snapshots_local_depth | default('50') }},
+      "intervalSynced": {{ hornet_snapshots_local_interval_synced | default('50') }},
+      "intervalUnsynced": {{ hornet_snapshots_local_interval_unsynced | default('1000') }},
+      "path": "{{ hornet_snapshots_local_path | default('snapshot/export.bin') }}"
+    },
+    "global": {
+      "path": "snapshotMainnet.txt",
+      "spentAddressesPaths": {{ hornet_globalsnapshot_spentaddressespaths | default([]) | to_nice_json(indent=6) }},
+      "index": {{ hornet_global_snapshot_index | default('1050000') }}
+    },
+    "pruning": {
+      "enabled": {{ hornet_snapshot_pruning_enabled | default('true') | bool | lower | string }},
+      "delay": {{ hornet_snapshot_pruning_delay | default('40000') }}
+    }
   },
-  "localsnapshots": {
-    "enabled": {{ hornet_local_snapshots | default('true') | lower | string }},
-    "depth": {{ hornet_local_snapshots_depth | default('50') }},
-    "intervalsynced": {{ hornet_local_snapshots_intervalsynced | default('50') }},
-    "intervalunsynced": {{ hornet_local_snapshots_intervalunsynced | default('1000') }},
-    "path": "snapshot/latest-export.gz.bin"
-   },
-  "globalsnapshot": {
-    "load": {{ hornet_globalsnapshot_load | default('false') | lower | string }},
-    "path": "snapshotMainnet.txt",
-    "spentaddressespaths": {{ hornet_globalsnapshot_spentaddressespaths | default([]) | to_nice_json(indent=4) }},
-    "index": {{ hornet_global_snapshot_index | default('1050000') }}
-  },
-  "privatetangle": {
-    "ledgerstatepath": "balances.txt"
+  "spentAddresses": {
+    "enabled": {{ hornet_spent_addresses | default('true') | bool | lower | string }}
   },
   "milestones": {
     "coordinator": "{{ hornet_coo_address | default('EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9') }}",
-    "coordinatorsecuritylevel": {{ hornet_coo_security_level | default('2') }},
-    "numberofkeysinamilestone": {{ hornet_number_of_keys_in_milestone | default('23') }}
-  },
-  "graph": {
-    "webrootPath": "IOTAtangle/webroot",
-    "socketiopath": "socket.io-client/dist/socket.io.js",
-    "domain": "{{ honet_graph_domain | default('') }}",
-    "host": "{{ hornet_graph_address | default('127.0.0.1') }}",
-    "port": {{ hornet_graph_internal_port | default('18083') }},
-    "networkName": "meets HORNET"
-  },
-  "monitor": {
-    "tanglemonitorpath": "tanglemonitor/frontend",
-    "domain": "{{ honet_monitor_domain | default('') }}",
-    "host": "{{ hornet_monitor_address | default('127.0.0.1') }}",
-    "port": {{ hornet_monitor_port | default('14434') }},
-    "apiPort": {{ hornet_monitor_api_port | default('14433') }}
-  },
-  "mqtt": {
-    "config": "{{ hornet_mqtt_config_file | default('mqtt_config.json') }}"
+    "coordinatorSecurityLevel": {{ hornet_coo_security_level | default('2') }},
+    "numberOfKeysInAMilestone": {{ hornet_number_of_keys_in_milestone | default('23') }}
   },
   "network": {
-    "preferIPv6": false,
-    "address": "{{ hornet_peering_address | default('0.0.0.0') }}",
-    "port": {{ hornet_peering_port | default('15600') }},
-    "reconnectattemptintervalseconds": {{ hornet_reconnect_int | default('60') }}
-  },
-  "node": {
-    "disableplugins": {{ hornet_disable_plugins | to_nice_json(indent=4) }},
-    "enableplugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }}
-  },
-  "logger": {
-    "level": "{{ hornet_log_level | default('info') }}",
-    "disableCaller": true,
-    "encoding": "console",
-    "outputPaths": [
-      "stdout"
-    ]
+    "preferIPv6": {{ hornet_network_prefer_ipv6 | default('false') | bool | lower | string }},
+    "gossip": {
+      "bindAddress": "{{ hornet_peering_address | default('0.0.0.0') }}:{{ hornet_peering_port | default('15600') }}",
+      "reconnectAttemptIntervalSeconds": {{ hornet_reconnect_int | default('60') }}
+    },
+    "autopeering": {
+      "bindAddress": "{{ hornet_network_autopeering_address | default('0.0.0.0') }}:{{ hornet_network_autopeering_port | default('14626') }}",
+      "runAsEntryNode": {{ hornet_network_autopeering_entrynode | default('false') | bool | lower | string }},
+      "entryNodes": {{ hornet_network_entrynodes | default([]) | to_nice_json(indent=6) }},
+      "seed": "{{ hornet_autopeering_seed | default('') }}"
+    }
   },
   "protocol": {
     "mwm": {{ hornet_protocol_mwm | default('14') }}
   },
   "tipsel": {
-    "belowmaxdepthtransactionlimit": {{ hornet_belowmax_depth_tx_limit | default('20000') }},
-    "maxdepth": {{ hornet_max_depth | default('15') }}
+    "belowMaxDepthTransactionLimit": {{ hornet_belowmax_depth_tx_limit | default('20000') }},
+    "maxDepth": {{ hornet_max_depth | default('3') }}
+  },
+  "node": {
+    "disablePlugins": {{ hornet_disable_plugins | to_nice_json(indent=4) }},
+    "enablePlugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }}
+  },
+  "logger": {
+    "level": "{{ hornet_log_level | default('info') }}",
+    "disableCaller": true,
+    "encoding": "console",
+    "outputPaths": ["stdout"]
   },
   "spammer": {
     "address": "HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999",
     "depth": {{ hornet_spammer_depth | default('3') }},
     "message": "Spamming with HORNET tipselect",
     "tag": "HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES",
-    "tpsratelimit": {{ hornet_spammer_tpsratelimit | default('0.1') }},
+    "tpsRateLimit": {{ hornet_spammer_tpsratelimit | default('0.1') }},
     "workers": {{ hornet_spammer_workers | default('1') }}
   },
+  "graph": {
+    "webRootPath": "IOTAtangle/webroot",
+    "domain": "{{ honet_graph_domain | default('') }}",
+    "webSocket": {
+      "uri": ""
+    },
+    "bindAddress": "{{ hornet_graph_address | default('127.0.0.1') }}:{{ hornet_graph_internal_port | default('18083') }}",
+    "networkName": "meets HORNET"
+  },
+  "monitor": {
+    "tangleMonitorPath": "tanglemonitor/frontend",
+    "domain": "{{ honet_monitor_domain | default('') }}",
+    "initialTransactionsCount": {{ hornet_monitor_initial_tx_count | default('15000') }},
+    "remoteapiport": {{ hornet_api_monitor_port_ext | default('4433') }},
+    "apiBindAddress": "{{ hornet_monitor_address | default('127.0.0.1') }}:{{ hornet_monitor_api_port | default('14433') }}",
+    "webBindAddress": "{{ hornet_monitor_address | default('127.0.0.1') }}:{{ hornet_monitor_port | default('14434') }}",
+    "websocket": {
+      "uri": ""
+    }
+  },
+  "mqtt": {
+    "config": "{{ hornet_mqtt_config_file | default('mqtt_config.json') }}"
+  },
   "zmq": {
-    "port": {{ hornet_zmq_port | default('5556') }},
-    "host": "{{ hornet_zmq_address | default('127.0.0.1') }}"
+    "bindAddress": "{{ hornet_zmq_address | default('127.0.0.1') }}:{{ hornet_zmq_port | default('5556') }}"
+  },
+  "profiling": {
+    "bindAddress": "{{ hornet_profiling_address | default('127.0.0.1') }}:{{ hornet_profiling_port | default('6060') }}"
   }
 }

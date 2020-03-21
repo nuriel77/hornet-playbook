@@ -3,9 +3,3 @@
     repo: '{{ tanglevisualiser_git_url }}'
     dest: '{{ tanglevisualiser_path }}'
     version: '{{ tanglevisualiser_version | default(omit) }}'
-
-- name: clone socket io repository
-  git:
-    repo: '{{ socketio_git_url }}'
-    dest: '{{ socketio_path }}'
-    version: '{{ socketio_version | default(omit) }}'

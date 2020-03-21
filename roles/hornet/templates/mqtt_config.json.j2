@@ -9,7 +9,7 @@
   "router": "",
   "wsPort": "",
   "wsPath": "{{ hornet_mqtt_ws_path | default('/ws') }}",
-  "wsTLS": {{ hornet_mqtt_tls_enabled | default('false') | lower | string }},
+  "wsTLS": {{ hornet_mqtt_tls_enabled | default('false') | bool | lower | string }},
   "tlsPort": "",
   "tlsHost": "",
   "tlsInfo": {

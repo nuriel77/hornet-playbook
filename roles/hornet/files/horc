@@ -16,8 +16,9 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.9
+VERSION_TEMP=0.4.0
 __VERSION__=${VERSION_TEMP}
+SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
 : "${HORNET_BRANCH:=master}"
 : "${HORC_BRANCH:=master}"
@@ -105,10 +106,37 @@ function set_dist() {
     fi
 }
 
+function validate_version {
+    local version=$1
+    if [[ "$version" =~ $SEMVER_REGEX ]]
+    then
+        local major=${BASH_REMATCH[1]}
+        local minor=${BASH_REMATCH[2]}
+        local patch=${BASH_REMATCH[3]}
+        local prere=${BASH_REMATCH[4]}
+        local build=${BASH_REMATCH[5]}
+        if [[ ! -z "$prere" ]] || [[ ! -z "$build" ]]
+        then
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
 function compare_versions() {
     local FIRST_VERSION=$(echo "$1" | tr -d 'v')
     local EVAL_STR=$2
     local SECOND_VERSION=$(echo "$3" | tr -d 'v')
+
+    for VER in "$FIRST_VERSION" "$SECOND_VERSION"
+    do
+        if ! validate_version "$VER"
+        then
+            &>2 echo "Warning: the version '$VER' is not a valid release version. Cannot checking version."
+            return 1
+        fi
+    done
 
     local GET_BOOL=$(python -c "from distutils.version import StrictVersion; print(StrictVersion('$FIRST_VERSION') $EVAL_STR StrictVersion('$SECOND_VERSION'))")
     if [[ "$GET_BOOL" == "True" ]]
@@ -408,7 +436,7 @@ function get_db() {
     DEFAULT_SOURCE=$(grep ^hornet_db_source /opt/hornet-playbook/group_vars/all/hornet.yml | awk {'print $2'} | tr -d '"')
 
     # Create array of available DB resources
-    SOURCES_ARRAY=("https://ls.manapotion.io/latest-export.gz.bin" "$DEFAULT_SOURCE" "Custom")
+    SOURCES_ARRAY=("https://ls.manapotion.io/export.bin" "$DEFAULT_SOURCE" "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
@@ -1249,40 +1277,40 @@ function hornet_plugins() {
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
     # Save current config state
-    ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enableplugins) \(.disableplugins)"' < "$CONFIG_FILE")
+    ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' < "$CONFIG_FILE")
 
     IFS=', ' read -r -a DISABLE_PLUGINS_ARRAY <<< "$DISABLE_PLUGINS"
 
     # Get current states (TODO: use associative array and loop)
-    if jq -e -r '.node.enableplugins | index("Spammer")' < "$CONFIG_FILE" >/dev/null
+    if jq -e -r '.node.enablePlugins | index("Spammer")' < "$CONFIG_FILE" >/dev/null
     then
         PLUGIN_SPAMMER_STATE="ON"
     else
         PLUGIN_SPAMMER_STATE="OFF"
     fi
 
-    if jq -e -r '.node.enableplugins | index("ZeroMQ")' < "$CONFIG_FILE" >/dev/null
+    if jq -e -r '.node.enablePlugins | index("ZeroMQ")' < "$CONFIG_FILE" >/dev/null
     then
         PLUGIN_ZMQ_STATE="ON"
     else
         PLUGIN_ZMQ_STATE="OFF"
     fi
 
-    if jq -e -r '.node.enableplugins | index("Monitor")' < "$CONFIG_FILE" >/dev/null
+    if jq -e -r '.node.enablePlugins | index("Monitor")' < "$CONFIG_FILE" >/dev/null
     then
         PLUGIN_TANGLEMONITOR_STATE="ON"
     else
         PLUGIN_TANGLEMONITOR_STATE="OFF"
     fi
 
-    if jq -e -r '.node.enableplugins | index("MQTT")' < "$CONFIG_FILE" >/dev/null
+    if jq -e -r '.node.enablePlugins | index("MQTT")' < "$CONFIG_FILE" >/dev/null
     then
         PLUGIN_MQTT_STATE="ON"
     else
         PLUGIN_MQTT_STATE="OFF"
     fi
 
-    if jq -e -r '.node.enableplugins | index("Graph")' < "$CONFIG_FILE" >/dev/null
+    if jq -e -r '.node.enablePlugins | index("Graph")' < "$CONFIG_FILE" >/dev/null
     then
         PLUGIN_GRAPH_STATE="ON"
     else
@@ -1339,12 +1367,12 @@ import json, sys, os
 obj = json.load(sys.stdin)
 enable_plugins = os.environ["ENABLE_PLUGINS"]
 disable_plugins = os.environ["DISABLE_PLUGINS"]
-obj["node"]["enableplugins"] = [p for p in enable_plugins.split(",") if p != ""]
-obj["node"]["disableplugins"] = [p for p in disable_plugins.split(",") if p != ""]
+obj["node"]["enablePlugins"] = [p for p in enable_plugins.split(",") if p != ""]
+obj["node"]["disablePlugins"] = [p for p in disable_plugins.split(",") if p != ""]
 print(json.dumps(obj))
 ')
 
-    NEW_NODE_OBJ=$(jq -r '.node | "\(.enableplugins) \(.disableplugins)"' <<<"$JSON_OUTPUT")
+    NEW_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' <<<"$JSON_OUTPUT")
     [[ "$ORIGINAL_NODE_OBJ" == "$NEW_NODE_OBJ" ]] && return
 
     if (whiptail --title "Restart Hornet" \
@@ -1352,6 +1380,7 @@ print(json.dumps(obj))
              --defaultno \
              10 $WIDTH) then
         jq . <<< "$JSON_OUTPUT" > "$CONFIG_FILE"
+        echo "Restarting hornet, please wait ..."
         /bin/systemctl restart hornet
     fi
 }
