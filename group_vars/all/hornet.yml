@@ -43,11 +43,8 @@ hornet_profile: light
 hornet_httpapi_basic_auth: false
 
 # Hornet plugins
-hornet_enable_plugins: []
-# Example:
-#hornet_enable_plugins:
-#  - ZeroMQ
-#  - Spammer
+hornet_enable_plugins:
+  - Autopeering
 
 # By default disable all
 hornet_disable_plugins:
@@ -161,8 +158,6 @@ hornet_network_entrynodes:
 hornet_monitor_port_ext: "{{ hornet_ports.tanglemonitor.port }}"
 hornet_api_monitor_port_ext: "{{ hornet_ports.tanglemonitor_api.port }}"
 tanglemonitor_internal_address: "127.0.0.1"
-tanglemonitor_git_url: "https://github.com/unioproject/tanglemonitor.git"
-tanglemonitor_path: "{{ hornet_home_path }}/tanglemonitor"
 
 # Hornet ZMQ port
 hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
@@ -189,8 +184,6 @@ hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
 hornet_graph_internal_address: 127.0.0.1
 hornet_graph_internal_port: "18083"
 hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
-tanglevisualiser_git_url: "https://github.com/glumb/IOTAtangle.git"
-tanglevisualiser_path: "{{ hornet_home_path }}/tanglevisualiser"
 hornet_mqtt_ws_path: '/ws'
 
 # MQTT config

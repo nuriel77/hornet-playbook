@@ -1,5 +1,0 @@
-- name: clone tanglemonitor repository
-  git:
-    repo: '{{ tanglemonitor_git_url }}'
-    dest: '{{ tanglemonitor_path }}'
-    version: '{{ tanglemonitor_version | default(omit) }}'
