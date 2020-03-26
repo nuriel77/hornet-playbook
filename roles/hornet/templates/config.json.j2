@@ -41,7 +41,8 @@
       "depth": {{ hornet_snapshots_local_depth | default('50') }},
       "intervalSynced": {{ hornet_snapshots_local_interval_synced | default('50') }},
       "intervalUnsynced": {{ hornet_snapshots_local_interval_unsynced | default('1000') }},
-      "path": "{{ hornet_snapshots_local_path | default('snapshot/export.bin') }}"
+      "path": "{{ hornet_snapshots_local_path | default('snapshot/export.bin') }}",
+      "downloadURL": "{{ hornet_db_source }}"
     },
     "global": {
       "path": "snapshotMainnet.txt",
