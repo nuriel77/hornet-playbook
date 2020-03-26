@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.9
+VERSION_TEMP=0.3.10
 __VERSION__=${VERSION_TEMP}
 
 : "${HORNET_BRANCH:=master}"
@@ -408,7 +408,7 @@ function get_db() {
     DEFAULT_SOURCE=$(grep ^hornet_db_source /opt/hornet-playbook/group_vars/all/hornet.yml | awk {'print $2'} | tr -d '"')
 
     # Create array of available DB resources
-    SOURCES_ARRAY=("https://ls.manapotion.io/latest-export.gz.bin" "$DEFAULT_SOURCE" "Custom")
+    SOURCES_ARRAY=("https://ls.manapotion.io/export.bin" "$DEFAULT_SOURCE" "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
