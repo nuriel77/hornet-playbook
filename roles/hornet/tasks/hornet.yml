@@ -101,7 +101,7 @@
         content: |-
           api_version: {{ hornet_api_version | default('1') }}
           host: http://127.0.0.1:{{ hornet_api_port }}
-          file: {{ hornet_home_path }}/neighbors.json
+          file: {{ hornet_home_path }}/peering.json
           base_config: {{ hornet_home_path }}/config.json
           hornet: true
         force: "{{ overwrite | default('no') }}"
@@ -223,7 +223,7 @@
   notify:
     - restart hornet
 
-- name: copy neighbors.json
+- name: copy peering.json
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -234,7 +234,7 @@
     backup: yes
   tags: hornet_config_files
   with_items:
-    - {"src": "templates/neighbors.json.j2", "dest": "{{ hornet_neighbor_config }}"}
+    - {"src": "templates/peering.json.j2", "dest": "{{ hornet_neighbor_config }}"}
 
 - name: download hornet snapshot DB (can take a while)
   get_url:

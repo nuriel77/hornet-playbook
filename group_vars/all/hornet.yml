@@ -14,7 +14,7 @@ hornet_user: hornet
 hornet_group: hornet
 hornet_home_path: /var/lib/hornet
 hornet_config: "{{ hornet_home_path }}/config.json"
-hornet_neighbor_config: "{{ hornet_home_path }}/neighbors.json"
+hornet_neighbor_config: "{{ hornet_home_path }}/peering.json"
 hornet_mqtt_config_file: mqtt_config.json
 hornet_profiles_config_file: profiles.json
 hornet_db_path: "{{ hornet_home_path }}/mainnetdb"

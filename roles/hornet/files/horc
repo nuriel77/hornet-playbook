@@ -1197,7 +1197,7 @@ function view_iritop() {
 ### Notice ###
 function how_to_setup() {
     whiptail --title "HORC v${VERSION} - Instructions" \
-             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/neighbors.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
+             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/peering.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
              15 $WIDTH
 }
 
@@ -1236,7 +1236,7 @@ function configure_files() {
             ;;
 
         "c)")
-            edit_config "/var/lib/hornet/neighbors.json" "hornet"
+            edit_config "/var/lib/hornet/peering.json" "hornet"
             configure_files
             ;;
 
