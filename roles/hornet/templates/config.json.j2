@@ -1,6 +1,7 @@
 {
   "useProfile": "{{ hornet_profile | default('auto') }}",
   "httpAPI": {
+    "excludeHealthCheckFromAuth": {{ hornet_httpapi_exclude_health_check_auth | default('false') | bool | lower | string }},
     "basicAuth": {
       "enabled": {{ hornet_httpapi_basic_auth | default('false') | bool | lower | string }},
       "username": "{% if hornet_httpapi_basic_auth|bool %}{{ fullnode_user }}{% endif %}",
@@ -37,7 +38,6 @@
   "snapshots": {
     "loadType": "{{ hornet_snapshots_load_type | default('local') }}",
     "local": {
-      "enabled": "{{ hornet_snapshots_local_enabled | default('true') | bool | lower | string }}",
       "depth": {{ hornet_snapshots_local_depth | default('50') }},
       "intervalSynced": {{ hornet_snapshots_local_interval_synced | default('50') }},
       "intervalUnsynced": {{ hornet_snapshots_local_interval_unsynced | default('1000') }},
