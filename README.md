@@ -34,7 +34,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
 Tested on the following operating systems/architectures:
 
 * CentOS 7 and 8 (x86_64)
-* Ubuntu 18.04LTS (x86_64, aarch64/arm64) and 19.10.x for Raspberry
+* Ubuntu 18.04LTS or 20.04LTS (x86_64, aarch64/arm64) and 19.10.x for Raspberry
 * Debian 10 "Buster" (x86_64, aarch64/arm64)
 * Raspbian 10 (64 bit)
 
