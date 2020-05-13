@@ -136,7 +136,7 @@ function set_dist() {
 function wait_apt(){
     local i=0
     tput sc
-    while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+    while fuser /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
         case $(($i % 4)) in
           0 ) j="-" ;;
           1 ) j="\\" ;;
@@ -223,7 +223,7 @@ function init_centos_8(){
 function init_ubuntu(){
     # We have to test a few times because apt is unexpected upon update
     # of many packages (especially during update of old node)
-    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt && sleep 5 && wait_apt
+    wait_apt && echo "Ensuring no package managers ..." && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
@@ -264,7 +264,7 @@ function init_ubuntu(){
 function init_debian(){
     # We have to test a few times because apt is unexpected upon update
     # of many packages (especially during update of old node)
-    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt && sleep 5 && wait_apt
+    wait_apt && echo "Ensuring no package managers ..." && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
