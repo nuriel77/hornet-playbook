@@ -304,6 +304,18 @@ function init_debian(){
 }
 
 function inform_reboot() {
+    if [[ "$INSTALL_OPTIONS" =~ overwrite=yes ]]
+    then
+        cat <<EOF
+===== Some packages installed require a reboot ======
+
+Please reboot the node once the installation is done!
+
+=====================================================
+EOF
+        return
+    fi
+
     cat <<EOF >/etc/motd
 ======================== HORNET PLAYBOOK ========================
 
