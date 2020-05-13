@@ -144,7 +144,7 @@ function wait_apt(){
           3 ) j="/" ;;
         esac
         tput rc
-        echo -en "\r[$j] Waiting for other software managers to finish..."
+        echo -en "\r[$j] System packages being updated to newest version, this can take a moment..."
         sleep 0.5
         ((i=i+1))
     done
@@ -221,7 +221,9 @@ function init_centos_8(){
 }
 
 function init_ubuntu(){
-    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt
+    # We have to test a few times because apt is unexpected upon update
+    # of many packages (especially during update of old node)
+    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
@@ -260,7 +262,9 @@ function init_ubuntu(){
 }
 
 function init_debian(){
-    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt
+    # We have to test a few times because apt is unexpected upon update
+    # of many packages (especially during update of old node)
+    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
