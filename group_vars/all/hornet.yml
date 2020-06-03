@@ -54,6 +54,7 @@ hornet_disable_plugins:
   - Monitor
   - MQTT
   - Graph
+  - Coordinator
 
 hornet_permit_remote_access_list:
   - getNodeInfo

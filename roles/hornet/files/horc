@@ -1272,7 +1272,7 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph,Autopeering,Prometheus"
+    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph,Autopeering,Prometheus,Coordinator"
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
@@ -1331,18 +1331,26 @@ function hornet_plugins() {
         PLUGIN_PROMETHEUS_STATE="OFF"
     fi
 
+    if jq -e -r '.node.enablePlugins | index("Coordinator")' < "$CONFIG_FILE" >/dev/null
+    then
+        PLUGIN_COORDINATOR_STATE="ON"
+    else
+        PLUGIN_COORDINATOR_STATE="OFF"
+    fi
+
     RESULTS=$(whiptail --title "HORC v${__VERSION__} - Plugins" \
         --checklist \
         --cancel-button "Exit" \
         "\nPlease choose plugins to enable or disable.\n\
-Select/unselect options using space and\nclick Enter to proceed.\n" 15 60 "${#DISABLE_PLUGINS_ARRAY[@]}" \
-        "Spammer"           "...         Spammer" "$PLUGIN_SPAMMER_STATE" \
-        "ZMQ"               "...         ZeroMQ" "$PLUGIN_ZMQ_STATE" \
-        "MQTT"              "...         MQTT" "$PLUGIN_MQTT_STATE" \
-        "Monitor"           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
-        "Graph"             "...         Tangle Visualiser" "$PLUGIN_GRAPH_STATE" \
-        "Autopeering"       "...         Hornet Autopeering" "$PLUGIN_AUTOPEERING_STATE" \
-        "Prometheus"        "...         Prometheus Metrics" "$PLUGIN_PROMETHEUS_STATE" \
+Select/unselect options using space and\nclick Enter to proceed.\n" 17 60 "${#DISABLE_PLUGINS_ARRAY[@]}" \
+        Spammer           "...         Spammer" "$PLUGIN_SPAMMER_STATE" \
+        ZMQ               "...         ZeroMQ" "$PLUGIN_ZMQ_STATE" \
+        MQTT              "...         MQTT" "$PLUGIN_MQTT_STATE" \
+        Monitor           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
+        Graph             "...         Tangle Visualiser" "$PLUGIN_GRAPH_STATE" \
+        Autopeering       "...         Hornet Autopeering" "$PLUGIN_AUTOPEERING_STATE" \
+        Prometheus        "...         Prometheus Metrics" "$PLUGIN_PROMETHEUS_STATE" \
+        Coordinator       "...         Comnet Coordinator" "$PLUGIN_COORDINATOR_STATE" \
         3>&1 1>&2 2>&3)
 
     RC=$?
@@ -1351,38 +1359,8 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 15 60 "${#DI
     read -a RESULTS_ARRAY <<< "$RESULTS"
     for CHOICE in "${RESULTS_ARRAY[@]}"
     do
-        case $CHOICE in
-            '"Spammer"')
-                ENABLE_PLUGINS+=",Spammer"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Spammer/}")
-                ;;
-            '"ZMQ"')
-                ENABLE_PLUGINS+=",ZeroMQ"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/ZeroMQ/}")
-                ;;
-            '"MQTT"')
-                ENABLE_PLUGINS+=",MQTT"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/MQTT/}")
-                ;;
-            '"Monitor"')
-                ENABLE_PLUGINS+=",Monitor"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Monitor/}")
-                ;;
-            '"Graph"')
-                ENABLE_PLUGINS+=",Graph"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Graph/}")
-                ;;
-            '"Autopeering"')
-                ENABLE_PLUGINS+=",Autopeering"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Autopeering/}")
-                ;;
-            '"Prometheus"')
-                ENABLE_PLUGINS+=",Prometheus"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Prometheus/}")
-                ;;
-            *)
-                ;;
-        esac
+        ENABLE_PLUGINS+=",${CHOICE//\"}"
+        DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/${CHOICE//\"}/}")
     done
 
     DISABLE_PLUGINS=$(printf "%s,"  "${DISABLE_PLUGINS_ARRAY[@]}")
