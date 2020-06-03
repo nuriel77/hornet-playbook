@@ -43,7 +43,7 @@
       "downloadURL": "{{ hornet_db_source }}"
     },
     "global": {
-      "path": "snapshotMainnet.txt",
+      "path": "snapshot/snapshotMainnet.txt",
       "spentAddressesPaths": {{ hornet_globalsnapshot_spentaddressespaths | default([]) | to_nice_json(indent=6) }},
       "index": {{ hornet_global_snapshot_index | default('1050000') }}
     },
@@ -60,8 +60,8 @@
     "securityLevel": {{ hornet_coo_security_level | default('2') }},
     "merkleTreeDepth": {{ hornet_coo_merkle_tree_depth |  default('23') }},
     "mwm": {{ hornet_coo_mwm | default('14') }},
-    "stateFilePath": "{{ hornet_coo_state_file | default('coordinator.state') }}",
-    "merkleTreeFilePath": "{{ hornet_coo_merkle_tree_file | default('coordinator.tree') }}",
+    "stateFilePath": "{{ hornet_coo_state_file | default('coordinator/state') }}",
+    "merkleTreeFilePath": "{{ hornet_coo_merkle_tree_file | default('coordinator/tree') }}",
     "intervalSeconds": {{ hornet_coo_interval_seconds | default('60') }},
     "checkpointTransactions": {{ hornet_coo_interval_seconds | default('5') }}
   },

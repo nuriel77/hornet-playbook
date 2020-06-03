@@ -187,6 +187,7 @@
     - "{{ hornet_home_path }}"
     - "{{ hornet_db_path }}"
     - "{{ hornet_home_path }}/snapshot"
+    - "{{ hornet_home_path }}/coordinator"
 
 # hornet system config
 - name: copy hornet environment config file

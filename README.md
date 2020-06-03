@@ -25,6 +25,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
      * [Logs](#logs)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
+     * [Private Tangle](#private-tangle)
      * [Related Documentation](docs/)
    * [Known Issues](#known-issues)
    * [Donations](#donations)
@@ -244,6 +245,25 @@ You can access the Tangle Monitor using `https://[your-server's-address]:4434`. 
 This has not been tried and basically **discouraged**. It could work if you know exactly what you are doing, i.e. making sure no conflicting ports between the two.
 
 On the otherhand, you could probably run hornet-playbook alongside goshimmer-playbook. However, this has not been tested yet.
+
+## Private Tangle
+
+The Hornet private tangle setup is documented [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle)
+
+Before doing anything make sure you've stopped hornet: `sudo systemctl stop hornet`.
+
+Next you'll have to edit `/var/lib/hornet/config.json`: make sure you set the values specified in the `coordinator` configuration as shown [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle#configuration). Same for `snapshots`, follow the example in the document (`loadType` etc). Note that the correct path for the playbook's base directory is `snapshot/` thus you should end up configuring `snapshot/snapshot.csv` in the configuration.
+
+To generate the merkle tree when using docker you need 2 parameters: the image name and your COO_SEED.
+
+For example below we're using `gohornet/hornet:v0.4.0-rc13` as the image with a random COO_SEED:
+```sh
+docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json -v /var/lib/hornet/snapshot:/app/snapshot gohornet/hornet:v0.4.0-rc13 tool merkle
+```
+
+Following the tutorial, you'll be adding the `merkle tree root` value as the `address` value in the `coordinator` in the `config.json`.
+
+Note that the state file and merkle tree file path are `coordinator/state` and `coordinator/tree`.
 
 # Known Issues
 
