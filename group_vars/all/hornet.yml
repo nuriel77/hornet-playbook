@@ -14,7 +14,7 @@ hornet_user: hornet
 hornet_group: hornet
 hornet_home_path: /var/lib/hornet
 hornet_config: "{{ hornet_home_path }}/config.json"
-hornet_neighbor_config: "{{ hornet_home_path }}/peering.json"
+hornet_peers_config: "{{ hornet_home_path }}/peering.json"
 hornet_mqtt_config_file: mqtt_config.json
 hornet_profiles_config_file: profiles.json
 hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
@@ -26,7 +26,7 @@ hornet_db_source: "https://ls.manapotion.io/export.bin"
 hornet_timeout_stop: 900
 
 # Neighbors
-hornet_neighbors: []
+hornet_peers: []
 #  - identity: example1.neighbor.com:15600
 #    preferIPv6: false
 #    alias: first_node
@@ -131,14 +131,14 @@ hornet_peering_address: "0.0.0.0"
 # The TCP neighbor peering port
 hornet_peering_port: "{{ hornet_ports.peering.port }}"
 
-hornet_accept_any_neighbor_connection: false
+hornet_accept_any_connection: false
 
 # Hornet autopeering port
 hornet_network_autopeering_address: "0.0.0.0"
 hornet_network_autopeering_port: "{{ hornet_ports.autopeering.port }}"
 
 # Hornet max neighbors
-hornet_max_neighbors: 5
+hornet_max_peers: 5
 
 # Hornet's API IP whitelist to bypass limitations
 hornet_httpapi_whitelist: []

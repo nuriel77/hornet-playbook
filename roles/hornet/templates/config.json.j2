@@ -18,9 +18,6 @@
       "requestsList": {{ hornet_max_requests_list | default('1000') }}
     }
   },
-  "compass": {
-    "loadLSMIAsLMI": false
-  },
   "dashboard": {
     "bindAddress": "{{ hornet_dashboard_internal_address | default('127.0.0.1') }}:{{ hornet_dashboard_internal_port | default('8087') }}",
     "theme": "{{ hornet_dashboard_theme | default('default') }}",
@@ -33,7 +30,8 @@
     }
   },
   "db": {
-    "path": "mainnetdb"
+    "path": "{{ hornet_db_path_in_container | default('mainnetdb') }}",
+    "debug": {{ hornet_db_debug | default('false') | bool | lower | string }}
   },
   "snapshots": {
     "loadType": "{{ hornet_snapshots_load_type | default('local') }}",
@@ -57,10 +55,15 @@
   "spentAddresses": {
     "enabled": {{ hornet_spent_addresses | default('true') | bool | lower | string }}
   },
-  "milestones": {
-    "coordinator": "{{ hornet_coo_address | default('EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9') }}",
-    "coordinatorSecurityLevel": {{ hornet_coo_security_level | default('2') }},
-    "numberOfKeysInAMilestone": {{ hornet_number_of_keys_in_milestone | default('23') }}
+  "coordinator": {
+    "address": "{{ hornet_coo_address | default('EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9') }}",
+    "securityLevel": {{ hornet_coo_security_level | default('2') }},
+    "merkleTreeDepth": {{ hornet_coo_merkle_tree_depth |  default('23') }},
+    "mwm": {{ hornet_coo_mwm | default('14') }},
+    "stateFilePath": "{{ hornet_coo_state_file | default('coordinator.state') }}",
+    "merkleTreeFilePath": "{{ hornet_coo_merkle_tree_file | default('coordinator.tree') }}",
+    "intervalSeconds": {{ hornet_coo_interval_seconds | default('60') }},
+    "checkpointTransactions": {{ hornet_coo_interval_seconds | default('5') }}
   },
   "network": {
     "preferIPv6": {{ hornet_network_prefer_ipv6 | default('false') | bool | lower | string }},
@@ -75,39 +78,43 @@
       "seed": "{{ hornet_autopeering_seed | default('') }}"
     }
   },
-  "protocol": {
-    "mwm": {{ hornet_protocol_mwm | default('14') }}
-  },
   "tipsel": {
     "belowMaxDepthTransactionLimit": {{ hornet_belowmax_depth_tx_limit | default('20000') }},
     "maxDepth": {{ hornet_max_depth | default('3') }}
   },
   "node": {
+    "alias": "{{ hornet_node_alias | default('') }}",
+    "showAliasInGetNodeInfo": {{ hornet_node_show_alias | default('false') | bool | lower | string }},
     "disablePlugins": {{ hornet_disable_plugins | to_nice_json(indent=4) }},
     "enablePlugins": {{ hornet_enable_plugins | to_nice_json(indent=4) }}
   },
   "logger": {
     "level": "{{ hornet_log_level | default('info') }}",
-    "disableCaller": true,
-    "encoding": "console",
-    "outputPaths": ["stdout"]
+    "disableCaller": {{ hornet_log_disable_caller | default('true') | bool | lower | string }},
+    "encoding": "{{ hornet_log_encoding | default('console') }}",
+    "outputPaths": {{ hornet_logger_output_paths | default(["stdout"]) | to_nice_json(indent=4) }}
   },
   "spammer": {
     "address": "HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999",
-    "depth": {{ hornet_spammer_depth | default('3') }},
-    "message": "Spamming with HORNET tipselect",
+    "depth": {{ hornet_spammer_depth | default('1') }},
+    "message": "{{ hornet_spammer_message | default('Spamming with HORNET tipselect, thank you for using HORNET playbook') }}",
     "tag": "HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES",
-    "tpsRateLimit": {{ hornet_spammer_tpsratelimit | default('0.1') }},
-    "workers": {{ hornet_spammer_workers | default('1') }}
+    "cpuMaxUsage": {{ hornet_spammer_cpu_max_usage | default('0.8') }},
+    "tpsRateLimit": {{ hornet_spammer_tpsratelimit | default('0.0') }},
+    "bundleSize": {{ hornet_spammer_bundle_size | default('1') }},
+    "valueSpam": {{ hornet_spammer_value_spam | default('false') | bool | lower | string }},
+    "workers": {{ hornet_spammer_workers | default('0') }}
   },
   "graph": {
     "webRootPath": "IOTAtangle/webroot",
     "domain": "{{ honet_graph_domain | default('') }}",
     "webSocket": {
-      "uri": ""
+      "uri": "{{ hornet_graph_websocket_uri | default('') }}"
     },
     "bindAddress": "{{ hornet_graph_address | default('127.0.0.1') }}:{{ hornet_graph_internal_port | default('18083') }}",
-    "networkName": "meets HORNET"
+    "networkName": "meets HORNET",
+    "explorerTxLink": "{{ hornet_graph_exp_tx_link | default('http://localhost:8081/explorer/tx/') }}",
+    "explorerBundleLink": "{{ hornet_graph_exp_bundle_link | default('http://localhost:8081/explorer/bundle/') }}"
   },
   "monitor": {
     "tangleMonitorPath": "tanglemonitor/frontend",
@@ -117,7 +124,7 @@
     "apiBindAddress": "{{ hornet_monitor_address | default('127.0.0.1') }}:{{ hornet_monitor_api_port | default('14433') }}",
     "webBindAddress": "{{ hornet_monitor_address | default('127.0.0.1') }}:{{ hornet_monitor_port | default('14434') }}",
     "websocket": {
-      "uri": ""
+      "uri": "{{ hornet_monitor_websocket_uri | default('') }}"
     }
   },
   "mqtt": {
@@ -127,6 +134,9 @@
     "bindAddress": "{{ hornet_zmq_address | default('127.0.0.1') }}:{{ hornet_zmq_port | default('5556') }}"
   },
   "profiling": {
-    "bindAddress": "{{ hornet_profiling_address | default('127.0.0.1') }}:{{ hornet_profiling_port | default('6060') }}"
+    "bindAddress": "{{ hornet_profiling_address | default('127.0.0.1') }}:{{ hornet_profiling_port | default('6060') }}",
+    "goMetrics": {{ hornet_profiling_go_metrics | default('false') | bool | lower | string }},
+    "processMetrics": {{ hornet_profiling_process_metrics | default('false') | bool | lower | string }},
+    "promhttpMetrics": {{ hornet_profiling_prom_metrics | default('true') | bool | lower | string }}
   }
 }
