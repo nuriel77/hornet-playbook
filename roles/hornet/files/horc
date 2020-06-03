@@ -133,7 +133,7 @@ function compare_versions() {
     do
         if ! validate_version "$VER"
         then
-            &>2 echo "Warning: the version '$VER' is not a valid release version. Cannot checking version."
+            >&2 echo "Warning: the version '$VER' is not a valid release version. Cannot check version." 
             return 1
         fi
     done
@@ -1272,7 +1272,7 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph,Autopeering"
+    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph,Autopeering,Prometheus"
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
@@ -1324,6 +1324,13 @@ function hornet_plugins() {
         PLUGIN_AUTOPEERING_STATE="OFF"
     fi
 
+    if jq -e -r '.node.enablePlugins | index("Prometheus")' < "$CONFIG_FILE" >/dev/null
+    then
+        PLUGIN_PROMETHEUS_STATE="ON"
+    else
+        PLUGIN_PROMETHEUS_STATE="OFF"
+    fi
+
     RESULTS=$(whiptail --title "HORC v${__VERSION__} - Plugins" \
         --checklist \
         --cancel-button "Exit" \
@@ -1335,6 +1342,7 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 15 60 "${#DI
         "Monitor"           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
         "Graph"             "...         Tangle Visualiser" "$PLUGIN_GRAPH_STATE" \
         "Autopeering"       "...         Hornet Autopeering" "$PLUGIN_AUTOPEERING_STATE" \
+        "Prometheus"        "...         Prometheus Metrics" "$PLUGIN_PROMETHEUS_STATE" \
         3>&1 1>&2 2>&3)
 
     RC=$?
@@ -1367,6 +1375,10 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 15 60 "${#DI
             '"Autopeering"')
                 ENABLE_PLUGINS+=",Autopeering"
                 DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Autopeering/}")
+                ;;
+            '"Prometheus"')
+                ENABLE_PLUGINS+=",Prometheus"
+                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Prometheus/}")
                 ;;
             *)
                 ;;

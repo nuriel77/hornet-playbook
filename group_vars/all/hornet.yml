@@ -45,6 +45,7 @@ hornet_httpapi_basic_auth: false
 # Hornet plugins
 hornet_enable_plugins:
   - Autopeering
+  - Prometheus
 
 # By default disable all
 hornet_disable_plugins:

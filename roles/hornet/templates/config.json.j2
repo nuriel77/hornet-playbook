@@ -134,9 +134,12 @@
     "bindAddress": "{{ hornet_zmq_address | default('127.0.0.1') }}:{{ hornet_zmq_port | default('5556') }}"
   },
   "profiling": {
-    "bindAddress": "{{ hornet_profiling_address | default('127.0.0.1') }}:{{ hornet_profiling_port | default('6060') }}",
-    "goMetrics": {{ hornet_profiling_go_metrics | default('false') | bool | lower | string }},
-    "processMetrics": {{ hornet_profiling_process_metrics | default('false') | bool | lower | string }},
-    "promhttpMetrics": {{ hornet_profiling_prom_metrics | default('true') | bool | lower | string }}
+    "bindAddress": "{{ hornet_profiling_address | default('127.0.0.1') }}:{{ hornet_profiling_port | default('6060') }}"
+  },
+  "prometheus": {
+    "bindAddress": "{{ hornet_prometheus_address | default('127.0.0.1') }}:{{ hornet_prometheus_port | default('9312') }}",
+    "goMetrics": {{ hornet_prometheus_go_metrics | default('false') | bool | lower | string }},
+    "processMetrics": {{ hornet_prometheus_process_metrics | default('false') | bool | lower | string }},
+    "promhttpMetrics": {{ hornet_prometheus_prometheus_metrics | default('true') | bool | lower | string }}
   }
 }
