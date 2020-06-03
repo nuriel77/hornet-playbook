@@ -1350,7 +1350,7 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 17 60 "${#DI
         Graph             "...         Tangle Visualiser" "$PLUGIN_GRAPH_STATE" \
         Autopeering       "...         Hornet Autopeering" "$PLUGIN_AUTOPEERING_STATE" \
         Prometheus        "...         Prometheus Metrics" "$PLUGIN_PROMETHEUS_STATE" \
-        Coordinator       "...         Comnet Coordinator" "$PLUGIN_COORDINATOR_STATE" \
+        Coordinator       "...  (*dev) Comnet Coordinator" "$PLUGIN_COORDINATOR_STATE" \
         3>&1 1>&2 2>&3)
 
     RC=$?
