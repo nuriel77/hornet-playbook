@@ -120,9 +120,9 @@
     "tangleMonitorPath": "tanglemonitor/frontend",
     "domain": "{{ honet_monitor_domain | default('') }}",
     "initialTransactionsCount": {{ hornet_monitor_initial_tx_count | default('15000') }},
-    "remoteapiport": {{ hornet_api_monitor_port_ext | default('4433') }},
-    "apiBindAddress": "{{ hornet_monitor_address | default('127.0.0.1') }}:{{ hornet_monitor_api_port | default('14433') }}",
-    "webBindAddress": "{{ hornet_monitor_address | default('127.0.0.1') }}:{{ hornet_monitor_port | default('14434') }}",
+    "remoteApiPort": {{ hornet_api_monitor_port_ext | default('4433') }},
+    "apiBindAddress": "{{ hornet_monitor_internal_address | default('127.0.0.1') }}:{{ hornet_monitor_api_port | default('14433') }}",
+    "webBindAddress": "{{ hornet_monitor_internal_address | default('127.0.0.1') }}:{{ hornet_monitor_port | default('14434') }}",
     "websocket": {
       "uri": "{{ hornet_monitor_websocket_uri | default('') }}"
     }

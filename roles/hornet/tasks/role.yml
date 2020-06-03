@@ -53,3 +53,7 @@
 - import_tasks: ssl.yml
   tags:
     - hornet_ssl
+
+- import_tasks: tanglemonitor.yml
+  tags:
+    - tanglemonitor_role

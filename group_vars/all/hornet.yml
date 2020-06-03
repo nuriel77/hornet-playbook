@@ -192,6 +192,11 @@ hornet_mqtt_internal_address: 127.0.0.1
 hornet_mqtt_internal_port: "11883"
 hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
 
+# Tangle Monitor
+hornet_monitor_internal_address: 127.0.0.1
+hornet_monitor_git_url: "https://github.com/unioproject/tanglemonitor.git"
+hornet_monitor_path: "{{ hornet_home_path }}/tanglemonitor"
+
 # Only needs enabling if not served via nginx
 hornet_dashboard_basic_auth: false
 
