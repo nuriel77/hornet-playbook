@@ -185,6 +185,8 @@ hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
 hornet_graph_internal_address: 127.0.0.1
 hornet_graph_internal_port: "18083"
 hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
+tanglevisualiser_git_url: "https://github.com/glumb/IOTAtangle.git"
+tanglevisualiser_path: "{{ hornet_home_path }}/tanglevisualiser"
 hornet_mqtt_ws_path: '/ws'
 
 # MQTT config

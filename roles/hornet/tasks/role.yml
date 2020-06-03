@@ -54,6 +54,10 @@
   tags:
     - hornet_ssl
 
+- import_tasks: tanglevisualiser.yml
+  tags:
+    - tanglevisualiser_role
+
 - import_tasks: tanglemonitor.yml
   tags:
     - tanglemonitor_role
