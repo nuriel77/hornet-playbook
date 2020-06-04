@@ -1273,6 +1273,7 @@ function hornet_plugins() {
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
     export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph,Autopeering,Prometheus,Coordinator"
+    declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
@@ -1280,77 +1281,29 @@ function hornet_plugins() {
     ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' < "$CONFIG_FILE")
 
     IFS=', ' read -r -a DISABLE_PLUGINS_ARRAY <<< "$DISABLE_PLUGINS"
-
-    # Get current states (TODO: use associative array and loop)
-    if jq -e -r '.node.enablePlugins | index("Spammer")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_SPAMMER_STATE="ON"
-    else
-        PLUGIN_SPAMMER_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enablePlugins | index("ZeroMQ")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_ZMQ_STATE="ON"
-    else
-        PLUGIN_ZMQ_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enablePlugins | index("Monitor")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_TANGLEMONITOR_STATE="ON"
-    else
-        PLUGIN_TANGLEMONITOR_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enablePlugins | index("MQTT")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_MQTT_STATE="ON"
-    else
-        PLUGIN_MQTT_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enablePlugins | index("Graph")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_GRAPH_STATE="ON"
-    else
-        PLUGIN_GRAPH_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enablePlugins | index("Autopeering")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_AUTOPEERING_STATE="ON"
-    else
-        PLUGIN_AUTOPEERING_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enablePlugins | index("Prometheus")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_PROMETHEUS_STATE="ON"
-    else
-        PLUGIN_PROMETHEUS_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enablePlugins | index("Coordinator")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_COORDINATOR_STATE="ON"
-    else
-        PLUGIN_COORDINATOR_STATE="OFF"
-    fi
+    for PLUGIN in "${DISABLE_PLUGINS_ARRAY[@]}"
+    do
+        if jq -e -r '.node.enablePlugins | index("'${PLUGIN}'")' < "$CONFIG_FILE" >/dev/null
+        then
+            PLUGINS_STATE[${PLUGIN}]="ON"
+        else
+            PLUGINS_STATE[${PLUGIN}]="OFF"
+        fi
+    done
 
     RESULTS=$(whiptail --title "HORC v${__VERSION__} - Plugins" \
         --checklist \
         --cancel-button "Exit" \
         "\nPlease choose plugins to enable or disable.\n\
 Select/unselect options using space and\nclick Enter to proceed.\n" 17 60 "${#DISABLE_PLUGINS_ARRAY[@]}" \
-        Spammer           "...         Spammer" "$PLUGIN_SPAMMER_STATE" \
-        ZMQ               "...         ZeroMQ" "$PLUGIN_ZMQ_STATE" \
-        MQTT              "...         MQTT" "$PLUGIN_MQTT_STATE" \
-        Monitor           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
-        Graph             "...         Tangle Visualiser" "$PLUGIN_GRAPH_STATE" \
-        Autopeering       "...         Hornet Autopeering" "$PLUGIN_AUTOPEERING_STATE" \
-        Prometheus        "...         Prometheus Metrics" "$PLUGIN_PROMETHEUS_STATE" \
-        Coordinator       "...  (*dev) Comnet Coordinator" "$PLUGIN_COORDINATOR_STATE" \
+        Spammer           "...         Spammer" "${PLUGINS_STATE[Spammer]}" \
+        ZMQ               "...         ZeroMQ" "${PLUGINS_STATE[ZeroMQ]}" \
+        Monitor           "...         Tangle Monitor" "${PLUGINS_STATE[Monitor]}" \
+        MQTT              "...         MQTT" "${PLUGINS_STATE[MQTT]}" \
+        Graph             "...         Tangle Visualiser" "${PLUGINS_STATE[Graph]}" \
+        Autopeering       "...         Hornet Autopeering" "${PLUGINS_STATE[Autopeering]}" \
+        Prometheus        "...         Prometheus Metrics" "${PLUGINS_STATE[Prometheus]}" \
+        Coordinator       "...  (*dev) Comnet Coordinator" "${PLUGINS_STATE[Coordinator]}" \
         3>&1 1>&2 2>&3)
 
     RC=$?
