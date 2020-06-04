@@ -195,6 +195,8 @@ Alertmanager       | 9093          | 9993          | TCP
 
 All the external ports have been made accessible in the firewall. There is no need to configure the firewall on the node.
 
+### Forward Ports
+
 If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
 
 Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
