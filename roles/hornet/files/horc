@@ -1330,11 +1330,13 @@ print(json.dumps(obj))
     NEW_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' <<<"$JSON_OUTPUT")
     [[ "$ORIGINAL_NODE_OBJ" == "$NEW_NODE_OBJ" ]] && return
 
+    # Produce new config
+    jq . <<< "$JSON_OUTPUT" > "$CONFIG_FILE"
+
     if (whiptail --title "Restart Hornet" \
              --yesno "You've made changes to the plugins. A restart of HORNET is needed to load the new configuration.\n\nRestart now?" \
              --defaultno \
              10 $WIDTH) then
-        jq . <<< "$JSON_OUTPUT" > "$CONFIG_FILE"
         echo "Restarting hornet, please wait ..."
         /bin/systemctl restart hornet
     fi
