@@ -36,7 +36,7 @@ hornet_peers: []
 
 # Hornet run profile (e.g. auto or light)
 # 'light' will consume less memory.
-hornet_profile: light
+hornet_profile: auto
 
 # Enable hornet API auth.
 # The default node's username and password are used.

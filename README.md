@@ -28,7 +28,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
      * [Private Tangle](#private-tangle)
      * [Related Documentation](docs/)
    * [Known Issues](#known-issues)
-   * [Donations](#donations)
+   * [Support the Project](#support-the-project)
 <!--te-->
 
 ## Requirements
@@ -256,7 +256,7 @@ Before doing anything make sure you've stopped hornet: `sudo systemctl stop horn
 
 Next you'll have to edit `/var/lib/hornet/config.json`: make sure you set the values specified in the `coordinator` configuration as shown [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle#configuration). Same for `snapshots`, follow the example in the document (`loadType` etc). Note that the correct path for the playbook's base directory is `snapshot/` thus you should end up configuring `snapshot/snapshot.csv` in the configuration.
 
-To generate the merkle tree when using docker you need 2 parameters: the image name and your COO_SEED.
+To generate the **merkle tree root** when using docker you need 2 parameters: a. the image name, b. your COO_SEED.
 
 For example below we're using `gohornet/hornet:v0.4.0-rc13` as the image with a random COO_SEED:
 ```sh
@@ -267,11 +267,31 @@ Following the tutorial, you'll be adding the `merkle tree root` value as the `ad
 
 Note that the state file and merkle tree file path are `coordinator/state` and `coordinator/tree`.
 
+The following step is to create the `snapshot.csv`. You should to that in `/var/lib/hornet/snapshot/snapshot.csv` as this is mounted into the HORNET docker container.
+
+Here's an example of the coordinator bootstrap command, as before, providing the COO_SEED and the docker image to use:
+```sh
+docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/snapshot:/app/snapshot -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json gohornet/hornet:v0.4.0-rc13 --cooBootstrap
+```
+Bootstrap is ended once you see milestones being issued. At this point you can stop the process with CTRL-c. It will look like this:
+```
+...
+INFO    Coordinator     milestone issued (1): 9AAHNAXNNQJM9HYHEBAKCNVXOLNYYDEJZWHAMLQPKQDEHMZXHYKJGIJSJJGOSZILWAAFZJGBIKHIXPC99
+...
+```
+
+Last step before starting up HORNET is adding the COO_SEED to `/etc/default/hornet` (or `/etc/sysconfig/hornet` in CentOS):
+```
+DOCKER_OPTS="-e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO"
+```
+Now you can start up HORNET using `sudo systemctl start hornet`
+
+
 # Known Issues
 
 * Due to the rapid development and changes to Hornet, the configuration file can break the existing configuration when upgrading.
 
-# Donations
+# Support the Project
 
 To create, test and maintain this playbook requires many hours of work and resources. This is done wholeheartedly for the IOTA community.
 
