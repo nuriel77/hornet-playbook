@@ -562,7 +562,7 @@ function display_requirements_url() {
 function check_arch() {
     # Check architecture
     ARCH=$(uname -m)
-    local REGEXP="x86_64|armv7l|armv8l|aarch64|aarch32|armhf"
+    local REGEXP="x86_64|armv8l|aarch64"
     if [[ ! "$ARCH" =~ $REGEXP ]]; then
         echo "ERROR: $ARCH architecture not supported"
         display_requirements_url

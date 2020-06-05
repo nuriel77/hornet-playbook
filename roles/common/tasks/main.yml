@@ -24,7 +24,7 @@
 
 - name: stop if architecture is not supported
   assert:
-    that: 'ansible_architecture in ["armv7l", "armhf", "aarch32", "armv8l", "aarch64", "x86_64"]'
+    that: 'ansible_architecture in ["armv8l", "aarch64", "x86_64"]'
   ignore_errors: "{{ ignore_assert_errors }}"
   tags:
     - always
