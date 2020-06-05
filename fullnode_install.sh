@@ -136,7 +136,7 @@ function set_dist() {
 function wait_apt(){
     local i=0
     tput sc
-    while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+    while fuser /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend >/dev/null 2>&1 ; do
         case $(($i % 4)) in
           0 ) j="-" ;;
           1 ) j="\\" ;;
@@ -144,7 +144,7 @@ function wait_apt(){
           3 ) j="/" ;;
         esac
         tput rc
-        echo -en "\r[$j] Waiting for other software managers to finish..."
+        echo -en "\r[$j] System packages being updated to newest version, this can take a moment..."
         sleep 0.5
         ((i=i+1))
     done
@@ -221,7 +221,9 @@ function init_centos_8(){
 }
 
 function init_ubuntu(){
-    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt
+    # We have to test a few times because apt is unexpected upon update
+    # of many packages (especially during update of old node)
+    wait_apt && echo "Ensuring no package managers ..." && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
@@ -236,7 +238,8 @@ function init_ubuntu(){
 
     echo "Installing Ansible and git..."
     apt-get install software-properties-common -y
-    apt-add-repository ppa:ansible/ansible -y
+    # PPA not ready for ubuntu focal yet (20.04)
+    [[ ! "$VER" =~ ^20 ]] && apt-add-repository ppa:ansible/ansible -y
     add-apt-repository universe -y
     apt-get update -y
     apt-get install ansible\
@@ -246,8 +249,10 @@ function init_ubuntu(){
                     libcrack2\
                     cracklib-runtime\
                     whiptail\
-                    python3-pip\
-                    python-pip -y
+                    python3-pip -y
+
+    [[ ! "$VER" =~ ^20 ]] && apt-get install python-pip -y
+
     if [ -e /usr/bin/pip ]; then
         /usr/bin/pip install jmespath
     fi
@@ -257,7 +262,9 @@ function init_ubuntu(){
 }
 
 function init_debian(){
-    wait_apt && echo "Ensure no package managers ..." && sleep 5 && wait_apt
+    # We have to test a few times because apt is unexpected upon update
+    # of many packages (especially during update of old node)
+    wait_apt && echo "Ensuring no package managers ..." && sleep 5 && wait_apt
 
     echo "Updating system packages..."
     apt update -qqy --fix-missing
@@ -297,6 +304,18 @@ function init_debian(){
 }
 
 function inform_reboot() {
+    if [[ "$INSTALL_OPTIONS" =~ overwrite=yes ]]
+    then
+        cat <<EOF
+===== Some packages installed require a reboot ======
+
+Please reboot the node once the installation is done!
+
+=====================================================
+EOF
+        return
+    fi
+
     cat <<EOF >/etc/motd
 ======================== HORNET PLAYBOOK ========================
 
@@ -717,7 +736,7 @@ if [[ "$OS" =~ ^(CentOS|Red) ]]; then
     check_arch
     init_centos_$VER
 elif [[ "$OS" =~ ^Ubuntu ]]; then
-    if [[ ! "$VER" =~ ^(16|17|18|19) ]]; then
+    if [[ ! "$VER" =~ ^(16|17|18|19|20) ]]; then
         echo "ERROR: $OS version $VER not supported"
         display_requirements_url
         exit 1

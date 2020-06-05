@@ -24,7 +24,9 @@
         update_cache: yes
       vars:
         packages: "{{ deb_packages }}"
-      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      when:
+        - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+        - ansible_distribution_major_version != '20'
 
     - name: install local dependencies
       tags:

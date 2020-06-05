@@ -18,12 +18,15 @@
 - name: add ansible repository Ubuntu
   apt_repository:
     repo: ppa:ansible/ansible
-  when: ansible_distribution == 'Ubuntu'
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_major_version != '20'
 
 - name: add ansible repository Debian
   apt_repository:
     repo: deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main
     state: present
+  when: ansible_distribution_major_version != '20'
 
 - name: Install some packages
   apt:
@@ -49,11 +52,19 @@
       - openssl
       - bsdmainutils
       - whiptail
-      - python-pip
       - python3-pip
       - python-passlib
       - apache2-utils
       - ansible
+  tags:
+    - deps
+    - scripts
+
+- name: Install old python-pip
+  apt:
+    name: "python-pip"
+    update_cache: yes
+  when: ansible_distribution_major_version != '20'
   tags:
     - deps
     - scripts
