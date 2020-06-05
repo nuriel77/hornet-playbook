@@ -254,6 +254,8 @@ The Hornet private tangle setup is documented [here](https://github.com/gohornet
 
 Before doing anything make sure you've stopped hornet: `sudo systemctl stop hornet`.
 
+Make sure you remove (or backup to another location) `/var/lib/hornet/mainnetdb/*` so there are no conflicts with a previous database.
+
 Next you'll have to edit `/var/lib/hornet/config.json`: make sure you set the values specified in the `coordinator` configuration as shown [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle#configuration). Same for `snapshots`, follow the example in the document (`loadType` etc). Note that the correct path for the playbook's base directory is `snapshot/` thus you should end up configuring `snapshot/snapshot.csv` in the configuration.
 
 To generate the **merkle tree root** when using docker you need 2 parameters: a. the image name, b. your COO_SEED.
@@ -271,7 +273,7 @@ The following step is to create the `snapshot.csv`. You should to that in `/var/
 
 Here's an example of the coordinator bootstrap command, as before, providing the COO_SEED and the docker image to use:
 ```sh
-docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/snapshot:/app/snapshot -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json gohornet/hornet:v0.4.0-rc13 --cooBootstrap
+docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/mainnetdb:/app/mainnetdb -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/snapshot:/app/snapshot -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json gohornet/hornet:v0.4.0-rc13 --cooBootstrap
 ```
 Bootstrap is ended once you see milestones being issued. At this point you can stop the process with CTRL-c. It will look like this:
 ```
