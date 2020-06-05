@@ -27,6 +27,24 @@
   tags:
     - py_docker
 
+- name: hornet home path
+  file:
+    state: directory
+    mode: 0700
+    owner: "{{ hornet_user }}"
+    group: "{{ hornet_group }}"
+    path: "{{ item }}"
+  with_items:
+    - "{{ hornet_home_path }}"
+
+- import_tasks: tanglevisualiser.yml
+  tags:
+    - tanglevisualiser_role
+
+- import_tasks: tanglemonitor.yml
+  tags:
+    - tanglemonitor_role
+
 - name: set ip variable if not set
   set_fact:
     ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
@@ -53,11 +71,3 @@
 - import_tasks: ssl.yml
   tags:
     - hornet_ssl
-
-- import_tasks: tanglevisualiser.yml
-  tags:
-    - tanglevisualiser_role
-
-- import_tasks: tanglemonitor.yml
-  tags:
-    - tanglemonitor_role
