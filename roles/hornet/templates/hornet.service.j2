@@ -17,12 +17,12 @@ ExecStart=/usr/bin/docker run \
   -v /etc/localtime:/etc/localtime:ro,Z \
   -v {{ hornet_db_path }}:/app/mainnetdb:rw,Z \
   -v {{ hornet_config }}:/app/config.json:ro,Z \
-  -v {{ hornet_neighbor_config }}:/app/neighbors.json:rw,Z \
+  -v {{ hornet_peers_config }}:/app/peering.json:rw,Z \
   -v {{ hornet_home_path }}/{{ hornet_mqtt_config_file }}:/app/{{ hornet_mqtt_config_file }}:ro,Z \
+  -v {{ hornet_home_path }}/{{ hornet_profiles_config_file }}:/app/{{ hornet_profiles_config_file }}:ro,Z \
   -v {{ hornet_home_path }}/snapshot:/app/snapshot:rw,Z \
-  -v {{ tanglemonitor_path }}/frontend:/app/tanglemonitor/frontend:ro,Z \
-  -v {{ tanglevisualiser_path }}/webroot:/app/IOTAtangle/webroot:ro,Z \
-  -v {{ socketio_path }}/dist/socket.io.js:/app/socket.io-client/dist/socket.io.js:ro,Z \
+  -v {{ hornet_monitor_path }}/frontend:/app/tanglemonitor/frontend:ro,Z \
+  -v {{ hornet_monitor_path }}/coordinator:/app/coordinator:rw,Z \
   --ulimit nofile={{ hornet_nofile_limit }}:{{ hornet_nofile_limit }} \
   $DOCKER_OPTS \
   ${HORNET_IMAGE}:${TAG} \

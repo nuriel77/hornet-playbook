@@ -1,5 +1,5 @@
 - name: clone tanglemonitor repository
   git:
-    repo: '{{ tanglemonitor_git_url }}'
-    dest: '{{ tanglemonitor_path }}'
-    version: '{{ tanglemonitor_version | default(omit) }}'
+    repo: '{{ hornet_monitor_git_url }}'
+    dest: '{{ hornet_monitor_path }}'
+    version: '{{ hornet_monitor_version | default(omit) }}'

@@ -16,8 +16,9 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.3.10
+VERSION_TEMP=0.4.0
 __VERSION__=${VERSION_TEMP}
+SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
 : "${HORNET_BRANCH:=master}"
 : "${HORC_BRANCH:=master}"
@@ -105,10 +106,37 @@ function set_dist() {
     fi
 }
 
+function validate_version {
+    local version=$1
+    if [[ "$version" =~ $SEMVER_REGEX ]]
+    then
+        local major=${BASH_REMATCH[1]}
+        local minor=${BASH_REMATCH[2]}
+        local patch=${BASH_REMATCH[3]}
+        local prere=${BASH_REMATCH[4]}
+        local build=${BASH_REMATCH[5]}
+        if [[ ! -z "$prere" ]] || [[ ! -z "$build" ]]
+        then
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
 function compare_versions() {
     local FIRST_VERSION=$(echo "$1" | tr -d 'v')
     local EVAL_STR=$2
     local SECOND_VERSION=$(echo "$3" | tr -d 'v')
+
+    for VER in "$FIRST_VERSION" "$SECOND_VERSION"
+    do
+        if ! validate_version "$VER"
+        then
+            >&2 echo "Warning: the version '$VER' is not a valid release version. Cannot check version." 
+            return 1
+        fi
+    done
 
     local GET_BOOL=$(python -c "from distutils.version import StrictVersion; print(StrictVersion('$FIRST_VERSION') $EVAL_STR StrictVersion('$SECOND_VERSION'))")
     if [[ "$GET_BOOL" == "True" ]]
@@ -408,7 +436,7 @@ function get_db() {
     DEFAULT_SOURCE=$(grep ^hornet_db_source /opt/hornet-playbook/group_vars/all/hornet.yml | awk {'print $2'} | tr -d '"')
 
     # Create array of available DB resources
-    SOURCES_ARRAY=("https://ls.manapotion.io/export.bin" "$DEFAULT_SOURCE" "Custom")
+    SOURCES_ARRAY=("$DEFAULT_SOURCE" "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
@@ -1169,7 +1197,7 @@ function view_iritop() {
 ### Notice ###
 function how_to_setup() {
     whiptail --title "HORC v${VERSION} - Instructions" \
-             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/neighbors.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
+             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/peering.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
              15 $WIDTH
 }
 
@@ -1208,7 +1236,7 @@ function configure_files() {
             ;;
 
         "c)")
-            edit_config "/var/lib/hornet/neighbors.json" "hornet"
+            edit_config "/var/lib/hornet/peering.json" "hornet"
             configure_files
             ;;
 
@@ -1244,61 +1272,38 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph"
+    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph,Autopeering,Prometheus,Coordinator"
+    declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
     # Save current config state
-    ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enableplugins) \(.disableplugins)"' < "$CONFIG_FILE")
+    ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' < "$CONFIG_FILE")
 
     IFS=', ' read -r -a DISABLE_PLUGINS_ARRAY <<< "$DISABLE_PLUGINS"
-
-    # Get current states (TODO: use associative array and loop)
-    if jq -e -r '.node.enableplugins | index("Spammer")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_SPAMMER_STATE="ON"
-    else
-        PLUGIN_SPAMMER_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enableplugins | index("ZeroMQ")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_ZMQ_STATE="ON"
-    else
-        PLUGIN_ZMQ_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enableplugins | index("Monitor")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_TANGLEMONITOR_STATE="ON"
-    else
-        PLUGIN_TANGLEMONITOR_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enableplugins | index("MQTT")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_MQTT_STATE="ON"
-    else
-        PLUGIN_MQTT_STATE="OFF"
-    fi
-
-    if jq -e -r '.node.enableplugins | index("Graph")' < "$CONFIG_FILE" >/dev/null
-    then
-        PLUGIN_GRAPH_STATE="ON"
-    else
-        PLUGIN_GRAPH_STATE="OFF"
-    fi
+    for PLUGIN in "${DISABLE_PLUGINS_ARRAY[@]}"
+    do
+        if jq -e -r '.node.enablePlugins | index("'${PLUGIN}'")' < "$CONFIG_FILE" >/dev/null
+        then
+            PLUGINS_STATE[${PLUGIN}]="ON"
+        else
+            PLUGINS_STATE[${PLUGIN}]="OFF"
+        fi
+    done
 
     RESULTS=$(whiptail --title "HORC v${__VERSION__} - Plugins" \
         --checklist \
         --cancel-button "Exit" \
         "\nPlease choose plugins to enable or disable.\n\
-Select/unselect options using space and\nclick Enter to proceed.\n" 15 50 "${#DISABLE_PLUGINS_ARRAY[@]}" \
-        "Spammer"           "...         Spammer" "$PLUGIN_SPAMMER_STATE" \
-        "ZMQ"               "...         ZeroMQ" "$PLUGIN_ZMQ_STATE" \
-        "MQTT"              "...         MQTT" "$PLUGIN_MQTT_STATE" \
-        "Monitor"           "...         Tangle Monitor" "$PLUGIN_TANGLEMONITOR_STATE" \
-        "Graph"             "...         Tangle Visualiser" "$PLUGIN_GRAPH_STATE" \
+Select/unselect options using space and\nclick Enter to proceed.\n" 17 60 "${#DISABLE_PLUGINS_ARRAY[@]}" \
+        Spammer           "...         Spammer" "${PLUGINS_STATE[Spammer]}" \
+        ZMQ               "...         ZeroMQ" "${PLUGINS_STATE[ZeroMQ]}" \
+        Monitor           "...         Tangle Monitor" "${PLUGINS_STATE[Monitor]}" \
+        MQTT              "...         MQTT" "${PLUGINS_STATE[MQTT]}" \
+        Graph             "...         Tangle Visualiser" "${PLUGINS_STATE[Graph]}" \
+        Autopeering       "...         Hornet Autopeering" "${PLUGINS_STATE[Autopeering]}" \
+        Prometheus        "...         Prometheus Metrics" "${PLUGINS_STATE[Prometheus]}" \
+        Coordinator       "...  (*dev) Comnet Coordinator" "${PLUGINS_STATE[Coordinator]}" \
         3>&1 1>&2 2>&3)
 
     RC=$?
@@ -1307,30 +1312,8 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 15 50 "${#DI
     read -a RESULTS_ARRAY <<< "$RESULTS"
     for CHOICE in "${RESULTS_ARRAY[@]}"
     do
-        case $CHOICE in
-            '"Spammer"')
-                ENABLE_PLUGINS+=",Spammer"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Spammer/}")
-                ;;
-            '"ZMQ"')
-                ENABLE_PLUGINS+=",ZeroMQ"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/ZeroMQ/}")
-                ;;
-            '"MQTT"')
-                ENABLE_PLUGINS+=",MQTT"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/MQTT/}")
-                ;;
-            '"Monitor"')
-                ENABLE_PLUGINS+=",Monitor"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Monitor/}")
-                ;;
-            '"Graph"')
-                ENABLE_PLUGINS+=",Graph"
-                DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/Graph/}")
-                ;;
-            *)
-                ;;
-        esac
+        ENABLE_PLUGINS+=",${CHOICE//\"}"
+        DISABLE_PLUGINS_ARRAY=("${DISABLE_PLUGINS_ARRAY[@]/${CHOICE//\"}/}")
     done
 
     DISABLE_PLUGINS=$(printf "%s,"  "${DISABLE_PLUGINS_ARRAY[@]}")
@@ -1339,19 +1322,22 @@ import json, sys, os
 obj = json.load(sys.stdin)
 enable_plugins = os.environ["ENABLE_PLUGINS"]
 disable_plugins = os.environ["DISABLE_PLUGINS"]
-obj["node"]["enableplugins"] = [p for p in enable_plugins.split(",") if p != ""]
-obj["node"]["disableplugins"] = [p for p in disable_plugins.split(",") if p != ""]
+obj["node"]["enablePlugins"] = [p for p in enable_plugins.split(",") if p != ""]
+obj["node"]["disablePlugins"] = [p for p in disable_plugins.split(",") if p != ""]
 print(json.dumps(obj))
 ')
 
-    NEW_NODE_OBJ=$(jq -r '.node | "\(.enableplugins) \(.disableplugins)"' <<<"$JSON_OUTPUT")
+    NEW_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' <<<"$JSON_OUTPUT")
     [[ "$ORIGINAL_NODE_OBJ" == "$NEW_NODE_OBJ" ]] && return
+
+    # Produce new config
+    jq . <<< "$JSON_OUTPUT" > "$CONFIG_FILE"
 
     if (whiptail --title "Restart Hornet" \
              --yesno "You've made changes to the plugins. A restart of HORNET is needed to load the new configuration.\n\nRestart now?" \
              --defaultno \
              10 $WIDTH) then
-        jq . <<< "$JSON_OUTPUT" > "$CONFIG_FILE"
+        echo "Restarting hornet, please wait ..."
         /bin/systemctl restart hornet
     fi
 }

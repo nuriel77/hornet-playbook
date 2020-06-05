@@ -18,15 +18,17 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet Controller App](#hornet-controller-app)
    * [Hornet Dashboard](#hornet-dashboard)
    * [Hornet HTTPS](#hornet-https)
+   * [Ports](#ports)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
      * [DB Corruption](#db-corruption)
      * [Logs](#logs)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
+     * [Private Tangle](#private-tangle)
      * [Related Documentation](docs/)
    * [Known Issues](#known-issues)
-   * [Donations](#donations)
+   * [Support the Project](#support-the-project)
 <!--te-->
 
 ## Requirements
@@ -66,6 +68,12 @@ If you are working on a fork in a feature branch or happen to directly contribut
 ```sh
 BRANCH="dev-branch"; GIT_OPTIONS="-b $BRANCH" bash <(curl -s "https://raw.githubusercontent.com/nuriel77/hornet-playbook/$BRANCH/fullnode_install.sh")
 ```
+
+To update the playbook to use a different hornet tag/version, for example hornet prerelease version `v0.4.0-rc2`:
+```sh
+ansible-playbook -i inventory site.yml -v -e hornet_version=v0.4.0-rc2 -e overwrite=yes
+```
+Note that a Hornet prerelease might require changes on the playbook's code.
 
 ## Docker Usage Commands
 
@@ -168,6 +176,31 @@ The second step is to enable HTTPS certificate. Note that you must already have 
 
 Enabling a certificate will allow you to connect to your node with IOTA's official Trinity wallet.
 
+## Ports
+
+Here's a list of ports configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy, or `HAproxy` for the API port. The internal ports are not accessible externally.
+
+NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL
+-------------------|---------------|---------------|---------
+Hornet API         | 14265         | 14267         | TCP
+Hornet autopeering | 14626         | 14626         | UDP
+Hornet peering     | 15600         | 15600         | TCP
+Dashboard          | 8087          | 8081          | TCP
+Monitor            | 14434         | 4434          | TCP
+Monitor API        | 14433         | 4433          | TCP
+Visualiser         | 18083         | 8083          | TCP
+Grafana            | 3000          | 5555          | TCP
+Prometheus         | 9090          | 8999          | TCP
+Alertmanager       | 9093          | 9993          | TCP
+
+All the external ports have been made accessible in the firewall. There is no need to configure the firewall on the node.
+
+### Forward Ports
+
+If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
+
+Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
+
 # Troubleshooting
 
 If something isn't working as expected, try to gather as much data as possible, as this can help someone who is able to help you finding out the cause of the issue.
@@ -215,11 +248,52 @@ This has not been tried and basically **discouraged**. It could work if you know
 
 On the otherhand, you could probably run hornet-playbook alongside goshimmer-playbook. However, this has not been tested yet.
 
+## Private Tangle
+
+The Hornet private tangle setup is documented [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle)
+
+Before doing anything make sure you've stopped hornet: `sudo systemctl stop hornet`.
+
+Make sure you remove (or backup to another location) `/var/lib/hornet/mainnetdb/*` so there are no conflicts with a previous database.
+
+Next you'll have to edit `/var/lib/hornet/config.json`: make sure you set the values specified in the `coordinator` configuration as shown [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle#configuration). Same for `snapshots`, follow the example in the document (`loadType` etc). Note that the correct path for the playbook's base directory is `snapshot/` thus you should end up configuring `snapshot/snapshot.csv` in the configuration.
+
+To generate the **merkle tree root** when using docker you need 2 parameters: a. the image name, b. your COO_SEED.
+
+For example below we're using `gohornet/hornet:v0.4.0-rc13` as the image with a random COO_SEED:
+```sh
+docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json -v /var/lib/hornet/snapshot:/app/snapshot gohornet/hornet:v0.4.0-rc13 tool merkle
+```
+
+Following the tutorial, you'll be adding the `merkle tree root` value as the `address` value in the `coordinator` in the `config.json`.
+
+Note that the state file and merkle tree file path are `coordinator/state` and `coordinator/tree`.
+
+The following step is to create the `snapshot.csv`. You should to that in `/var/lib/hornet/snapshot/snapshot.csv` as this is mounted into the HORNET docker container.
+
+Here's an example of the coordinator bootstrap command, as before, providing the COO_SEED and the docker image to use:
+```sh
+docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/mainnetdb:/app/mainnetdb -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/snapshot:/app/snapshot -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json gohornet/hornet:v0.4.0-rc13 --cooBootstrap
+```
+Bootstrap is ended once you see milestones being issued. At this point you can stop the process with CTRL-c. It will look like this:
+```
+...
+INFO    Coordinator     milestone issued (1): 9AAHNAXNNQJM9HYHEBAKCNVXOLNYYDEJZWHAMLQPKQDEHMZXHYKJGIJSJJGOSZILWAAFZJGBIKHIXPC99
+...
+```
+
+Last step before starting up HORNET is adding the COO_SEED to `/etc/default/hornet` (or `/etc/sysconfig/hornet` in CentOS):
+```
+DOCKER_OPTS="-e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO"
+```
+Now you can start up HORNET using `sudo systemctl start hornet`
+
+
 # Known Issues
 
 * Due to the rapid development and changes to Hornet, the configuration file can break the existing configuration when upgrading.
 
-# Donations
+# Support the Project
 
 To create, test and maintain this playbook requires many hours of work and resources. This is done wholeheartedly for the IOTA community.
 

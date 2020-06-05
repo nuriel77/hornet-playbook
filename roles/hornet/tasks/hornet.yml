@@ -101,7 +101,7 @@
         content: |-
           api_version: {{ hornet_api_version | default('1') }}
           host: http://127.0.0.1:{{ hornet_api_port }}
-          file: {{ hornet_home_path }}/neighbors.json
+          file: {{ hornet_home_path }}/peering.json
           base_config: {{ hornet_home_path }}/config.json
           hornet: true
         force: "{{ overwrite | default('no') }}"
@@ -187,6 +187,7 @@
     - "{{ hornet_home_path }}"
     - "{{ hornet_db_path }}"
     - "{{ hornet_home_path }}/snapshot"
+    - "{{ hornet_home_path }}/coordinator"
 
 # hornet system config
 - name: copy hornet environment config file
@@ -216,24 +217,25 @@
     force: "{{ overwrite | default('no') }}"
     backup: yes
   with_items:
-    - {"src": "templates/config.json.j2", "dest": "{{ hornet_home_path }}/config.json"}
-    - {"src": "templates/mqtt_config.json.j2", "dest": "{{ hornet_home_path }}/mqtt_config.json"}
+    - {"src": "templates/config.json.j2", "dest": "{{ hornet_config }}"}
+    - {"src": "templates/{{ hornet_mqtt_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_mqtt_config_file }}"}
+    - {"src": "templates/{{ hornet_profiles_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_profiles_config_file }}"}
   tags: hornet_config_files
   notify:
     - restart hornet
 
-- name: copy neighbors.json
+- name: copy peering.json
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: 0600
     owner: "{{ hornet_user }}"
     group: "{{ hornet_group }}"
-    force: no
+    force: "{{ overwrite | default('no') }}"
     backup: yes
   tags: hornet_config_files
   with_items:
-    - {"src": "templates/neighbors.json.j2", "dest": "{{ hornet_home_path }}/neighbors.json"}
+    - {"src": "templates/peering.json.j2", "dest": "{{ hornet_peers_config }}"}
 
 - name: download hornet snapshot DB (can take a while)
   get_url:

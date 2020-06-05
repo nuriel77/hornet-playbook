@@ -1,5 +1,0 @@
-{
-  "autotetheringenabled": {{ hornet_auto_peering_enabled | default('false') | lower | string }},
-  "maxneighbors": {{ hornet_max_neighbors | default('5') }},
-  "neighbors": {{ hornet_neighbors | to_nice_json(indent=4) }}
-}
