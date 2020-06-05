@@ -189,6 +189,15 @@
     - "{{ hornet_home_path }}/snapshot"
     - "{{ hornet_home_path }}/coordinator"
 
+# Import visualiser and monitor repos
+- import_tasks: tanglevisualiser.yml
+  tags:
+    - tanglevisualiser_role
+
+- import_tasks: tanglemonitor.yml
+  tags:
+    - tanglemonitor_role
+
 # hornet system config
 - name: copy hornet environment config file
   template:
