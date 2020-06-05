@@ -23,6 +23,7 @@ ExecStart=/usr/bin/docker run \
   -v {{ hornet_home_path }}/snapshot:/app/snapshot:rw,Z \
   -v {{ hornet_home_path }}/coordinator:/app/coordinator:rw,Z \
   -v {{ hornet_monitor_path }}/frontend:/app/tanglemonitor/frontend:ro,Z \
+  -v {{ tanglevisualiser_path }}/webroot:/app/tanglevisualiser/webroot:ro,Z \
   --ulimit nofile={{ hornet_nofile_limit }}:{{ hornet_nofile_limit }} \
   $DOCKER_OPTS \
   ${HORNET_IMAGE}:${TAG} \
