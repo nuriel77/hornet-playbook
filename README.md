@@ -19,6 +19,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet Dashboard](#hornet-dashboard)
    * [Hornet HTTPS](#hornet-https)
    * [Ports](#ports)
+     * [Forward Ports](#forward-ports)
    * [Security](#security)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
@@ -208,7 +209,7 @@ Security should not be taken lightly. It is recommended to take several steps to
 
 Please follow [this guide](https://iri-playbook.readthedocs.io/en/master/securityhardening.html), it works for any Linux server.
 
-# Troubleshooting
+## Troubleshooting
 
 If something isn't working as expected, try to gather as much data as possible, as this can help someone who is able to help you finding out the cause of the issue.
 
@@ -220,7 +221,7 @@ sudo lsof -Pni:14265
 ```
 Note that after restarting Hornet it takes it some time to make the port available (e.g. when loading snapshot file).
 
-## 502 Bad Gateway
+### 502 Bad Gateway
 
 If you receive this error when trying to browse to the dashboard:
 
@@ -229,19 +230,30 @@ If you receive this error when trying to browse to the dashboard:
 
 Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io:8081` would tell nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly as described in the beginning of this chapter.
 
-## DB Corruption
+### DB Corruption
 
 If Hornet wasn't shut down properly there is a good chance that the DB is corrupted and you will have to remove it and start all over again.
 
 
-## Logs
+### Logs
 In the following link you can read more about how to collect logs from your system. Although this documentation is for IRI, the commands are similar (just replace iri with hornet if needed):
 
 https://iri-playbook.readthedocs.io/en/master/troubleshooting.html#troubleshooting
 
-# Appendix
+### Rerun Playbook
 
-## Hornet Plugins
+You can rerun the playbook to fix most issues. Use the tool `horc`, there's an option to rerun the playbook.
+
+If `horc` isn't working, try the following command:
+
+```sh
+cd /opt/hornet-playbook && git pull && ansible-playbook -v site.yml -i inventory -e overwrite=yes
+```
+This command will reset all configuration files but also make a backup of existing ones so you'll be able to restore any previous peers and settings you had.
+
+## Appendix
+
+### Hornet Plugins
 
 Some of Hornet's plugins can be enabled and disabled using the `horc` tool via the menu.
 
@@ -249,13 +261,13 @@ Note about the Tangle Monitor plugin: it uses two ports: 4433 and 4434 where the
 
 You can access the Tangle Monitor using `https://[your-server's-address]:4434`. Once your node is fully synced you will start seeing data.
 
-## Install Alongside IRI-Playbook
+### Install Alongside IRI-Playbook
 
 This has not been tried and basically **discouraged**. It could work if you know exactly what you are doing, i.e. making sure no conflicting ports between the two.
 
 On the otherhand, you could probably run hornet-playbook alongside goshimmer-playbook. However, this has not been tested yet.
 
-## Private Tangle
+### Private Tangle
 
 The Hornet private tangle setup is documented [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle)
 
@@ -295,12 +307,11 @@ DOCKER_OPTS="-e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZU
 ```
 Now you can start up HORNET using `sudo systemctl start hornet`
 
-
-# Known Issues
+## Known Issues
 
 * Due to the rapid development and changes to Hornet, the configuration file can break the existing configuration when upgrading.
 
-# Support the Project
+## Support the Project
 
 To create, test and maintain this playbook requires many hours of work and resources. This is done wholeheartedly for the IOTA community.
 
