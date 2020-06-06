@@ -19,6 +19,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet Dashboard](#hornet-dashboard)
    * [Hornet HTTPS](#hornet-https)
    * [Ports](#ports)
+   * [Security](#security)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
      * [DB Corruption](#db-corruption)
@@ -200,6 +201,12 @@ All the external ports have been made accessible in the firewall. There is no ne
 If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
 
 Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
+
+## Security
+
+Security should not be taken lightly. It is recommended to take several steps to improve how you interact and authenticate with your server.
+
+Please follow this tutorial, it works for any Linux server: [this guide](https://iri-playbook.readthedocs.io/en/master/securityhardening.html)
 
 # Troubleshooting
 
