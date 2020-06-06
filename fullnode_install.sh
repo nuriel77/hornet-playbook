@@ -534,7 +534,6 @@ Please confirm you want to proceed with the installation?" \
     [ "$SKIP_FIREWALL_CONFIG" = true ] && echo "configure_firewall: false" >>"$INSTALLER_OVERRIDE_FILE"
     [ "$DISABLE_MONITORING" = true ] && echo "disable_monitoring: true" >>"$INSTALLER_OVERRIDE_FILE"
     [ "$ENABLE_HAPROXY" = true ] && echo "lb_bind_addresses: ['0.0.0.0']" >>"$INSTALLER_OVERRIDE_FILE"
-    [ "$ENABLE_COMNET" = true ] && cp -- "/opt/hornet-playbook/roles/shared-files/comnet-vars.yml" "/opt/hornet-playbook/group_vars/all/z-comnet-vars.yml"
     INSTALL_OPTIONS+=" $SKIP_TAGS"
 }
 
@@ -635,7 +634,10 @@ function run_playbook(){
     echo "SSH port to use: $SSH_PORT"
 
     # Ansible output log file
-    LOGFILE=/var/log/hornet-playbook-$(date +%Y%m%d%H%M).log
+    LOGFILE="/var/log/hornet-playbook-$(date +%Y%m%d%H%M).log"
+
+    # Enable comnet if selected
+    [ "$ENABLE_COMNET" = true ] && cp -- "/opt/hornet-playbook/roles/shared-files/comnet-vars.yml" "/opt/hornet-playbook/group_vars/all/z-comnet-vars.yml"
 
     # Override ssh_port
     [[ $SSH_PORT -ne 22 ]] && echo "ssh_port: \"${SSH_PORT}\"" > "${HORNET_PLAYBOOK_DIR}/group_vars/all/z-ssh-port.yml"
