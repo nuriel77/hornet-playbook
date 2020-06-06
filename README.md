@@ -206,7 +206,7 @@ Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp,
 
 Security should not be taken lightly. It is recommended to take several steps to improve how you interact and authenticate with your server.
 
-Please follow this tutorial, it works for any Linux server: [this guide](https://iri-playbook.readthedocs.io/en/master/securityhardening.html)
+Please follow [this guide](https://iri-playbook.readthedocs.io/en/master/securityhardening.html), it works for any Linux server.
 
 # Troubleshooting
 
