@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.4.1
+VERSION_TEMP=0.5.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -1342,6 +1342,50 @@ print(json.dumps(obj))
     fi
 }
 
+### Toggle Comnet ###
+function toggle_comnet(){
+    local TO="comnet"
+    local FROM="mainnet"
+    local MSG
+
+    if [ -f "/opt/hornet-playbook/group_vars/all/z-comnet-vars.yml" ]
+    then
+        TO="mainnet"
+        FROM="comnet"
+    fi
+
+    MSG="This node seems to be configured for $FROM at the moment.\n\nWould you like to switch it to $TO?"
+    if ! (whiptail --title "Toggle ComNet" \
+                 --yesno "${MSG}" \
+                 --defaultno \
+                 10 $WIDTH) then
+        return
+    fi
+
+    if [ "$TO" == "comnet" ]
+    then
+        cp -- "/opt/hornet-playbook/roles/shared-files/comnet-vars.yml" "/opt/hornet-playbook/group_vars/all/z-comnet-vars.yml"
+    else
+        rm "/opt/hornet-playbook/group_vars/all/z-comnet-vars.yml"
+    fi
+
+    echo "Stopping HORNET ..."
+    /bin/systemctl stop hornet
+
+    # Cleanup
+    rm -f /var/lib/hornet/snapshot/export.bin /var/lib/hornet/mainnetdb/*
+
+    # Reconfigure
+    cd /opt/hornet-playbook \
+      && ansible-playbook -v site.yml \
+                          -i inventory \
+                          -e overwrite=yes \
+                          --tags="hornet_config_files"
+
+    MSG="Node configured for ${TO}."
+    pause "$MSG Press ENTER to return to menu."
+}
+
 ### Neighbors ###
 function neighbors_menu(){
     whiptail --title "HORC v${__VERSION__} - Neighbors" \
@@ -1398,7 +1442,7 @@ function main_menu() {
     whiptail --title "HORC v${__VERSION__} - Hornet Configuration Menu" \
              --menu "$MENU" \
              --cancel-button "Exit" \
-             26 $WIDTH 16 \
+             28 $WIDTH 18 \
     "a)" "Update Hornet Software" \
     "b)" "Hornet Plugins" \
     "c)" "Manage Services" \
@@ -1414,6 +1458,7 @@ function main_menu() {
     "m)" "Get new snapshot DB" \
     "n)" "Neighbors" \
     "o)" "View IRITOP" \
+    "p)" "Toggle ComNet" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1507,6 +1552,10 @@ function run_main_menu() {
             run_main_menu
             ;;
 
+        "p)")
+            toggle_comnet
+            run_main_menu
+            ;;
         *)
             run_main_menu
             ;;

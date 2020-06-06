@@ -471,12 +471,13 @@ Please choose additional installation options.
 Note that defaults have been set according to your system's configuration.
 
 Select/unselect options using space and click Enter to proceed.
-        " 24 78 5 \
+        " 24 78 6 \
         "INSTALL_DOCKER"           "Install Docker runtime (recommended)" ON \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
         "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
         "ENABLE_HAPROXY"           "Enable HAProxy (recommended)" ON \
         "DISABLE_MONITORING"       "Disable node monitoring${DISABLE_MONITORING_MSG}" "$DISABLE_MONITORING_DEFAULT" \
+        "ENABLE_COMNET"            "Run this node on the comnet" OFF \
         3>&1 1>&2 2>&3)
 
     RC=$?
@@ -490,20 +491,23 @@ Select/unselect options using space and click Enter to proceed.
     do
         case $CHOICE in
             '"INSTALL_DOCKER"')
-                echo "install_docker: true" >>"$INSTALLER_OVERRIDE_FILE"
+                INSTALL_DOCKER="true"
                 ;;
             '"INSTALL_NGINX"')
-                echo "install_nginx: true" >>"$INSTALLER_OVERRIDE_FILE"
+                INSTALL_NGINX="true"
                 ;;
             '"SKIP_FIREWALL_CONFIG"')
-                echo "configure_firewall: false" >>"$INSTALLER_OVERRIDE_FILE"
+                SKIP_FIREWALL_CONFIG="true"
                 ;;
             '"DISABLE_MONITORING"')
                 SKIP_TAGS+=",monitoring_role"
-                echo "disable_monitoring: true" >>"$INSTALLER_OVERRIDE_FILE"
+                DISABLE_MONITORING="true"
                 ;;
             '"ENABLE_HAPROXY"')
-                echo "lb_bind_addresses: ['0.0.0.0']" >>"$INSTALLER_OVERRIDE_FILE"
+                ENABLE_HAPROXY="true"
+                ;;
+            '"ENABLE_COMNET"')
+                ENABLE_COMNET="true"
                 ;;
             *)
                 ;;
@@ -521,9 +525,15 @@ $RESULTS_MSG
 Please confirm you want to proceed with the installation?" \
                  --defaultno \
                  16 78); then
-            exit 1
+            exit
         fi
     fi
+
+    [ "$INSTALL_DOCKER" = true ] && echo "install_docker: true" >>"$INSTALLER_OVERRIDE_FILE"
+    [ "$INSTALL_NGINX" = true ] && echo "install_nginx: true" >>"$INSTALLER_OVERRIDE_FILE"
+    [ "$SKIP_FIREWALL_CONFIG" = true ] && echo "configure_firewall: false" >>"$INSTALLER_OVERRIDE_FILE"
+    [ "$DISABLE_MONITORING" = true ] && echo "disable_monitoring: true" >>"$INSTALLER_OVERRIDE_FILE"
+    [ "$ENABLE_HAPROXY" = true ] && echo "lb_bind_addresses: ['0.0.0.0']" >>"$INSTALLER_OVERRIDE_FILE"
     INSTALL_OPTIONS+=" $SKIP_TAGS"
 }
 
@@ -624,7 +634,10 @@ function run_playbook(){
     echo "SSH port to use: $SSH_PORT"
 
     # Ansible output log file
-    LOGFILE=/var/log/hornet-playbook-$(date +%Y%m%d%H%M).log
+    LOGFILE="/var/log/hornet-playbook-$(date +%Y%m%d%H%M).log"
+
+    # Enable comnet if selected
+    [ "$ENABLE_COMNET" = true ] && cp -- "/opt/hornet-playbook/roles/shared-files/comnet-vars.yml" "/opt/hornet-playbook/group_vars/all/z-comnet-vars.yml"
 
     # Override ssh_port
     [[ $SSH_PORT -ne 22 ]] && echo "ssh_port: \"${SSH_PORT}\"" > "${HORNET_PLAYBOOK_DIR}/group_vars/all/z-ssh-port.yml"
