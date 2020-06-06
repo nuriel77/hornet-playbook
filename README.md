@@ -25,6 +25,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
      * [502 Bad Gateway](#502-bad-gateway)
      * [DB Corruption](#db-corruption)
      * [Logs](#logs)
+     * [Rerun Playbook](#rerun-playbook)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
      * [Private Tangle](#private-tangle)
