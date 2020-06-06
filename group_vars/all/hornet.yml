@@ -153,6 +153,7 @@ hornet_globalsnapshot_spentaddressespaths:
 hornet_network_entrynodes:
   - "LehlDBPJ6kfcfLOK6kAU4nD7B/BdR7SJhai7yFCbCCM=@enter.hornet.zone:14626"
   - "zEiNuQMDfZ6F8QDisa1ndX32ykBTyYCxbtkO0vkaWd0=@enter.manapotion.io:18626"
+  - "EsY+zvaselQYA33AVNzrYIGLplboIh4r8oO+vLKQAVM=@entrynode.tanglebay.org:14626"
 
 # Tanglemonitor ports external
 # Those best be kept on these ports

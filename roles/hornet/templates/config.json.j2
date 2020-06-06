@@ -49,7 +49,7 @@
     },
     "pruning": {
       "enabled": {{ hornet_snapshot_pruning_enabled | default('true') | bool | lower | string }},
-      "delay": {{ hornet_snapshot_pruning_delay | default('40000') }}
+      "delay": {{ hornet_snapshot_pruning_delay | default('15000') }}
     }
   },
   "spentAddresses": {
