@@ -138,8 +138,8 @@
   },
   "prometheus": {
     "bindAddress": "{{ hornet_prometheus_address | default('127.0.0.1') }}:{{ hornet_prometheus_port | default('9312') }}",
-    "goMetrics": {{ hornet_prometheus_go_metrics | default('false') | bool | lower | string }},
-    "processMetrics": {{ hornet_prometheus_process_metrics | default('false') | bool | lower | string }},
+    "goMetrics": {{ hornet_prometheus_go_metrics | default('true') | bool | lower | string }},
+    "processMetrics": {{ hornet_prometheus_process_metrics | default('true') | bool | lower | string }},
     "promhttpMetrics": {{ hornet_prometheus_prometheus_metrics | default('true') | bool | lower | string }}
   }
 }
