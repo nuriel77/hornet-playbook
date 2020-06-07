@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.5.0
+VERSION_TEMP=0.5.1
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -1272,7 +1272,7 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZeroMQ,Monitor,MQTT,Graph,Autopeering,Prometheus,Coordinator"
+    export DISABLE_PLUGINS="Spammer,ZMQ,Monitor,MQTT,Graph,Autopeering,Prometheus,Coordinator"
     declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
@@ -1297,7 +1297,7 @@ function hornet_plugins() {
         "\nPlease choose plugins to enable or disable.\n\
 Select/unselect options using space and\nclick Enter to proceed.\n" 17 60 "${#DISABLE_PLUGINS_ARRAY[@]}" \
         Spammer           "...         Spammer" "${PLUGINS_STATE[Spammer]}" \
-        ZMQ               "...         ZeroMQ" "${PLUGINS_STATE[ZeroMQ]}" \
+        ZMQ               "...         ZeroMQ" "${PLUGINS_STATE[ZMQ]}" \
         Monitor           "...         Tangle Monitor" "${PLUGINS_STATE[Monitor]}" \
         MQTT              "...         MQTT" "${PLUGINS_STATE[MQTT]}" \
         Graph             "...         Tangle Visualiser" "${PLUGINS_STATE[Graph]}" \
