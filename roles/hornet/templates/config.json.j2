@@ -5,7 +5,7 @@
     "basicAuth": {
       "enabled": {{ hornet_httpapi_basic_auth | bool | lower | string }},
       "username": "{% if hornet_httpapi_basic_auth | bool %}{{ fullnode_user }}{% endif %}",
-      "passwordHash": "{% if hornet_httpapi_basic_auth | bool %}{{ fullnode_user_password + hornet_httpapi_basic_auth_salt | hash('sha256') }}{% endif %}",
+      "passwordHash": "{% if hornet_httpapi_basic_auth | bool %}{{ (fullnode_user_password + hornet_httpapi_basic_auth_salt) | hash('sha256') }}{% endif %}",
       "passwordSalt": "{% if hornet_httpapi_basic_auth | bool %}{{ hornet_httpapi_basic_auth_salt }}{% endif %}"
     },
     "permitRemoteAccess": {{ hornet_permit_remote_access_list | to_nice_json(indent=6) }},
@@ -25,7 +25,7 @@
     "basicAuth": {
       "enabled": {{ hornet_dashboard_basic_auth | bool | lower | string }},
       "username": "{% if hornet_dashboard_basic_auth | bool %}{{ fullnode_user }}{% endif %}",
-      "passwordHash": "{% if hornet_dashboard_basic_auth | bool %}{{ fullnode_user_password + hornet_dashboard_basic_auth_salt | hash('sha256') }}{% endif %}",
+      "passwordHash": "{% if hornet_dashboard_basic_auth | bool %}{{ (fullnode_user_password + hornet_dashboard_basic_auth_salt) | hash('sha256') }}{% endif %}",
       "passwordSalt": "{% if hornet_dashboard_basic_auth | bool %}{{ hornet_dashboard_basic_auth_salt }}{% endif %}"
     }
   },
