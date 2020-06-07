@@ -192,6 +192,7 @@ hornet_spammer_workers: 0
 #hornet_graph_websocket_uri: ""
 hornet_graph_internal_address: 127.0.0.1
 hornet_graph_internal_port: "18083"
+hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
 hornet_graph_exp_tx_link: http://localhost:8081/explorer/tx/
 hornet_graph_exp_bundle_link: http://localhost:8081/explorer/bundle/
 
@@ -216,6 +217,7 @@ hornet_mqtt_config_file: mqtt_config.json
 hornet_mqtt_worker_number: 4096
 hornet_mqtt_internal_port: "11883"
 hornet_mqtt_internal_address: 127.0.0.1
+hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
 hornet_mqtt_ws_path: /ws
 hornet_mqtt_tls_enabled: "false"
 hornet_mqtt_ca_file: tls/ca/cacert.pem

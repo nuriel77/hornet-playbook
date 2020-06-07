@@ -25,16 +25,6 @@ hornet_db_source: "https://ls.manapotion.io/export.bin"
 # gracefully stop. This applies for restart/stop.
 hornet_timeout_stop: 900
 
-#  - identity: example1.neighbor.com:15600
-#    preferIPv6: false
-#    alias: first_node
-#  - identity: example2.neighbor.com:15600
-#    alias: second_node
-#    preferIPv6: false
-
-# Unprivileged user to run hornet with
-hornet_username: hornet
-
 # Ports used by hornet
 # For now only peering port is not
 # running behind a proxy. Therefore
@@ -79,18 +69,6 @@ hornet_ports:
     proto: tcp
     allow: yes
 
-hornet_accept_any_connection: false
-
-# Tanglemonitor ports external
-# Those best be kept on these ports
-# because the frontend has them hardcoded
-hornet_monitor_port_ext: "{{ hornet_ports.tanglemonitor.port }}"
-hornet_api_monitor_port_ext: "{{ hornet_ports.tanglemonitor_api.port }}"
-tanglemonitor_internal_address: "127.0.0.1"
-
-# Hornet ZMQ port
-hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
-
 # Set openfiles limit
 hornet_nofile_limit: "65535"
 
@@ -100,15 +78,8 @@ hornet_nofile_limit: "65535"
 hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
 
 # Tangle Visualiser/Graph config
-hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
 tanglevisualiser_git_url: "https://github.com/glumb/IOTAtangle.git"
 tanglevisualiser_path: "{{ hornet_home_path }}/tanglevisualiser"
-hornet_mqtt_ws_path: '/ws'
-
-# MQTT config
-hornet_mqtt_internal_address: 127.0.0.1
-hornet_mqtt_internal_port: "11883"
-hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
 
 # Tangle Monitor
 hornet_monitor_git_url: "https://github.com/unioproject/tanglemonitor.git"

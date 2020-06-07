@@ -1,5 +1,5 @@
 upstream tanglevisualiser {
-    server {{ hornet_graph_internal_address | default('127.0.0.1') }}:{{ hornet_graph_internal_port }};
+    server {{ hornet_graph_internal_address }}:{{ hornet_graph_internal_port }};
 }
 
 # Rate limit requestsi
