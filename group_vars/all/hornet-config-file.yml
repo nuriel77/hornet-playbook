@@ -41,6 +41,7 @@ hornet_dashboard_internal_port: "8087"
 hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
 hornet_dashboard_theme: default
 hornet_dashboard_dev: "false"
+# Only needs enabling if not served via nginx
 hornet_dashboard_basic_auth: "false"
 hornet_dashboard_basic_auth_salt: someCrazySalt
 
