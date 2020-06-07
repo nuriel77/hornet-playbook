@@ -25,51 +25,12 @@ hornet_db_source: "https://ls.manapotion.io/export.bin"
 # gracefully stop. This applies for restart/stop.
 hornet_timeout_stop: 900
 
-# Neighbors
-hornet_peers: []
 #  - identity: example1.neighbor.com:15600
 #    preferIPv6: false
 #    alias: first_node
 #  - identity: example2.neighbor.com:15600
 #    alias: second_node
 #    preferIPv6: false
-
-# Hornet run profile (e.g. auto or light)
-# 'light' will consume less memory.
-hornet_profile: auto
-
-# Enable hornet API auth.
-# The default node's username and password are used.
-hornet_httpapi_basic_auth: false
-
-# Hornet plugins
-hornet_enable_plugins:
-  - Autopeering
-  - Prometheus
-
-# By default disable all
-hornet_disable_plugins:
-  - ZeroMQ
-  - Spammer
-  - Monitor
-  - MQTT
-  - Graph
-  - Coordinator
-
-hornet_permit_remote_access_list:
-  - getNodeInfo
-  - getBalances
-  - checkConsistency
-  - getTransactionsToApprove
-  - getInclusionStates
-  - getNodeAPIConfiguration
-  - wereAddressesSpentFrom
-  - broadcastTransactions
-  - findTransactions
-  - storeTransactions
-  - getTrytes
-  - attachToTangle
-  - interruptAttachingToTangle
 
 # Unprivileged user to run hornet with
 hornet_username: hornet
@@ -118,42 +79,7 @@ hornet_ports:
     proto: tcp
     allow: yes
 
-# Hornet API port address bind.
-# If you are using a proxy, leave
-# this is as it is.
-hornet_api_address: "127.0.0.1"
-
-# The TCP port on which hornet listens for API calls and allows for light wallets to connect to
-hornet_api_port: "{{ hornet_ports.api.port }}"
-
-# The peering address to listen on (interface on your node)
-# 0.0.0.0 means all interfaces
-hornet_peering_address: "0.0.0.0"
-
-# The TCP neighbor peering port
-hornet_peering_port: "{{ hornet_ports.peering.port }}"
-
 hornet_accept_any_connection: false
-
-# Hornet autopeering port
-hornet_network_autopeering_address: "0.0.0.0"
-hornet_network_autopeering_port: "{{ hornet_ports.autopeering.port }}"
-
-# Hornet max neighbors
-hornet_max_peers: 5
-
-# Hornet's API IP whitelist to bypass limitations
-hornet_httpapi_whitelist: []
-
-hornet_globalsnapshot_spentaddressespaths: 
-  - previousEpochsSpentAddresses1.txt
-  - previousEpochsSpentAddresses2.txt
-  - previousEpochsSpentAddresses3.txt
-
-hornet_network_entrynodes:
-  - "LehlDBPJ6kfcfLOK6kAU4nD7B/BdR7SJhai7yFCbCCM=@enter.hornet.zone:14626"
-  - "zEiNuQMDfZ6F8QDisa1ndX32ykBTyYCxbtkO0vkaWd0=@enter.manapotion.io:18626"
-  - "EsY+zvaselQYA33AVNzrYIGLplboIh4r8oO+vLKQAVM=@entrynode.tanglebay.org:14626"
 
 # Tanglemonitor ports external
 # Those best be kept on these ports
@@ -165,9 +91,6 @@ tanglemonitor_internal_address: "127.0.0.1"
 # Hornet ZMQ port
 hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
 
-# Hornet ZMQ bind address
-hornet_zmq_address: 127.0.0.1
-
 # Set openfiles limit
 hornet_nofile_limit: "65535"
 
@@ -176,16 +99,7 @@ hornet_nofile_limit: "65535"
 # Note: if you are using haproxy, limits are set there.
 hornet_remote_limit_api: "removeNeighbors, addNeighbors, getNeighbors"
 
-# Dashboard config
-# Keep the dashboard on 127.0.0.1 when running behind
-# a proxy like nginx.
-hornet_dashboard_internal_address: 127.0.0.1
-hornet_dashboard_internal_port: "8087"
-hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
-
 # Tangle Visualiser/Graph config
-hornet_graph_internal_address: 127.0.0.1
-hornet_graph_internal_port: "18083"
 hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
 tanglevisualiser_git_url: "https://github.com/glumb/IOTAtangle.git"
 tanglevisualiser_path: "{{ hornet_home_path }}/tanglevisualiser"
@@ -197,16 +111,8 @@ hornet_mqtt_internal_port: "11883"
 hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
 
 # Tangle Monitor
-hornet_monitor_internal_address: 127.0.0.1
 hornet_monitor_git_url: "https://github.com/unioproject/tanglemonitor.git"
 hornet_monitor_path: "{{ hornet_home_path }}/tanglemonitor"
 
 # Only needs enabling if not served via nginx
 hornet_dashboard_basic_auth: false
-
-# Aliases used in generic roles (e.g. ansible-monitoring)
-node_db_path: "{{ hornet_db_path }}"
-node_zmq_port: "{{ hornet_zmq_port }}"
-node_enable_plugins: "{{ hornet_enable_plugins }}"
-node_api_port: "{{ hornet_api_port }}"
-node_api_port_remote: "14267"
