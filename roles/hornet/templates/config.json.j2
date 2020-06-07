@@ -63,7 +63,7 @@
     "stateFilePath": "{{ hornet_coo_state_file }}",
     "merkleTreeFilePath": "{{ hornet_coo_merkle_tree_file }}",
     "intervalSeconds": {{ hornet_coo_interval_seconds }},
-    "checkpointTransactions": {{ hornet_coo_interval_seconds }}
+    "checkpointTransactions": {{ hornet_coo_checkpoint_transactions }}
   },
   "network": {
     "preferIPv6": {{ hornet_network_prefer_ipv6 | bool | lower | string }},
@@ -98,7 +98,7 @@
     "address": "{{ hornet_spammer_address }}",
     "depth": {{ hornet_spammer_depth }},
     "message": "{{ hornet_spammer_message }}",
-    "tag": "{{ hornet_spammer_tag }}"
+    "tag": "{{ hornet_spammer_tag }}",
     "cpuMaxUsage": {{ hornet_spammer_cpu_max_usage }},
     "tpsRateLimit": {{ hornet_spammer_tpsratelimit }},
     "bundleSize": {{ hornet_spammer_bundle_size }},

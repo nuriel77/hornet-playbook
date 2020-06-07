@@ -116,7 +116,7 @@ hornet_coo_mwm: 14
 hornet_coo_state_file: coordinator/state
 hornet_coo_merkle_tree_file: coordinator/tree
 hornet_coo_interval_seconds: 60
-hornet_coo_interval_seconds: 5
+hornet_coo_checkpoint_transactions: 5
 
 #
 # network
