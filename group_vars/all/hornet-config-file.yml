@@ -1,0 +1,251 @@
+# These are the default variables that configure:
+# peering.json, config.json and mqtt_config.json
+# To override, copy the file to z-append.yml and edit as required.
+
+#
+# Hornet run profile (e.g. auto or light)
+# 'light' will consume less memory.
+hornet_profile: auto
+
+#
+# httpAPI
+hornet_httpapi_exclude_health_check_auth: "false"
+
+# Enable hornet API auth.
+# The default node's username and password are used.
+hornet_httpapi_basic_auth: "false"
+# Change this by overwriting the variable in a z-* variable file.
+hornet_httpapi_basic_auth_salt: someCrazySalt
+
+hornet_permit_remote_access_list:
+  - getNodeInfo
+  - getBalances
+  - checkConsistency
+  - getTransactionsToApprove
+  - getInclusionStates
+  - getNodeAPIConfiguration
+  - wereAddressesSpentFrom
+  - broadcastTransactions
+  - findTransactions
+  - storeTransactions
+  - getTrytes
+  - attachToTangle
+  - interruptAttachingToTangle
+
+#
+# dashboard config
+# Keep the dashboard on 127.0.0.1 when running behind
+# a proxy like nginx.
+hornet_dashboard_internal_address: 127.0.0.1
+hornet_dashboard_internal_port: "8087"
+hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
+hornet_dashboard_theme: default
+hornet_dashboard_dev: "false"
+# Only needs enabling if not served via nginx
+hornet_dashboard_basic_auth: "false"
+hornet_dashboard_basic_auth_salt: someCrazySalt
+
+#
+# Peers
+hornet_peers: []
+# Example:
+#  - identity: example1.neighbor.com:15600
+#    preferIPv6: false
+#    alias: first_node
+#  - identity: example2.neighbor.com:15600
+#    alias: second_node
+#    preferIPv6: false
+
+hornet_accept_any_connection: "false"
+hornet_max_peers: 5
+
+#
+# Hornet API
+# Hornet's API IP whitelist to bypass limitations
+hornet_httpapi_whitelist: []
+
+# httpAPI limits
+hornet_max_body_length: 1000000
+hornet_max_find_transactions: 100000
+hornet_max_get_trytes: 1000
+hornet_max_requests_list: 1000
+
+hornet_globalsnapshot_spentaddressespaths:
+  - previousEpochsSpentAddresses1.txt
+  - previousEpochsSpentAddresses2.txt
+  - previousEpochsSpentAddresses3.txt
+
+# Hornet API port address bind.
+# If you are using a proxy, leave
+# this is as it is.
+hornet_api_address: "127.0.0.1"
+
+# The TCP port on which hornet listens for API calls and allows for light wallets to connect to
+hornet_api_port: "{{ hornet_ports.api.port }}"
+
+#
+# db
+hornet_db_path_in_container: mainnetdb
+hornet_db_debug: "false"
+
+#
+# snapshot
+hornet_snapshots_load_type: local
+hornet_snapshots_local_depth: 50
+hornet_snapshots_local_interval_synced: 50
+hornet_snapshots_local_interval_unsynced: 1000
+hornet_snapshots_local_path: snapshot/export.bin
+hornet_db_source: "https://ls.manapotion.io/export.bin"
+
+hornet_globalsnapshot_spentaddresses_paths: []
+hornet_global_snapshot_index: 1050000
+
+hornet_snapshot_pruning_enabled: "true"
+hornet_snapshot_pruning_delay: 15000
+
+#
+# spent address
+hornet_spent_addresses_enabled: "true"
+
+#
+# coordinator
+hornet_coo_address: EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9
+hornet_coo_security_level: 2
+hornet_coo_merkle_tree_depth: 23
+hornet_coo_mwm: 14
+hornet_coo_state_file: coordinator/state
+hornet_coo_merkle_tree_file: coordinator/tree
+hornet_coo_interval_seconds: 60
+hornet_coo_checkpoint_transactions: 5
+
+#
+# network
+hornet_network_prefer_ipv6: "false"
+
+# The peering address to listen on (interface on your node)
+# 0.0.0.0 means all interfaces
+hornet_peering_address: "0.0.0.0"
+
+# The TCP neighbor peering port
+hornet_peering_port: "{{ hornet_ports.peering.port }}"
+
+hornet_reconnect_int: 60
+
+# Hornet autopeering
+hornet_network_autopeering_address: "0.0.0.0"
+hornet_network_autopeering_port: "{{ hornet_ports.autopeering.port }}"
+hornet_network_autopeering_entrynode: "false"
+hornet_network_entrynodes:
+  - "LehlDBPJ6kfcfLOK6kAU4nD7B/BdR7SJhai7yFCbCCM=@enter.hornet.zone:14626"
+  - "zEiNuQMDfZ6F8QDisa1ndX32ykBTyYCxbtkO0vkaWd0=@enter.manapotion.io:18626"
+  - "EsY+zvaselQYA33AVNzrYIGLplboIh4r8oO+vLKQAVM=@entrynode.tanglebay.org:14626"
+
+#hornet_autopeering_seed: ""
+
+#
+# tipsel
+hornet_belowmax_depth_tx_limit: 20000
+hornet_max_depth: 3
+
+#
+# node
+#hornet_node_alias: ""
+hornet_node_show_alias: "false"
+
+# By default enable these
+hornet_enable_plugins:
+  - Autopeering
+  - Prometheus
+
+# By default disable these
+hornet_disable_plugins:
+  - ZeroMQ
+  - Spammer
+  - Monitor
+  - MQTT
+  - Graph
+  - Coordinator
+
+#
+# logger
+hornet_log_level: info
+hornet_log_disable_caller: "true"
+hornet_log_encoding: console
+hornet_logger_output_paths:
+  - stdout
+
+#
+# spammer
+hornet_spammer_address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
+hornet_spammer_depth: 1
+hornet_spammer_message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
+hornet_spammer_tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
+hornet_spammer_cpu_max_usage: 0.8
+hornet_spammer_tpsratelimit: 0.0
+hornet_spammer_bundle_size: 1
+hornet_spammer_value_spam: "false"
+hornet_spammer_workers: 0
+
+#
+# graph
+#honet_graph_domain: ""
+#hornet_graph_websocket_uri: ""
+hornet_graph_internal_address: 127.0.0.1
+hornet_graph_internal_port: "18083"
+hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
+hornet_graph_exp_tx_link: http://localhost:8081/explorer/tx/
+hornet_graph_exp_bundle_link: http://localhost:8081/explorer/bundle/
+
+#
+# monitor
+#honet_monitor_domain: ""
+hornet_monitor_initial_tx_count: 15000
+hornet_monitor_internal_address: 127.0.0.1
+
+# Tanglemonitor ports external
+# Those best be kept on these ports
+# because the frontend has them hardcoded
+hornet_monitor_port_ext: "{{ hornet_ports.tanglemonitor.port }}"
+hornet_api_monitor_port_ext: "{{ hornet_ports.tanglemonitor_api.port }}"
+hornet_monitor_api_port: "14433"
+hornet_monitor_port: "14434"
+#hornet_monitor_websocket_uri: ""
+
+#
+# mqtt
+hornet_mqtt_config_file: mqtt_config.json
+hornet_mqtt_worker_number: 4096
+hornet_mqtt_internal_port: "11883"
+hornet_mqtt_internal_address: 127.0.0.1
+hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
+hornet_mqtt_ws_path: /ws
+hornet_mqtt_tls_enabled: "false"
+hornet_mqtt_ca_file: tls/ca/cacert.pem
+hornet_mqtt_cert_file: tls/server/cert.pem
+hornet_mqtt_key_file: tls/server/key.pem
+#
+# zmq
+hornet_zmq_address: 127.0.0.1
+hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
+
+#
+# profiling
+hornet_profiling_address: 127.0.0.1
+hornet_profiling_port: "6060"
+
+#
+# prometheus
+hornet_prometheus_address: 127.0.0.1
+hornet_prometheus_port: "9312"
+hornet_prometheus_go_metrics: "true"
+hornet_prometheus_process_metrics: "true"
+hornet_prometheus_prometheus_metrics: "true"
+
+
+#
+# Aliases used in generic roles (e.g. ansible-monitoring)
+node_db_path: "{{ hornet_db_path }}"
+node_zmq_port: "{{ hornet_zmq_port }}"
+node_enable_plugins: "{{ hornet_enable_plugins }}"
+node_api_port: "{{ hornet_api_port }}"
+node_api_port_remote: "14267"

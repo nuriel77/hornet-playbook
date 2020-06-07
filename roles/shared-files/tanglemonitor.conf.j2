@@ -1,5 +1,5 @@
 upstream tanglemonitor {
-    server {{ tanglemonitor_internal_address | default('127.0.0.1') }}:{{ hornet_monitor_port | default('14434') }};
+    server {{ hornet_monitor_internal_address }}:{{ hornet_monitor_port }};
 }
 
 # Rate limit requestsi
@@ -48,7 +48,7 @@ server {
 }
 
 upstream tanglemonitor_api {
-    server {{ tanglemonitor_internal_address | default('127.0.0.1') }}:{{ hornet_monitor_api_port | default('14433') }};
+    server {{ hornet_monitor_internal_address }}:{{ hornet_monitor_api_port }};
 }
 server {
     limit_req zone=tanglemonitor burst=25;
