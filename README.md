@@ -20,6 +20,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet HTTPS](#hornet-https)
    * [Ports](#ports)
      * [Forward Ports](#forward-ports)
+   * [Monitoring](#monitoring)
    * [Security](#security)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
@@ -203,6 +204,15 @@ All the external ports have been made accessible in the firewall. There is no ne
 If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
 
 Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
+
+## Monitoring
+
+If you have monitoring enabled you can point your browser to `https://your-ip-or-domain:5555`. That will open Grafana where some monitoring dashboards are available.
+
+Monitoring applications (e.g. node-exporter, prometheus, etc) and dashboards can be upgraded using the command:
+```sh
+cd /opt/hornet-playbook && ansible-playbook -i inventory site.yml -v --tags=monitoring_role
+```
 
 ## Security
 
