@@ -24,6 +24,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Security](#security)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
+     * [Connection not Private](#connection-not-private)
      * [DB Corruption](#db-corruption)
      * [Logs](#logs)
      * [Rerun Playbook](#rerun-playbook)
@@ -174,6 +175,15 @@ https://my-node.io:8081
 ```
 
 ## Hornet HTTPS
+
+When you access your node via its IP address you will likely get a warning from the browser about the site not being secure or certificate invalid for the domain. The reason is that a self-signed certificate has been generated for the node during the installation.
+
+Some browsers should allow you to bypass the warning (`advanced` -> `proceed`). Some browsers may not allow this (e.g. Chrome or Brave on Mac).
+
+You can get a domain name to point to your node's IP. In that case you can use `horc` to request a certificate for your domain. Then you'll be able to access the node using that domain name and the certificate will be approved.
+
+**HTTPS Certificate**
+
 A first step is to enable HAProxy via `horc`. By default the API port is not exposed.
 
 The second step is to enable HTTPS certificate. Note that you must already have a fully qualified domain name A record pointing to your server's IP.
@@ -234,12 +244,20 @@ Note that after restarting Hornet it takes it some time to make the port availab
 
 ### 502 Bad Gateway
 
-If you receive this error when trying to browse to the dashboard:
+If you receive this error when trying to browse to the dashboard then:
 
 * nginx (the webserver/proxy) is working properly
-* the back end to which it is trying to connect isn't working properly.
+* the back-end to which it is trying to connect isn't working properly.
 
 Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io:8081` would tell nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly as described in the beginning of this chapter.
+
+### Connection not Private
+
+You will probably get this message when trying to connect to the dashboard using your IP address.
+
+Other messages might claim certificate is invalid for the domain.
+
+You can safely proceed (most browsers allow to bypass the warning). And please read [Hornet HTTPS](#hornet-https)
 
 ### DB Corruption
 
