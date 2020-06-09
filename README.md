@@ -185,7 +185,7 @@ Enabling a certificate will allow you to connect to your node with IOTA's offici
 Here's a list of ports configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy, or `HAproxy` for the API port. The internal ports are not accessible externally.
 
 NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL | DESCRIPTION
--------------------|---------------|---------------|-------------------------------------------
+-------------------|---------------|---------------|----------|--------------------------------
 Hornet API         | 14265         | 14267         | TCP      | Used for wallet/API calls
 Hornet autopeering | 14626         | 14626         | UDP      | Autopeering
 Hornet peering     | 15600         | 15600         | TCP      | Main peering port
