@@ -184,18 +184,18 @@ Enabling a certificate will allow you to connect to your node with IOTA's offici
 
 Here's a list of ports configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy, or `HAproxy` for the API port. The internal ports are not accessible externally.
 
-NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL
--------------------|---------------|---------------|---------
-Hornet API         | 14265         | 14267         | TCP
-Hornet autopeering | 14626         | 14626         | UDP
-Hornet peering     | 15600         | 15600         | TCP
-Dashboard          | 8087          | 8081          | TCP
-Monitor            | 14434         | 4434          | TCP
-Monitor API        | 14433         | 4433          | TCP
-Visualiser         | 18083         | 8083          | TCP
-Grafana            | 3000          | 5555          | TCP
-Prometheus         | 9090          | 8999          | TCP
-Alertmanager       | 9093          | 9993          | TCP
+NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL | DESCRIPTION
+-------------------|---------------|---------------|-------------------------------------------
+Hornet API         | 14265         | 14267         | TCP      | Used for wallet/API calls
+Hornet autopeering | 14626         | 14626         | UDP      | Autopeering
+Hornet peering     | 15600         | 15600         | TCP      | Main peering port
+Dashboard          | 8087          | 8081          | TCP      | Main dashboard
+Monitor            | 14434         | 4434          | TCP      | Tangle monitor (via plugin)
+Monitor API        | 14433         | 4433          | TCP      | Tangle monitor API (via plugin)
+Visualiser         | 18083         | 8083          | TCP      | Tangle visualiser
+Grafana            | 3000          | 5555          | TCP      | Grafana monitoring
+Prometheus         | 9090          | 8999          | TCP      | Prometheus metrics
+Alertmanager       | 9093          | 9993          | TCP      | Alertmanager for prometheus
 
 All the external ports have been made accessible in the firewall. There is no need to configure the firewall on the node.
 
