@@ -28,6 +28,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
      * [DB Corruption](#db-corruption)
      * [Logs](#logs)
      * [Rerun Playbook](#rerun-playbook)
+     * [Grafana Dashboards Missing](#grafana-dashboards-missing)
    * [Appendix](#appendix)
      * [Install Alongside IRI-Playbook](#install-alongside-iri-playbook)
      * [Private Tangle](#private-tangle)
@@ -279,6 +280,14 @@ If `horc` isn't working, try the following command:
 cd /opt/hornet-playbook && git pull && ansible-playbook -v site.yml -i inventory -e overwrite=yes
 ```
 This command will reset all configuration files but also make a backup of existing ones so you'll be able to restore any previous peers and settings you had.
+
+### Grafana Dashboards Missing
+
+If you've opened Grafana for the first time and don't see any dashboards listed on the upper-left corner (Home) then you might have to restart Grafana. Simply run:
+
+```sh
+sudo systemctl restart grafana-server
+```
 
 ## Appendix
 
