@@ -17,6 +17,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Control Hornet](#control-hornet)
    * [Hornet Controller App](#hornet-controller-app)
    * [Hornet Dashboard](#hornet-dashboard)
+   * [Overwrite Hornet Config](#overwrite-hornet-config)
    * [Hornet HTTPS](#hornet-https)
    * [Ports](#ports)
      * [Forward Ports](#forward-ports)
@@ -173,6 +174,23 @@ horc
 Point your browser to your host's IP address or fully qualified domain name with port 8081, e.g.:
 ```sh
 https://my-node.io:8081
+```
+
+## Overwrite Hornet Config
+
+It is possible to edit `/var/lib/hornet/config.json` manually and restart HORNET to apply the changes. Re-running the playbook will not overwrite your changes by default.
+
+The recommended way to configure the file without having to worry about it getting overwritten is by copying the variables file to a new overwrite file and configure the required values there.
+
+Copy the config variables file to a new file:
+```sh
+/opt/hornet-playbook/group_vars/all/hornet-config-file.yml /opt/hornet-playbook/group_vars/all/z-append.yml
+```
+Edit as required (using nano, vi or your preferred editor). The variable names are similar to how you'd read the `config.json`. For example `hornet_coo_merkle_tree_depth` would correspond to `coordinator.merkleTreeFilePath` in `config.json`. If you want to see the actual mapping you can view the template file in `/opt/hornet-playbook/roles/hornet/templates/config.json.j2`.
+
+Then re-run the playbook while tagging the task to update the configuration file. Any variables you have overwritten and modified in `z-append.yml` will be applied and take precedence.
+```sh
+cd /opt/hornet-playbook && sudo ansible-playbook -i inventory site.yml -v --tags=hornet_config_file -e overwrite=yes
 ```
 
 ## Hornet HTTPS

@@ -216,7 +216,7 @@
   notify:
     - restart hornet
 
-- name: copy hornet config files
+- name: copy hornet main config file
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -227,6 +227,22 @@
     backup: yes
   with_items:
     - {"src": "templates/config.json.j2", "dest": "{{ hornet_config }}"}
+  tags:
+    - hornet_config_files
+    - hornet_config_file
+  notify:
+    - restart hornet
+
+- name: copy hornet config files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0600
+    owner: "{{ hornet_user }}"
+    group: "{{ hornet_group }}"
+    force: "{{ overwrite | default('no') }}"
+    backup: yes
+  with_items:
     - {"src": "templates/{{ hornet_mqtt_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_mqtt_config_file }}"}
     - {"src": "templates/{{ hornet_profiles_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_profiles_config_file }}"}
   tags: hornet_config_files
