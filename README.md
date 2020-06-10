@@ -249,7 +249,7 @@ If you receive this error when trying to browse to the dashboard then:
 * nginx (the webserver/proxy) is working properly
 * the back-end to which it is trying to connect isn't working properly.
 
-Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io:8081` would tell nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly as described in the beginning of this chapter.
+Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io:8081` would tell nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly, e.g. checking logs: see [Control Hornet](#control-hornet).
 
 ### Connection not Private
 
