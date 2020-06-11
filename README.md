@@ -21,6 +21,8 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Hornet HTTPS](#hornet-https)
    * [Ports](#ports)
      * [Forward Ports](#forward-ports)
+   * [Peers](#peers)
+     * [nbctl](#nbctl)
    * [Monitoring](#monitoring)
    * [Security](#security)
    * [Troubleshooting](#troubleshooting)
@@ -233,6 +235,29 @@ All the external ports have been made accessible in the firewall. There is no ne
 If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
 
 Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
+
+## Peers
+
+By default HORNET has the autopeering enabled. It is also recommended to have one or two static peers. The tool `horc` or `nbctl` can be used to manage static neighbors.
+
+### nbctl
+
+This tool has been created to help managed peers from the command line instead of having to manually edit `peering.json` which is error-prone.
+
+**If you didn't install your node using the playbook** you can still use this tool. It communicates with HORNET's API to add, remove or list peers:
+
+```sh
+wget -O /usr/bin/nbctl https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/nbctl && chmod +x /usr/bin/nbctl
+```
+
+Example of adding a peer:
+```sh
+nbctl -a -n somepeer.com:12345
+```
+Remove:
+```sh
+nbctl -r -n somepeer.com:12345
+```
 
 ## Monitoring
 
