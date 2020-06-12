@@ -1,7 +1,7 @@
 hornet_snapshots_local_interval_synced: 200
 hornet_db_source: "https://ls.manapotion.io/comnet/export.bin"
 hornet_snapshot_pruning_delay: 1000
-hornet_coo_address: BODHQPXSMDNHBWVZHVATBAHQGZSKWQLXYZNOXMKNUCOZCPTWHHNFBBHFOEGPTWGGUVDJPZAYZIMXIIGVD
+hornet_coo_address: YBWDHGHUEB9KSOPONTLTOSSKITIBE9MXPASCLREDNV9HEABYBPTHRQGWNJWQFSYAYZRDXXIOZHWBC9DWC
 hornet_coo_mwm: 10
 hornet_network_entrynodes:
   - "TANGLEleGqaMFFSTiyAV/vvdING/xuJNTDW16oCXZbo=@enter.comnet.thetangle.org:14641"
