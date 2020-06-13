@@ -60,23 +60,25 @@ spec:
             - "/bin/sh"
             - "-ec"
             - |
-              cp -- /app/config/config.json /app/config.json
-              wget -O /app/latest-export.gz.bin {{ .Values.latestExportDB }}
-              exec /tini -s -- /app/hornet -c config
+              cp -- /app/config/*.json /app/
+              mkdir -p /app/db/snapshot /app/db/mainnetdb /app/db/coordinator
+              exec /sbin/tini -s -- /app/hornet -c config
           volumeMounts:
-            - name: mainnetdb
-              mountPath: "/app/mainnetdb"
+            - name: db
+              mountPath: "/app/db"
             - name: mainconfig
               mountPath: "/app/config"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      securityContext:
+        fsGroup: {{ .Values.fsgroup }}
       volumes:
       {{- if .Values.persistence.useStorage }}
-        - name: mainnetdb
+        - name: db
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.pvcName | quote }}
       {{ else }}
-        - name: mainnetdb
+        - name: db
           emptyDir: {}
       {{ end }}
         - name: mainconfig

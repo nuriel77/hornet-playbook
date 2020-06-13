@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: hornet
+  repository: gohornet/hornet
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -28,23 +28,26 @@ service:
       protocol: TCP
       port: 31200
       nodePort: 31200
+    autopeering:
+      protocol: UDP
+      port: 31201
+      nodePort: 31201
 
 # Hornet Secret config name.
 # Create this secret first as suggested here: https://github.com/nuriel77/hornet-playbook/blob/master/docs/kubernetes.md#prepare
 # Use the example JSON from above URL. Make sure the ports match the configuration here.
 hornetConfig: hornet-config
 
-# URL to d/l the initial DB from
-latestExportDB: 'https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin'
-
 # Use persistent storage
 persistence:
   useStorage: true
   # Set to your storageClass name
-  storageClass: "microk8s-hostpath"
-  pvcName: "mainnetdb"
+  storageClass: "k8s-hostpath"
+  pvcName: "db"
   accessMode: "ReadWriteOnce"
   size: "20Gi"
+
+fsgroup: 39999
 
 # Ingress
 ingress:
