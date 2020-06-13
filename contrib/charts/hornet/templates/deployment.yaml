@@ -62,7 +62,7 @@ spec:
             - |
               cp -- /app/config/*.json /app/
               mkdir -p /app/db/snapshot /app/db/mainnetdb /app/db/coordinator
-              exec /tini -s -- /app/hornet -c config
+              exec /sbin/tini -s -- /app/hornet -c config
           volumeMounts:
             - name: db
               mountPath: "/app/db"
