@@ -1,0 +1,179 @@
+{
+  "useProfile": "auto",
+  "httpAPI": {
+    "excludeHealthCheckFromAuth": false,
+    "basicAuth": {
+      "enabled": false,
+      "username": "",
+      "passwordHash": "",
+      "passwordSalt": ""
+    },
+    "permitRemoteAccess": [
+      "getNodeInfo",
+      "getBalances",
+      "checkConsistency",
+      "getTransactionsToApprove",
+      "getInclusionStates",
+      "getNodeAPIConfiguration",
+      "wereAddressesSpentFrom",
+      "broadcastTransactions",
+      "findTransactions",
+      "storeTransactions",
+      "getTrytes",
+      "attachToTangle",
+      "interruptAttachingToTangle"
+    ],
+    "whitelistedAddresses": ["192.168.0.0/16"],
+    "bindAddress": "0.0.0.0:14265",
+    "limits": {
+      "bodyLengthBytes": 1000000,
+      "findTransactions": 100000,
+      "getTrytes": 1000,
+      "requestsList": 1000
+    }
+  },
+  "dashboard": {
+    "bindAddress": "0.0.0.0:8081",
+    "theme": "default",
+    "dev": false,
+    "basicAuth": {
+      "enabled": false,
+      "username": "",
+      "passwordHash": "",
+      "passwordSalt": ""
+    }
+  },
+  "db": {
+    "path": "db/mainnetdb",
+    "debug": false
+  },
+  "snapshots": {
+    "loadType": "local",
+    "local": {
+      "depth": 50,
+      "intervalSynced": 50,
+      "intervalUnsynced": 1000,
+      "path": "db/snapshot/export.bin",
+      "downloadURL": "https://ls.manapotion.io/export.bin"
+    },
+    "global": {
+      "path": "db/snapshot/snapshotMainnet.txt",
+      "spentAddressesPaths": [
+        "previousEpochsSpentAddresses1.txt",
+        "previousEpochsSpentAddresses2.txt",
+        "previousEpochsSpentAddresses3.txt"
+      ],
+      "index": 1050000
+    },
+    "pruning": {
+      "enabled": true,
+      "delay": 10000
+    }
+  },
+  "spentAddresses": {
+    "enabled": true
+  },
+  "coordinator": {
+    "address": "EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9",
+    "securityLevel": 2,
+    "merkleTreeDepth": 23,
+    "mwm": 14,
+    "stateFilePath": "coordinator/state",
+    "merkleTreeFilePath": "coordinator/tree",
+    "intervalSeconds": 60,
+    "checkpointTransactions": 5
+  },
+  "network": {
+    "preferIPv6": false,
+    "gossip": {
+      "bindAddress": "0.0.0.0:31200",
+      "reconnectAttemptIntervalSeconds": 60
+    },
+    "autopeering": {
+      "bindAddress": "0.0.0.0:31201",
+      "runAsEntryNode": false,
+      "entryNodes": [
+        "LehlDBPJ6kfcfLOK6kAU4nD7B/BdR7SJhai7yFCbCCM=@enter.hornet.zone:14626",
+        "zEiNuQMDfZ6F8QDisa1ndX32ykBTyYCxbtkO0vkaWd0=@enter.manapotion.io:18626",
+        "EsY+zvaselQYA33AVNzrYIGLplboIh4r8oO+vLKQAVM=@entrynode.tanglebay.org:14626"
+      ],
+      "seed": ""
+    }
+  },
+  "tipsel": {
+    "belowMaxDepthTransactionLimit": 20000,
+    "maxDepth": 3
+  },
+  "node": {
+    "alias": "",
+    "showAliasInGetNodeInfo": false,
+    "disablePlugins": [
+      "ZeroMQ",
+      "Spammer",
+      "Monitor",
+      "MQTT",
+      "Graph",
+      "Coordinator"
+    ],
+    "enablePlugins": [
+      "Autopeering",
+      "Prometheus"
+    ]
+  },
+  "logger": {
+    "level": "info",
+    "disableCaller": true,
+    "encoding": "console",
+    "outputPaths": [
+      "stdout"
+    ]
+  },
+  "spammer": {
+    "address": "HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999",
+    "depth": 1,
+    "message": "Spamming with HORNET tipselect, thank you for using HORNET playbook",
+    "tag": "HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES",
+    "cpuMaxUsage": 0.8,
+    "tpsRateLimit": 0.0,
+    "bundleSize": 1,
+    "valueSpam": false,
+    "workers": 0
+  },
+  "graph": {
+    "webRootPath": "tanglevisualiser/webroot",
+    "domain": "",
+    "webSocket": {
+      "uri": ""
+    },
+    "bindAddress": "0.0.0.0:8083",
+    "networkName": "meets HORNET",
+    "explorerTxLink": "http://localhost:8081/explorer/tx/",
+    "explorerBundleLink": "http://localhost:8081/explorer/bundle/"
+  },
+  "monitor": {
+    "tangleMonitorPath": "tanglemonitor/frontend",
+    "domain": "",
+    "initialTransactionsCount": 15000,
+    "remoteApiPort": 32433,
+    "apiBindAddress": "0.0.0.0:4433",
+    "webBindAddress": "0.0.0.0:4434",
+    "websocket": {
+      "uri": ""
+    }
+  },
+  "mqtt": {
+    "config": "mqtt_config.json"
+  },
+  "zmq": {
+    "bindAddress": "0.0.0.0:5556"
+  },
+  "profiling": {
+    "bindAddress": "0.0.0.0:6060"
+  },
+  "prometheus": {
+    "bindAddress": "0.0.0.0:9311",
+    "goMetrics": true,
+    "processMetrics": true,
+    "promhttpMetrics": true
+  }
+}

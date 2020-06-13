@@ -13,183 +13,46 @@ Or you can deploy using a helm chart available [here](../contrib/charts/hornet),
 A few things to take into account:
 
 - This configuration uses NodePort. Another alternative is hostNetwork but this will not work well on a real cluster.
-- There is no configuration yet for persistent storage, therefore a restart of the pod will start with empty DB.
+- Storage persistence in the example below is using hostPath. For real deployments use other "cloud-native" storage-classes.
 - The peering port in the config.json must match the NodePort, else other nodes will get a conflict in between what is advertised by the k8s hornet node and the port with which it was added.
-- At time of writing there is still no official hornet Docker image. You will have to clone the repository and build the docker image yourself and push it to a registry accessible to your kubernetes cluster (e.g. Dockerhub or an internal registry).
 
-## config.json
+## Configurations
 
-```json
-{
-  "useProfile": "2gb",
-  "profiles": {
-    "custom": {
-      "caches": {
-        "requestQueue": {
-          "size": 100000
-        },
-        "approvers": {
-          "size": 100000,
-          "evictionSize": 1000
-        },
-        "bundles": {
-          "size": 20000,
-          "evictionSize": 1000
-        },
-        "milestones": {
-          "size": 1000,
-          "evictionSize": 100
-        },
-        "spentAddresses": {
-          "size": 5000,
-          "evictionSize": 1000
-        },
-        "transactions": {
-          "size": 50000,
-          "evictionSize": 1000
-        },
-        "incomingTransactionFilter": {
-          "size": 5000
-        },
-        "refsInvalidBundle": {
-          "size": 10000
-        }
-      },
-      "badger": {
-        "levelOneSize": 268435456,
-        "levelSizeMultiplier": 10,
-        "tableLoadingMode": 2,
-        "valueLogLoadingMode": 2,
-        "maxLevels": 7,
-        "maxTableSize": 67108864,
-        "numCompactors": 2,
-        "numLevelZeroTables": 5,
-        "numLevelZeroTablesStall": 10,
-        "numMemtables": 5,
-        "bloomFalsePositive": 0.01,
-        "blockSize": 4096,
-        "syncWrites": false,
-        "numVersionsToKeep": 1,
-        "compactLevel0OnClose": false,
-        "keepL0InMemory": false,
-        "verifyValueChecksum": false,
-        "maxCacheSize": 50000000,
-        "ZSTDCompressionLevel": 10,
-        "valueLogFileSize": 1073741823,
-        "valueLogMaxEntries": 1000000,
-        "valueThreshold": 32,
-        "withTruncate": false,
-        "logRotatesToFlush": 2,
-        "eventLogging": false
-      }
-    }
-  },
-  "api": {
-    "auth": {
-      "password": "",
-      "username": ""
-    },
-    "permitRemoteAccess": [
-      "getNodeInfo",
-      "getNeighbors",
-      "getBalances",
-      "checkConsistency",
-      "getTransactionsToApprove",
-      "getInclusionStates",
-      "getNodeAPIConfiguration",
-      "wereAddressesSpentFrom",
-      "broadcastTransactions",
-      "findTransactions",
-      "storeTransactions",
-      "getTrytes"
-    ],
-    "host": "0.0.0.0",
-    "maxbodylength": 1000000,
-    "maxfindtransactions": 100000,
-    "maxgettrytes": 1000,
-    "maxrequestslist": 1000,
-    "port": 14265,
-    "remoteauth": ""
-  },
-  "compass": {
-    "loadLSMIAsLMI": false
-  },
-  "dashboard": {
-    "host": "0.0.0.0",
-    "port": 8081,
-    "dev": false,
-    "basic_auth": {
-      "enabled": false,
-      "username": "hornet",
-      "password": "hornet"
-    }
-  },
-  "db": {
-    "path": "mainnetdb"
-  },
-  "localsnapshots": {
-    "path": "latest-export.gz.bin"
-  },
-  "milestones": {
-    "coordinator": "EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9",
-    "coordinatorsecuritylevel": 2,
-    "numberofkeysinamilestone": 23
-  },
-  "monitor": {
-    "tanglemonitorpath": "tanglemonitor/frontend",
-    "domain": "",
-    "host": "0.0.0.0",
-    "port": 4434,
-    "apiPort": 4433
-  },
-  "network": {
-    "address": "0.0.0.0",
-    "autotetheringenabled": false,
-    "preferIPv6": false,
-    "maxneighbors": 5,
-    "neighbors": [
-      {
-        "identity": "xxxxx.io:15600",
-        "preferIPv6": false
-      },
-      {
-        "identity": "zzzzz.io:15600",
-        "preferIPv6": false
-      }
-    ],
-    "port": 31200,
-    "reconnectattemptintervalseconds": 60
-  },
-  "node": {
-    "disableplugins": [],
-    "enableplugins": [],
-    "loglevel": 127
-  },
-  "protocol": {
-    "mwm": 14
-  },
-  "spammer": {
-    "address": "HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999",
-    "depth": 3,
-    "message": "Spamming with HORNET tipselect",
-    "tag": "HORNET99INTEGRATED99SPAMMER",
-    "tpsratelimit": 0.1,
-    "workers": 1
-  },
-  "tipsel": {
-    "belowmaxdepthtransactionlimit": 20000,
-    "maxdepth": 15
-  },
-  "zmq": {
-    "host": "0.0.0.0",
-    "port": 5556
-  }
-}
-```
+Check [configurations examples](examples/) and modify according to your needs.
+
+These can be used at the [Prepare](#prepare) stage.
 
 ## Kubernetes YAML Spec
 
 ```yaml
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hornet-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hornet-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -211,7 +74,7 @@ spec:
       hostNetwork: false
       containers:
       - name: hornet
-        image: "localhost:32000/gohornet/hornet:v0.2.9"
+        image: "gohornet/hornet:latest"
         ports:
           - name: dashboard
             protocol: TCP
@@ -222,21 +85,41 @@ spec:
           - name: peering
             protocol: TCP
             containerPort: 31200
+          - name: autopeering
+            protocol: UDP
+            containerPort: 31201
+        livenessProbe:
+          tcpSocket:
+            port: 15600
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 2
+        readinessProbe:
+          tcpSocket:
+            port: 15600
+          initialDelaySeconds: 20
+          timeoutSeconds: 2
+          periodSeconds: 10
+          failureThreshold: 2
         command:
           - "/bin/sh"
           - "-ec"
           - |
-            cp -- /app/config/config.json /app/config.json
-            wget -O /app/latest-export.gz.bin https://dbfiles.iota.org/mainnet/hornet/latest-export.gz.bin
-            exec /tini -s -- /app/hornet -c config
+            cp -- /app/config/*.json /app/
+            mkdir -p /app/db/snapshot /app/db/mainnetdb /app/db/coordinator
+            exec /sbin/tini -s -- /app/hornet -c config
         volumeMounts:
-        - name: mainnetdb
-          mountPath: "/app/mainnetdb"
+        - name: db
+          mountPath: "/app/db"
         - name: mainconfig
           mountPath: "/app/config"
+      securityContext:
+        fsGroup: 39999
       volumes:
-      - name: mainnetdb
-        emptyDir: {}
+      - name: db
+        persistentVolumeClaim:
+          claimName: hornet-claim
       - name: mainconfig
         secret:
           secretName: hornet-config
@@ -262,6 +145,10 @@ spec:
       port: 31200
       nodePort: 31200
       name: peering
+    - protocol: UDP
+      port: 31201
+      nodePort: 31201
+      name: autopeering
   type: NodePort
 ```
 
@@ -274,9 +161,14 @@ kubectl create namespace hornet
 
 2. Create the configuration secret by creating a file `config.json` with the configuration json from above. As this may contain passwords we put it in a k8s secret:
 ```sh
-kubectl create secret --namespace hornet generic hornet-config --from-file=./config.json --dry-run -o yaml | kubectl apply -f -
+kubectl create secret --namespace hornet generic hornet-config --from-file=./config.json --from-file=./peering.json --from-file=./profiles.json --from-file=./mqtt_config.json --dry-run -o yaml | kubectl apply -f -
 ```
 Note that we use the above command (--dry-run and apply) so that it is easier to configure the secret and reload/replace it when it was already created.
+
+Chown the hostPath directory (unless you are going to use other persistent volumes):
+```sh
+mkdir -p /mnt/data && chown 39999: /mnt/data
+```
 
 ## Install
 
