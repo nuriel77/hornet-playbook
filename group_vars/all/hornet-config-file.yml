@@ -136,9 +136,10 @@ hornet_network_autopeering_address: "0.0.0.0"
 hornet_network_autopeering_port: "{{ hornet_ports.autopeering.port }}"
 hornet_network_autopeering_entrynode: "false"
 hornet_network_entrynodes:
-  - "LehlDBPJ6kfcfLOK6kAU4nD7B/BdR7SJhai7yFCbCCM=@enter.hornet.zone:14626"
-  - "zEiNuQMDfZ6F8QDisa1ndX32ykBTyYCxbtkO0vkaWd0=@enter.manapotion.io:18626"
-  - "EsY+zvaselQYA33AVNzrYIGLplboIh4r8oO+vLKQAVM=@entrynode.tanglebay.org:14626"
+  - "46CstniGgfWMdAySiWuS7bVfugwuHZCUQKVaC4Y34EYJ@enter.hornet.zone:14626"
+  - "EkSLZ4uvSTED1x6KaGzqxoGxjbytt2rPVfbJk1LRLCGL@enter.manapotion.io:18626"
+  - "2GHfjJhTqRaKCGBJJvS5RWty61XhjX7FtbVDhg7s8J1x@entrynode.tanglebay.org:14626"
+  - "iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627"
 
 #hornet_autopeering_seed: ""
 
@@ -151,6 +152,10 @@ hornet_max_depth: 3
 # node
 #hornet_node_alias: ""
 hornet_node_show_alias: "false"
+
+#
+# warpsync
+hornet_warpsync_advancement_range: 200
 
 # By default enable these
 hornet_enable_plugins:
