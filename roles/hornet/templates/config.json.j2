@@ -82,6 +82,9 @@
     "belowMaxDepthTransactionLimit": {{ hornet_belowmax_depth_tx_limit }},
     "maxDepth": {{ hornet_max_depth }}
   },
+  "warpsync": {
+    "advancementRange": {{ hornet_warpsync_advancement_range }}
+  },
   "node": {
     "alias": "{{ hornet_node_alias | default('') }}",
     "showAliasInGetNodeInfo": {{ hornet_node_show_alias | bool | lower | string }},
