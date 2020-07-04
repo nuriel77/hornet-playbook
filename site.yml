@@ -58,6 +58,7 @@
     centos_packages:
       ver7:
         - python3-pip
+        - python-pip
       ver8:
         - python3-pip
     deb_packages:
