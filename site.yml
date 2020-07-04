@@ -42,6 +42,7 @@
       pip:
         name: python-gilt
         state: present
+        executable: pip3
       tags:
         - local_deps
         - always
@@ -56,7 +57,7 @@
     ansible_connection: local
     centos_packages:
       ver7:
-        - python-pip
+        - python3-pip
       ver8:
         - python3-pip
     deb_packages:
