@@ -48,7 +48,7 @@
         - always
 
     - name: run gilt overlay
-      command: "gilt --config {{ gilt_config | default('gilt.yml') }} overlay"
+      command: "/usr/local/bin/gilt --config {{ gilt_config | default('gilt.yml') }} overlay"
       changed_when: false
       run_once: yes
       tags: always
