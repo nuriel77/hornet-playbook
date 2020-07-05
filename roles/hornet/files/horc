@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.5.2
+VERSION_TEMP=0.5.3
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -1181,6 +1181,32 @@ function cleanup_docker_images() {
     fi
 }
 
+### Update config.json ###
+function update_config() {
+    if ! (whiptail --title "Update config.json" \
+                   --yesno "This option will allow you to update config.json according to the playbook's variables.\nThis will update the configuration if there was any update to it or if you want to reset any modifications you have done to it manually.\n\nWould you like to proceed?\n" \
+                   --defaultno \
+          12 $WIDTH) then
+        return
+    fi
+
+    verify_playbook
+    if [[ $? -ne 0 ]]; then
+        whiptail --title "Error!" \
+                 --msgbox "ERROR: Cannot update config.json, unknown error trying to git pull." \
+                 8 $WIDTH
+        return 1
+    fi
+    cd /opt/hornet-playbook \
+      && git pull \
+      && ansible-playbook -v -i inventory \
+                          site.yml \
+                          --tags=hornet_config_file \
+                          -e overwrite=yes
+    [[ $? -ne 0 ]] && MSG="Failed to update config.json! Check output above for any errors. " || MSG="Update finished successfully! "
+    pause "${MSG}Press ENTER to return to menu."
+}
+
 ### IRITop ###
 function view_iritop() {
     which iritop >/dev/null 2>&1
@@ -1442,7 +1468,7 @@ function main_menu() {
     whiptail --title "HORC v${__VERSION__} - Hornet Configuration Menu" \
              --menu "$MENU" \
              --cancel-button "Exit" \
-             28 $WIDTH 18 \
+             29 $WIDTH 18 \
     "a)" "Update Hornet Software" \
     "b)" "Hornet Plugins" \
     "c)" "Manage Services" \
@@ -1459,6 +1485,7 @@ function main_menu() {
     "n)" "Neighbors" \
     "o)" "View IRITOP" \
     "p)" "Toggle ComNet" \
+    "q)" "Update config.json" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1554,6 +1581,11 @@ function run_main_menu() {
 
         "p)")
             toggle_comnet
+            run_main_menu
+            ;;
+
+        "q)")
+            update_config
             run_main_menu
             ;;
         *)
