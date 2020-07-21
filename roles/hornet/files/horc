@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.5.3
+VERSION_TEMP=0.5.4
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -489,7 +489,7 @@ function get_db() {
           && rm -rf /var/lib/hornet/snapshot /var/lib/hornet/mainnetdb* \
           && mkdir -p /var/lib/hornet/{mainnetdb,snapshot} \
           && cd /var/lib/hornet/snapshot \
-          && wget -N "$DB_SOURCE" \
+          && wget -O export.bin "$DB_SOURCE" \
           && chown hornet.hornet /var/lib/hornet -RL \
           && systemctl start hornet
 
