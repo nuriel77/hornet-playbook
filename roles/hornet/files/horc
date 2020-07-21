@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.5.4
+VERSION_TEMP=0.5.5
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -436,7 +436,7 @@ function get_db() {
     DEFAULT_SOURCE=$(grep ^hornet_db_source /opt/hornet-playbook/group_vars/all/hornet.yml | awk {'print $2'} | tr -d '"')
 
     # Create array of available DB resources
-    SOURCES_ARRAY=("$DEFAULT_SOURCE" "Custom")
+    SOURCES_ARRAY=("$DEFAULT_SOURCE" "https://x-vps.com/export.bin" "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
@@ -454,12 +454,10 @@ function get_db() {
     # Try to get database size. If source is custom, ask to enter URL.
     local FILE_SIZE
     local LAST_UPDATED="unknown"
-    if [ "$DB_SOURCE" == "$DEFAULT_SOURCE" ]; then
-        # For now this functionality doesn't work
-        :
-        #local JSON_OUTPUT=$(curl -k -H "Content-Type: application/json" -m 4 -f -s https://x-vps.com/index.php 2>/dev/null)
-        #FILE_SIZE=$(echo "$JSON_OUTPUT" | jq -r .file_size)
-        #LAST_UPDATED=$(echo "$JSON_OUTPUT" | jq -r .last_updated)
+    if [ "$DB_SOURCE" == "https://x-vps.com/export.bin" ]; then
+        local JSON_OUTPUT=$(curl -k -H "Content-Type: application/json" -m 4 -f -s https://x-vps.com/index.php 2>/dev/null)
+        FILE_SIZE=$(echo "$JSON_OUTPUT" | jq -r .file_size)
+        LAST_UPDATED=$(echo "$JSON_OUTPUT" | jq -r .last_updated)
     elif [ "$DB_SOURCE" == "Custom" ]; then
         DB_SOURCE=$(whiptail --inputbox "Choose a source where to download the snapshot state DB from:" 8 $WIDTH "" --title "Select Custom Database Source" 3>&1 1>&2 2>&3)
         if [ $? -eq 1 ]; then
