@@ -97,6 +97,10 @@ hornet_snapshots_local_interval_synced: 50
 hornet_snapshots_local_interval_unsynced: 1000
 hornet_snapshots_local_path: snapshot/export.bin
 hornet_db_source: "https://ls.manapotion.io/export.bin"
+hornet_db_sources:
+  - "{{ hornet_db_source }}"
+  - "https://x-vps.com/export.bin"
+  - "https://dbfiles.iota.org/mainnet/hornet/latest-export.bin"
 
 hornet_globalsnapshot_spentaddresses_paths: []
 hornet_global_snapshot_index: 1050000

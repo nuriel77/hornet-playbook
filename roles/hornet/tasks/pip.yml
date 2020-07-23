@@ -4,6 +4,9 @@
     name:
      - docker
      - jmespath
+  tags:
+    - pip
+    - build_hornet_image
 
 - name: install python deps via pip centos7
   pip:
