@@ -1,12 +1,14 @@
 hornet_snapshots_local_interval_synced: 200
-hornet_db_source: "https://ls.tanglebay.org/comnet/export.bin"
+hornet_db_source: "https://ls.manapotion.io/comnet/export.bin"
+hornet_db_sources:
+  - "{{ hornet_db_source }}"
 hornet_snapshot_pruning_delay: 1000
 hornet_coo_address: YBWDHGHUEB9KSOPONTLTOSSKITIBE9MXPASCLREDNV9HEABYBPTHRQGWNJWQFSYAYZRDXXIOZHWBC9DWC
 hornet_coo_mwm: 10
 hornet_network_entrynodes:
   - "iotaCrvEWGfaeA1HutcULjD4uZnPhEnD5xNGfGs8vhe@enter.comnet.thetangle.org:14647"
-  - "7Y1GSTTwJLMPCffNJhWggZPtwVce5hsgAVcHanNa6HXh@entrynode.comnet.tanglebay.org:14636"
-  - "FPE6kHwZhvw8g163faJwTaPzYePbYtaXhwpWxFKuJfEY@enter.comnet.hornet.zone:14627"
+  - "GLZAWBGqvm6ZRT7jGMFAKyUJNPdvx4i5A1GPRZbGS6C9@enter.comnet.hornet.zone:14627"
+  - "J1Hn5r9pS5FkLeYqXWstC2Zyjxj73grEWvjuene3qjM9@entrynode.comnet.tanglebay.org:14636"
 hornet_belowmax_depth_tx_limit: 10000
 hornet_max_depth: 5
 hornet_warpsync_advancement_range: 50
