@@ -16,7 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
-VERSION_TEMP=0.5.6
+VERSION_TEMP=0.5.7
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -432,11 +432,8 @@ function upgrade_hornet() {
 ### Get DB ###
 function get_db() {
 
-    # Playbook's default source
-    DEFAULT_SOURCE=$(grep ^hornet_db_source /opt/hornet-playbook/group_vars/all/hornet.yml | awk {'print $2'} | tr -d '"')
-
-    # Create array of available DB resources
-    SOURCES_ARRAY=("$DEFAULT_SOURCE" "https://x-vps.com/export.bin" "Custom")
+    # Playbook's default sources
+    SOURCES_ARRAY=($(jq -r '.snapshots.local.downloadURLs[]' < /var/lib/hornet/config.json) "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))

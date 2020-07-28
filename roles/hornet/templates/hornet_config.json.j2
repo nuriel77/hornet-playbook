@@ -1,0 +1,167 @@
+{
+{% set c = hornet_configuration.useProfile %}
+  "useProfile": "{{ c }}",
+{% set c = hornet_configuration.httpAPI %}
+  "httpAPI": {
+    "excludeHealthCheckFromAuth": {{ c.excludeHealthCheckFromAuth | bool | lower | string }},
+    "basicAuth": {
+      "enabled": {{ c.basicAuth.enabled | bool | lower | string }},
+      "username": "{{ c.basicAuth.username }}",
+      "passwordHash": "{{ c.basicAuth.passwordHash }}",
+      "passwordSalt": "{{ c.basicAuth.passwordSalt }}"
+    },
+    "permitRemoteAccess": {{ c.permitRemoteAccess | to_nice_json(indent=6) }},
+    "whitelistedAddresses": {{ c.whitelistedAddresses | to_nice_json(indent=6) }},
+    "bindAddress": "{{ c.bindAddress }}",
+    "limits": {
+      "bodyLengthBytes": {{ c.limits.bodyLengthBytes }},
+      "findTransactions": {{ c.limits.findTransactions }},
+      "getTrytes": {{ c.limits.getTrytes }},
+      "requestsList": {{ c.limits.requestsList }}
+    }
+  },
+{% set c = hornet_configuration.dashboard %}
+  "dashboard": {
+    "bindAddress": "{{ c.bindAddress }}",
+    "theme": "{{ c.theme }}",
+    "dev": {{ c.dev | bool | lower | string }},
+    "basicAuth": {
+      "enabled": {{ c.basicAuth.enabled  | bool | lower | string }},
+      "username": "{{ c.basicAuth.username }}",
+      "passwordHash": "{{ c.basicAuth.passwordHash }}",
+      "passwordSalt": "{{ c.basicAuth.passwordSalt }}"
+    }
+  },
+{% set c = hornet_configuration.db %}
+  "db": {
+    "path": "{{ c.path }}",
+    "debug": {{ c.debug | bool | lower | string }}
+  },
+{% set c = hornet_configuration.snapshots %}
+  "snapshots": {
+    "loadType": "{{ c.loadType }}",
+    "local": {
+      "depth": {{ c.local.depth | int }},
+      "intervalSynced": {{ c.local.intervalSynced | int }},
+      "intervalUnsynced": {{ c.local.intervalUnsynced | int }},
+      "path": "{{ c.local.path }}",
+      "downloadURLs": {{ c.local.downloadURLs | to_nice_json(indent=8) }}
+    },
+    "global": {
+      "path": "{{ c.global.path }}",
+      "spentAddressesPaths": {{ c.global.spentAddressesPaths | to_nice_json(indent=8) }},
+      "index": {{ c.global.index | int }}
+    },
+    "pruning": {
+      "enabled": {{ c.pruning.enabled | bool | lower | string }},
+      "delay": {{ c.pruning.delay | int }}
+    }
+  },
+{% set c = hornet_configuration.spentAddresses %}
+  "spentAddresses": {
+    "enabled": {{ c.enabled | bool | lower | string }}
+  },
+{% set c = hornet_configuration.coordinator %}
+  "coordinator": {
+    "address": "{{ c.address }}",
+    "securityLevel": {{ c.securityLevel | int }},
+    "merkleTreeDepth": {{ c.merkleTreeDepth | int }},
+    "mwm": {{ c.mwm | int }},
+    "stateFilePath": "{{ c.stateFilePath }}",
+    "merkleTreeFilePath": "{{ c.merkleTreeFilePath }}",
+    "intervalSeconds": {{ c.intervalSeconds | int }},
+    "checkpointTransactions": {{ c.checkpointTransactions | int }}
+  },
+{% set c = hornet_configuration.network %}
+  "network": {
+    "preferIPv6": {{ c.preferIPv6 | bool | lower | string }},
+    "gossip": {
+      "bindAddress": "{{ c.gossip.bindAddress }}",
+      "reconnectAttemptIntervalSeconds": {{ c.gossip.reconnectAttemptIntervalSeconds | int }}
+    },
+    "autopeering": {
+      "bindAddress": "{{ c.autopeering.bindAddress }}",
+      "runAsEntryNode": {{ c.autopeering.runAsEntryNode | bool | lower | string }},
+      "entryNodes": {{ c.autopeering.entryNodes | to_nice_json(indent=8) }},
+      "seed": "{{ c.autopeering.seed }}"
+    }
+  },
+{% set c = hornet_configuration.tipsel %}
+  "tipsel": {
+    "belowMaxDepthTransactionLimit": {{ c.belowMaxDepthTransactionLimit | int }},
+    "maxDepth": {{ c.maxDepth | int }}
+  },
+{% set c = hornet_configuration.warpsync %}
+  "warpsync": {
+    "advancementRange": {{ c.advancementRange | int }}
+  },
+{% set c = hornet_configuration.node %}
+  "node": {
+    "alias": "{{ c.alias }}",
+    "showAliasInGetNodeInfo": {{ c.showAliasInGetNodeInfo | bool | lower | string }},
+    "disablePlugins": {{ c.disablePlugins | to_nice_json(indent=6) }},
+    "enablePlugins": {{ c.enablePlugins | to_nice_json(indent=6) }}
+  },
+{% set c = hornet_configuration.logger %}
+  "logger": {
+    "level": "{{ c.level }}",
+    "disableCaller": {{ c.disableCaller | bool | lower | string }},
+    "encoding": "{{ c.encoding }}",
+    "outputPaths": {{ c.outputPaths | to_nice_json(indent=6) }}
+  },
+{% set c = hornet_configuration.spammer %}
+  "spammer": {
+    "address": "{{ c.address }}",
+    "depth": {{ c.depth | int }},
+    "message": "{{ c.message }}",
+    "tag": "{{ c.tag }}",
+    "cpuMaxUsage": {{ c.cpuMaxUsage | int }},
+    "tpsRateLimit": {{ c.tpsRateLimit | int }},
+    "bundleSize": {{ c.bundleSize }},
+    "valueSpam": {{ c.valueSpam | bool | lower | string }},
+    "workers": {{ c.workers | int }}
+  },
+{% set c = hornet_configuration.graph %}
+  "graph": {
+    "webRootPath": "{{ c.webRootPath }}",
+    "domain": "{{ c.domain }}",
+    "webSocket": {
+      "uri": "{{ c.webSocket.uri }}"
+    },
+    "bindAddress": "{{ c.bindAddress }}",
+    "networkName": "{{ c.networkName }}",
+    "explorerTxLink": "{{ c.explorerTxLink }}",
+    "explorerBundleLink": "{{ c.explorerBundleLink }}"
+  },
+{% set c = hornet_configuration.monitor %}
+  "monitor": {
+    "tangleMonitorPath": "{{ c.tangleMonitorPath }}",
+    "domain": "{{ c.domain }}",
+    "initialTransactionsCount": {{ c.initialTransactionsCount | int }},
+    "remoteApiPort": {{ c.remoteApiPort | int }},
+    "apiBindAddress": "{{ c.apiBindAddress }}",
+    "webBindAddress": "{{ c.webBindAddress }}",
+    "websocket": {
+      "uri": "{{ c.websocket.uri }}"
+    }
+  },
+{% set c = hornet_configuration.mqtt %}
+  "mqtt": {
+    "config": "{{ c.config }}"
+  },
+{% set c = hornet_configuration.zmq %}
+  "zmq": {
+    "bindAddress": "{{ c.bindAddress }}"
+  },
+{% set c = hornet_configuration.profiling %}
+  "profiling": {
+    "bindAddress": "{{ c.bindAddress }}"
+  },
+{% set c = hornet_configuration.prometheus %}
+  "prometheus": {
+    "bindAddress": "{{ c.bindAddress }}",
+    "goMetrics": {{ c.goMetrics | bool | lower | string }},
+    "processMetrics": {{ c.processMetrics | bool | lower | string }},
+    "promhttpMetrics": {{ c.promhttpMetrics | bool | lower | string }}
+  }
+}

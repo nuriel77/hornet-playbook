@@ -3,52 +3,162 @@
 # To override, copy the file to z-append.yml and edit as required.
 
 #
-# Hornet run profile (e.g. auto or light)
-# 'light' will consume less memory.
-hornet_profile: auto
+# config.json
+hornet_configuration:
+  useProfile: auto
+  httpAPI:
+    excludeHealthCheckFromAuth: false
+    basicAuth:
+      enabled: false
+      username: ''
+      passwordHash: ''
+      passwordSalt: ''
+    permitRemoteAccess:
+    - getNodeInfo
+    - getBalances
+    - checkConsistency
+    - getTransactionsToApprove
+    - getInclusionStates
+    - getNodeAPIConfiguration
+    - wereAddressesSpentFrom
+    - broadcastTransactions
+    - findTransactions
+    - storeTransactions
+    - getTrytes
+    - attachToTangle
+    - interruptAttachingToTangle
+    whitelistedAddresses: []
+    bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
+    limits:
+      bodyLengthBytes: 1000000
+      findTransactions: 100000
+      getTrytes: 1000
+      requestsList: 1000
+  dashboard:
+    bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
+    theme: default
+    dev: false
+    basicAuth:
+      enabled: false
+      username: ''
+      passwordHash: ''
+      passwordSalt: ''
+  db:
+    path: mainnetdb
+    debug: false
+  snapshots:
+    loadType: local
+    local:
+      depth: 50
+      intervalSynced: 50
+      intervalUnsynced: 1000
+      path: snapshot/export.bin
+      downloadURLs:
+      - https://ls.manapotion.io/export.bin
+      - https://x-vps.com/export.bin
+      - https://dbfiles.iota.org/mainnet/hornet/latest-export.bin
+    global:
+      path: snapshot/snapshotMainnet.txt
+      spentAddressesPaths:
+      - previousEpochsSpentAddresses1.txt
+      - previousEpochsSpentAddresses2.txt
+      - previousEpochsSpentAddresses3.txt
+      index: 1050000
+    pruning:
+      enabled: true
+      delay: 15000
+  spentAddresses:
+    enabled: true
+  coordinator:
+    address: EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9
+    securityLevel: 2
+    merkleTreeDepth: 23
+    mwm: 14
+    stateFilePath: coordinator/state
+    merkleTreeFilePath: coordinator/tree
+    intervalSeconds: 60
+    checkpointTransactions: 5
+  network:
+    preferIPv6: false
+    gossip:
+      bindAddress: "0.0.0.0:{{ hornet_ports.peering.port }}"
+      reconnectAttemptIntervalSeconds: 60
+    autopeering:
+      bindAddress: "0.0.0.0:{{ hornet_ports.autopeering.port }}"
+      runAsEntryNode: false
+      entryNodes:
+      - 46CstniGgfWMdAySiWuS7bVfugwuHZCUQKVaC4Y34EYJ@enter.hornet.zone:14626
+      - EkSLZ4uvSTED1x6KaGzqxoGxjbytt2rPVfbJk1LRLCGL@enter.manapotion.io:18626
+      - 2GHfjJhTqRaKCGBJJvS5RWty61XhjX7FtbVDhg7s8J1x@entrynode.tanglebay.org:14626
+      - iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627
+      - 12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626
+      seed: ''
+  tipsel:
+    belowMaxDepthTransactionLimit: 20000
+    maxDepth: 3
+  warpsync:
+    advancementRange: 200
+  node:
+    alias: ''
+    showAliasInGetNodeInfo: false
+    disablePlugins:
+    - ZeroMQ
+    - Spammer
+    - Monitor
+    - MQTT
+    - Graph
+    - Coordinator
+    enablePlugins:
+    - Autopeering
+    - Prometheus
+  logger:
+    level: info
+    disableCaller: true
+    encoding: console
+    outputPaths:
+    - stdout
+  spammer:
+    address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
+    depth: 1
+    message: Spamming with HORNET tipselect, thank you for using HORNET playbook
+    tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
+    cpuMaxUsage: 0.8
+    tpsRateLimit: 0
+    bundleSize: 1
+    valueSpam: false
+    workers: 0
+  graph:
+    webRootPath: tanglevisualiser/webroot
+    domain: ''
+    webSocket:
+      uri: ''
+    bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_graph_internal_port }}"
+    networkName: meets HORNET
+    explorerTxLink: http://localhost:8081/explorer/tx/
+    explorerBundleLink: http://localhost:8081/explorer/bundle/
+  monitor:
+    tangleMonitorPath: tanglemonitor/frontend
+    domain: ''
+    initialTransactionsCount: 15000
+    remoteApiPort: 4433
+    apiBindAddress: "{{ hornet_monitor_internal_address }}:{{ hornet_monitor_api_port }}"
+    webBindAddress: "{{ hornet_monitor_internal_address }}:{{ hornet_monitor_port }}"
+    websocket:
+      uri: ''
+  mqtt:
+    config: "{{ hornet_mqtt_config_file }}"
+  zmq:
+    bindAddress: 127.0.0.1:{{ hornet_ports.zmq.port }}
+  profiling:
+    bindAddress: 127.0.0.1:6060
+  prometheus:
+    bindAddress: 127.0.0.1:9312
+    goMetrics: true
+    processMetrics: true
+    promhttpMetrics: true
 
 #
-# httpAPI
-hornet_httpapi_exclude_health_check_auth: "false"
-
-# Enable hornet API auth.
-# The default node's username and password are used.
-hornet_httpapi_basic_auth: "false"
-
-# Change this by overwriting the variable in a z-* variable file.
-hornet_httpapi_basic_auth_salt: someCrazySalt
-
-hornet_permit_remote_access_list:
-  - getNodeInfo
-  - getBalances
-  - checkConsistency
-  - getTransactionsToApprove
-  - getInclusionStates
-  - getNodeAPIConfiguration
-  - wereAddressesSpentFrom
-  - broadcastTransactions
-  - findTransactions
-  - storeTransactions
-  - getTrytes
-  - attachToTangle
-  - interruptAttachingToTangle
-
-#
-# dashboard config
-# Keep the dashboard on 127.0.0.1 when running behind
-# a proxy like nginx.
-hornet_dashboard_internal_address: 127.0.0.1
-hornet_dashboard_internal_port: "8087"
-hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
-hornet_dashboard_theme: default
-hornet_dashboard_dev: "false"
-# Only needs enabling if not served via nginx
-hornet_dashboard_basic_auth: "false"
-hornet_dashboard_basic_auth_salt: someCrazySalt
-
-#
-# Peers
-hornet_peers: []
+# peers.json
 # Example:
 #  - identity: example1.neighbor.com:15600
 #    preferIPv6: false
@@ -56,207 +166,26 @@ hornet_peers: []
 #  - identity: example2.neighbor.com:15600
 #    alias: second_node
 #    preferIPv6: false
-
+hornet_peers: []
 hornet_accept_any_connection: "false"
 hornet_max_peers: 5
 
 #
-# Hornet API
-# Hornet's API IP whitelist to bypass limitations
-hornet_httpapi_whitelist: []
-
-# httpAPI limits
-hornet_max_body_length: 1000000
-hornet_max_find_transactions: 100000
-hornet_max_get_trytes: 1000
-hornet_max_requests_list: 1000
-
-hornet_globalsnapshot_spentaddressespaths:
-  - previousEpochsSpentAddresses1.txt
-  - previousEpochsSpentAddresses2.txt
-  - previousEpochsSpentAddresses3.txt
-
-# Hornet API port address bind.
-# If you are using a proxy, leave
-# this is as it is.
-hornet_api_address: "127.0.0.1"
-
-# The TCP port on which hornet listens for API calls and allows for light wallets to connect to
-hornet_api_port: "{{ hornet_ports.api.port }}"
-
-#
-# db
-hornet_db_path_in_container: mainnetdb
-hornet_db_debug: "false"
-
-#
-# snapshot
-hornet_snapshots_load_type: local
-hornet_snapshots_local_depth: 50
-hornet_snapshots_local_interval_synced: 50
-hornet_snapshots_local_interval_unsynced: 1000
-hornet_snapshots_local_path: snapshot/export.bin
-hornet_db_source: "https://ls.manapotion.io/export.bin"
-hornet_db_sources:
-  - "{{ hornet_db_source }}"
-  - "https://x-vps.com/export.bin"
-  - "https://dbfiles.iota.org/mainnet/hornet/latest-export.bin"
-
-hornet_globalsnapshot_spentaddresses_paths: []
-hornet_global_snapshot_index: 1050000
-
-hornet_snapshot_pruning_enabled: "true"
-hornet_snapshot_pruning_delay: 15000
-
-#
-# spent address
-hornet_spent_addresses_enabled: "true"
-
-#
-# coordinator
-hornet_coo_address: EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9
-hornet_coo_security_level: 2
-hornet_coo_merkle_tree_depth: 23
-hornet_coo_mwm: 14
-hornet_coo_state_file: coordinator/state
-hornet_coo_merkle_tree_file: coordinator/tree
-hornet_coo_interval_seconds: 60
-hornet_coo_checkpoint_transactions: 5
-
-#
-# network
-hornet_network_prefer_ipv6: "false"
-
-# The peering address to listen on (interface on your node)
-# 0.0.0.0 means all interfaces
-hornet_peering_address: "0.0.0.0"
-
-# The TCP neighbor peering port
-hornet_peering_port: "{{ hornet_ports.peering.port }}"
-
-hornet_reconnect_int: 60
-
-# Hornet autopeering
-hornet_network_autopeering_address: "0.0.0.0"
-hornet_network_autopeering_port: "{{ hornet_ports.autopeering.port }}"
-hornet_network_autopeering_entrynode: "false"
-hornet_network_entrynodes:
-  - "EkSLZ4uvSTED1x6KaGzqxoGxjbytt2rPVfbJk1LRLCGL@enter.manapotion.io:18626"
-  - "12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626"
-  - "FvfwJuCMoWJvcJLSYww7whPxouZ9WFJ55uyxTxKxJ1ez@enter.hornet.zone:14626"
-  - "iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627"
-  - "DboTc1v61Xdyvggj8VRszy92ScUTLgfwZaHvXsU8zr7e@entrynode.tanglebay.org:14626"
-
-#hornet_autopeering_seed: ""
-
-#
-# tipsel
-hornet_belowmax_depth_tx_limit: 20000
-hornet_max_depth: 3
-
-#
-# node
-#hornet_node_alias: ""
-hornet_node_show_alias: "false"
-
-#
-# warpsync
-hornet_warpsync_advancement_range: 200
-
-# By default enable these
-hornet_enable_plugins:
-  - Autopeering
-  - Prometheus
-
-# By default disable these
-hornet_disable_plugins:
-  - ZeroMQ
-  - Spammer
-  - Monitor
-  - MQTT
-  - Graph
-  - Coordinator
-
-#
-# logger
-hornet_log_level: info
-hornet_log_disable_caller: "true"
-hornet_log_encoding: console
-hornet_logger_output_paths:
-  - stdout
-
-#
-# spammer
-hornet_spammer_address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
-hornet_spammer_depth: 1
-hornet_spammer_message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
-hornet_spammer_tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
-hornet_spammer_cpu_max_usage: 0.8
-hornet_spammer_tpsratelimit: 0.0
-hornet_spammer_bundle_size: 1
-hornet_spammer_value_spam: "false"
-hornet_spammer_workers: 0
-
-#
-# graph
-#honet_graph_domain: ""
-#hornet_graph_websocket_uri: ""
-hornet_graph_internal_address: 127.0.0.1
-hornet_graph_internal_port: "18083"
-hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
-hornet_graph_exp_tx_link: http://localhost:8081/explorer/tx/
-hornet_graph_exp_bundle_link: http://localhost:8081/explorer/bundle/
-
-#
-# monitor
-#honet_monitor_domain: ""
-hornet_monitor_initial_tx_count: 15000
-hornet_monitor_internal_address: 127.0.0.1
-
-# Tanglemonitor ports external
-# Those best be kept on these ports
-# because the frontend has them hardcoded
-hornet_monitor_port_ext: "{{ hornet_ports.tanglemonitor.port }}"
-hornet_api_monitor_port_ext: "{{ hornet_ports.tanglemonitor_api.port }}"
-hornet_monitor_api_port: "14433"
-hornet_monitor_port: "14434"
-#hornet_monitor_websocket_uri: ""
-
-#
-# mqtt
-hornet_mqtt_config_file: mqtt_config.json
-hornet_mqtt_worker_number: 4096
-hornet_mqtt_internal_port: "11883"
-hornet_mqtt_internal_address: 127.0.0.1
-hornet_mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
-hornet_mqtt_ws_path: /ws
-hornet_mqtt_tls_enabled: "false"
-hornet_mqtt_ca_file: tls/ca/cacert.pem
-hornet_mqtt_cert_file: tls/server/cert.pem
-hornet_mqtt_key_file: tls/server/key.pem
-#
-# zmq
-hornet_zmq_address: 127.0.0.1
-hornet_zmq_port: "{{ hornet_ports.zmq.port }}"
-
-#
-# profiling
-hornet_profiling_address: 127.0.0.1
-hornet_profiling_port: "6060"
-
-#
-# prometheus
-hornet_prometheus_address: 127.0.0.1
-hornet_prometheus_port: "9312"
-hornet_prometheus_go_metrics: "true"
-hornet_prometheus_process_metrics: "true"
-hornet_prometheus_prometheus_metrics: "true"
-
+# mqtt_config.json
+mqtt_worker_number: 4096
+mqtt_internal_port: "11883"
+mqtt_internal_address: 127.0.0.1
+mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
+mqtt_ws_path: /ws
+mqtt_tls_enabled: "false"
+mqtt_ca_file: tls/ca/cacert.pem
+mqtt_cert_file: tls/server/cert.pem
+mqtt_key_file: tls/server/key.pem
 
 #
 # Aliases used in generic roles (e.g. ansible-monitoring)
-node_db_path: "{{ hornet_db_path }}"
-node_zmq_port: "{{ hornet_zmq_port }}"
-node_enable_plugins: "{{ hornet_enable_plugins }}"
-node_api_port: "{{ hornet_api_port }}"
+node_db_path: "{{ hornet_config.db.path }}"
+node_zmq_port: "{{ hornet_ports.zmq.port }}"
+node_enable_plugins: "{{ hornet_config.node.enablePlugins }}"
+node_api_port: "{{ hornet_ports.api.port }}"
 node_api_port_remote: "14267"

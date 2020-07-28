@@ -15,11 +15,11 @@ hornet_group: hornet
 hornet_home_path: /var/lib/hornet
 hornet_config: "{{ hornet_home_path }}/config.json"
 hornet_peers_config: "{{ hornet_home_path }}/peering.json"
-hornet_mqtt_config_file: mqtt_config.json
 hornet_profiles_config_file: profiles.json
 hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
 hornet_db_tar: "{{ hornet_home_path }}/snapshot/export.bin"
 hornet_db_source: "https://ls.manapotion.io/export.bin"
+hornet_mqtt_config_file: mqtt_config.json
 
 # How long to wait (seconds) for hornet to
 # gracefully stop. This applies for restart/stop.
@@ -84,3 +84,24 @@ tanglevisualiser_path: "{{ hornet_home_path }}/tanglevisualiser"
 # Tangle Monitor
 hornet_monitor_git_url: "https://github.com/unioproject/tanglemonitor.git"
 hornet_monitor_path: "{{ hornet_home_path }}/tanglemonitor"
+
+# Tanglemonitor ports external
+# Those best be kept on these ports
+# because the frontend has them hardcoded
+hornet_monitor_port_ext: "{{ hornet_ports.tanglemonitor.port }}"
+hornet_api_monitor_port_ext: "{{ hornet_ports.tanglemonitor_api.port }}"
+hornet_monitor_internal_address: 127.0.0.1
+hornet_monitor_api_port: "14433"
+hornet_monitor_port: "14434"
+
+#
+# graph
+hornet_graph_proxy_port: "{{ hornet_ports.graph.port }}"
+hornet_graph_internal_address: 127.0.0.1
+hornet_graph_internal_port: "18083"
+
+#
+# Dashboard nginx
+hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
+hornet_dashboard_internal_address: 127.0.0.1
+hornet_dashboard_internal_port: "8087"
