@@ -72,7 +72,7 @@ hornet_ports:
 # These can get overwritten by horc
 # once any changes are applied.
 hornet_disable_plugins:
-- ZeroMQ
+- ZMQ
 - Spammer
 - Monitor
 - MQTT

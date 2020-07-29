@@ -108,7 +108,7 @@
     "alias": "",
     "showAliasInGetNodeInfo": false,
     "disablePlugins": [
-      "ZeroMQ",
+      "ZMQ",
       "Spammer",
       "Monitor",
       "MQTT",
