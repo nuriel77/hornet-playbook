@@ -1303,7 +1303,7 @@ function hornet_plugins() {
     declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
-    PLUGINS_FILE="/opt/hornet-playbook/group_vars/all/hornet-applied-plugins.local.yml"
+    PLUGINS_FILE="/opt/hornet-playbook/group_vars/all/z-plugins.yml"
 
     # Save current config state
     ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' < "$CONFIG_FILE")
