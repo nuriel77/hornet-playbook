@@ -69,6 +69,19 @@ hornet_ports:
     proto: tcp
     allow: yes
 
+# These can get overwritten by horc
+# once any changes are applied.
+hornet_disable_plugins:
+- ZeroMQ
+- Spammer
+- Monitor
+- MQTT
+- Graph
+- Coordinator
+hornet_enable_plugins:
+- Autopeering
+- Prometheus
+
 # Set openfiles limit
 hornet_nofile_limit: "65535"
 

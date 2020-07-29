@@ -48,6 +48,7 @@ fi
 # Cleanup function
 function cleanup() {
     rm -f "$PID_FILE"
+    rm -f "$TEMP_PLUGIN_FILE"
     cd "$CUR_DIR"
     trap - EXIT
     clear
@@ -431,9 +432,11 @@ function upgrade_hornet() {
 
 ### Get DB ###
 function get_db() {
+    local CONFIG_FILE
+    CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
     # Playbook's default sources
-    SOURCES_ARRAY=($(jq -r '.snapshots.local.downloadURLs[]' < /var/lib/hornet/config.json) "Custom")
+    SOURCES_ARRAY=($(jq -r '.snapshots.local.downloadURLs[]' < "$CONFIG_FILE") "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
@@ -1239,6 +1242,8 @@ function configure_files_menu() {
 
 function configure_files() {
     local CHOICE
+    local CONFIG_FILE
+    CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
     CHOICE=$(configure_files_menu)
     RC=$?
     if [[ $RC -eq 1 ]]; then
@@ -1252,7 +1257,7 @@ function configure_files() {
             ;;
 
         "b)")
-            edit_config "/var/lib/hornet/config.json" "hornet"
+            edit_config "${CONFIG_FILE}" "hornet"
             configure_files
             ;;
 
@@ -1290,6 +1295,7 @@ function hornet_plugins() {
     local NEW_NODE_OBJ=
     local JSON_OUTPUT=
     local CONFIG_FILE=
+    local PLUGINS_FILE=
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
@@ -1297,6 +1303,7 @@ function hornet_plugins() {
     declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
+    PLUGINS_FILE="/opt/hornet-playbook/group_vars/all/hornet-applied-plugins.local.yml"
 
     # Save current config state
     ORIGINAL_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' < "$CONFIG_FILE")
@@ -1351,6 +1358,18 @@ print(json.dumps(obj))
     NEW_NODE_OBJ=$(jq -r '.node | "\(.enablePlugins) \(.disablePlugins)"' <<<"$JSON_OUTPUT")
     [[ "$ORIGINAL_NODE_OBJ" == "$NEW_NODE_OBJ" ]] && return
 
+    # Make consistent in yaml variables file
+    YAML_OUTPUT=$(python -c '
+import yaml, os
+obj = {"hornet_disable_plugins":{}, "hornet_enable_plugins":{}}
+enable_plugins = os.environ["ENABLE_PLUGINS"]
+disable_plugins = os.environ["DISABLE_PLUGINS"]
+obj["hornet_enable_plugins"] = [p for p in enable_plugins.split(",") if p != ""]
+obj["hornet_disable_plugins"] = [p for p in disable_plugins.split(",") if p != ""]
+print(yaml.dump(obj))
+')
+    echo "$YAML_OUTPUT" >"$PLUGINS_FILE"
+
     # Produce new config
     jq . <<< "$JSON_OUTPUT" > "$CONFIG_FILE"
 
@@ -1361,6 +1380,7 @@ print(json.dumps(obj))
         echo "Restarting hornet, please wait ..."
         /bin/systemctl restart hornet
     fi
+
 }
 
 ### Toggle Comnet ###

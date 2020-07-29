@@ -94,16 +94,8 @@ hornet_configuration:
   node:
     alias: ''
     showAliasInGetNodeInfo: false
-    disablePlugins:
-    - ZeroMQ
-    - Spammer
-    - Monitor
-    - MQTT
-    - Graph
-    - Coordinator
-    enablePlugins:
-    - Autopeering
-    - Prometheus
+    disablePlugins: "{{ hornet_disable_plugins }}"
+    enablePlugins: "{{ hornet_enable_plugins }}"
   logger:
     level: info
     disableCaller: true
