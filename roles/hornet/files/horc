@@ -48,7 +48,6 @@ fi
 # Cleanup function
 function cleanup() {
     rm -f "$PID_FILE"
-    rm -f "$TEMP_PLUGIN_FILE"
     cd "$CUR_DIR"
     trap - EXIT
     clear
