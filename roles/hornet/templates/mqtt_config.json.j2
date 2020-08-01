@@ -1,22 +1,22 @@
 {
-  "workerNum": {{ hornet_mqtt_worker_number }},
-  "port": "{{ hornet_mqtt_internal_port }}",
-  "host": "{{ hornet_mqtt_internal_address }}",
+  "workerNum": {{ mqtt_worker_number }},
+  "port": "{{ mqtt_internal_port }}",
+  "host": "{{ mqtt_internal_address }}",
   "cluster": {
     "host": "",
     "port": ""
   },
   "router": "",
   "wsPort": "",
-  "wsPath": "{{ hornet_mqtt_ws_path }}",
-  "wsTLS": {{ hornet_mqtt_tls_enabled | bool | lower | string }},
+  "wsPath": "{{ mqtt_ws_path }}",
+  "wsTLS": {{ mqtt_tls_enabled | bool | lower | string }},
   "tlsPort": "",
   "tlsHost": "",
   "tlsInfo": {
     "verify": false,
-    "caFile": "{{ hornet_mqtt_ca_file }}",
-    "certFile": "{{ hornet_mqtt_cert_file }}",
-    "keyFile": "{{ hornet_mqtt_key_file }}"
+    "caFile": "{{ mqtt_ca_file }}",
+    "certFile": "{{ mqtt_cert_file }}",
+    "keyFile": "{{ mqtt_key_file }}"
   },
   "plugins": {}
 }

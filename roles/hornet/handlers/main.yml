@@ -1,3 +1,6 @@
+- name: jq format config
+  shell: 'UUID=$(uuidgen); jq . < "{{ hornet_config }}" > "/tmp/ansible.format.${UUID}" && mv -- "/tmp/ansible.format.${UUID}" "{{ hornet_config }}" && chown {{ hornet_user }}:{{ hornet_group }} "{{ hornet_config }}" && chmod 600 "{{ hornet_config }}"'
+
 - name: restart hornet
   systemd:
     name: hornet.service

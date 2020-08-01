@@ -28,7 +28,7 @@ server {
         proxy_pass http://tanglevisualiser;
     }
 
-    location {{ hornet_mqtt_ws_path }} {
+    location {{ mqtt_ws_path }} {
         proxy_pass http://tanglevisualiser;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;

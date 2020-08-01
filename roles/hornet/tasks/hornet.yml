@@ -100,7 +100,7 @@
         dest: "{{ ansible_env.HOME }}/.nbctl"
         content: |-
           api_version: {{ hornet_api_version | default('1') }}
-          host: http://127.0.0.1:{{ hornet_api_port }}
+          host: http://127.0.0.1:{{ node_api_port }}
           file: {{ hornet_home_path }}/peering.json
           base_config: {{ hornet_home_path }}/config.json
           hornet: true
@@ -112,7 +112,7 @@
     - name: configure ~/.iritop
       copy:
         dest: "{{ ansible_env.HOME }}/.iritop"
-        content: "node: http://127.0.0.1:{{ hornet_api_port }}"
+        content: "node: http://127.0.0.1:{{ node_api_port }}"
         force: "{{ overwrite | default('no') }}"
         backup: yes
       tags:
@@ -224,13 +224,15 @@
     owner: "{{ hornet_user }}"
     group: "{{ hornet_group }}"
     force: "{{ overwrite | default('no') }}"
+    validate: jq -e '' %s
     backup: yes
   with_items:
-    - {"src": "templates/config.json.j2", "dest": "{{ hornet_config }}"}
+    - {"src": "templates/hornet_config.json.j2", "dest": "{{ hornet_config }}"}
   tags:
     - hornet_config_files
     - hornet_config_file
   notify:
+    - jq format config
     - restart hornet
 
 - name: copy hornet config files
