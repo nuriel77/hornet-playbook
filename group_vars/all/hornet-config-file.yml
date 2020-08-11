@@ -31,7 +31,7 @@ hornet_configuration:
     bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
     limits:
       bodyLengthBytes: 1000000
-      findTransactions: 100000
+      findTransactions: 1000
       getTrytes: 1000
       requestsList: 1000
   dashboard:
@@ -45,7 +45,6 @@ hornet_configuration:
       passwordSalt: ''
   db:
     path: mainnetdb
-    debug: false
   snapshots:
     loadType: local
     local:
@@ -66,7 +65,7 @@ hornet_configuration:
       index: 1050000
     pruning:
       enabled: true
-      delay: 15000
+      delay: 10000
   spentAddresses:
     enabled: true
   coordinator:
@@ -77,7 +76,13 @@ hornet_configuration:
     stateFilePath: coordinator/state
     merkleTreeFilePath: coordinator/tree
     intervalSeconds: 60
-    checkpointTransactions: 5
+    checkpoints:
+      maxTrackedTails: 10000
+    tipsel:
+      minHeaviestBranchUnconfirmedTransactionsThreshold: 20
+      maxHeaviestBranchTipsPerCheckpoint: 10
+      randomTipsPerCheckpoint: 2
+      heaviestBranchSelectionDeadlineMilliseconds: 100
   network:
     preferIPv6: false
     gossip:
@@ -94,8 +99,17 @@ hornet_configuration:
       - 12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626
       seed: ''
   tipsel:
-    belowMaxDepthTransactionLimit: 20000
-    maxDepth: 3
+    maxDeltaTxYoungestRootSnapshotIndexToLSMI: 2
+    maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI: 7
+    belowMaxDepth: 15
+    nonLazy:
+      retentionRulesTipsLimit: 100
+      maxReferencedTipAgeSeconds: 3
+      maxApprovers: 2
+    semiLazy:
+      retentionRulesTipsLimit: 20
+      maxReferencedTipAgeSeconds: 3
+      maxApprovers: 2
   warpsync:
     advancementRange: 200
   node:
@@ -112,13 +126,15 @@ hornet_configuration:
   spammer:
     address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
     depth: 1
-    message: Spamming with HORNET tipselect, thank you for using HORNET playbook
+    message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
     tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
+    tagSemiLazy: ''
     cpuMaxUsage: 0.8
     tpsRateLimit: 0
     bundleSize: 1
     valueSpam: false
     workers: 0
+    semiLazyTipsLimit: 30
   graph:
     webRootPath: tanglevisualiser/webroot
     domain: ''

@@ -34,8 +34,7 @@
   },
 {% set c = hornet_configuration.db %}
   "db": {
-    "path": "{{ c.path }}",
-    "debug": {{ c.debug | bool | lower | string }}
+    "path": "{{ c.path }}"
   },
 {% set c = hornet_configuration.snapshots %}
   "snapshots": {
@@ -70,7 +69,15 @@
     "stateFilePath": "{{ c.stateFilePath }}",
     "merkleTreeFilePath": "{{ c.merkleTreeFilePath }}",
     "intervalSeconds": {{ c.intervalSeconds | int }},
-    "checkpointTransactions": {{ c.checkpointTransactions | int }}
+    "checkpoints": {
+      "maxTrackedTails": {{ c.checkpoints.maxTrackedTails | int }}
+    },
+    "tipsel": {
+      "minHeaviestBranchUnconfirmedTransactionsThreshold": {{ c.tipsel.minHeaviestBranchUnconfirmedTransactionsThreshold | int }},
+      "maxHeaviestBranchTipsPerCheckpoint": {{ c.tipsel.maxHeaviestBranchTipsPerCheckpoint | int }},
+      "randomTipsPerCheckpoint": {{ c.tipsel.randomTipsPerCheckpoint | int }},
+      "heaviestBranchSelectionDeadlineMilliseconds": {{ c.tipsel.heaviestBranchSelectionDeadlineMilliseconds | int }}
+    }
   },
 {% set c = hornet_configuration.network %}
   "network": {
@@ -88,8 +95,19 @@
   },
 {% set c = hornet_configuration.tipsel %}
   "tipsel": {
-    "belowMaxDepthTransactionLimit": {{ c.belowMaxDepthTransactionLimit | int }},
-    "maxDepth": {{ c.maxDepth | int }}
+    "maxDeltaTxYoungestRootSnapshotIndexToLSMI": {{ c.maxDeltaTxYoungestRootSnapshotIndexToLSMI | int }},
+    "maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI": {{ c.maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI | int }},
+    "belowMaxDepth": {{ c.belowMaxDepth | int }},
+    "nonLazy": {
+      "retentionRulesTipsLimit": {{ c.nonLazy.retentionRulesTipsLimit | int }},
+      "maxReferencedTipAgeSeconds": {{ c.nonLazy.maxReferencedTipAgeSeconds | int }},
+      "maxApprovers": {{ c.nonLazy.maxApprovers | int }}
+    },
+    "semiLazy": {
+      "retentionRulesTipsLimit": {{ c.semiLazy.retentionRulesTipsLimit | int }},
+      "maxReferencedTipAgeSeconds": {{ c.semiLazy.maxReferencedTipAgeSeconds | int }},
+      "maxApprovers": {{ c.semiLazy.maxApprovers | int }}
+    }
   },
 {% set c = hornet_configuration.warpsync %}
   "warpsync": {
@@ -115,11 +133,13 @@
     "depth": {{ c.depth | int }},
     "message": "{{ c.message }}",
     "tag": "{{ c.tag }}",
+    "tagSemiLazy": "{{ c.tagSemiLazy }}",
     "cpuMaxUsage": {{ c.cpuMaxUsage | int }},
     "tpsRateLimit": {{ c.tpsRateLimit | int }},
     "bundleSize": {{ c.bundleSize }},
     "valueSpam": {{ c.valueSpam | bool | lower | string }},
-    "workers": {{ c.workers | int }}
+    "workers": {{ c.workers | int }},
+    "semiLazyTipsLimit": {{ c.semiLazyTipsLimit | int }}
   },
 {% set c = hornet_configuration.graph %}
   "graph": {
