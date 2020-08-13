@@ -17,6 +17,7 @@ hornet_configuration:
     - getNodeInfo
     - getBalances
     - checkConsistency
+    - getTipInfo
     - getTransactionsToApprove
     - getInclusionStates
     - getNodeAPIConfiguration
@@ -37,18 +38,14 @@ hornet_configuration:
   dashboard:
     bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
     theme: default
-    dev: false
     basicAuth:
       enabled: false
       username: ''
       passwordHash: ''
       passwordSalt: ''
-  db:
-    path: mainnetdb
   snapshots:
     loadType: local
     local:
-      depth: 50
       intervalSynced: 50
       intervalUnsynced: 1000
       path: snapshot/export.bin
@@ -98,6 +95,7 @@ hornet_configuration:
       - iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627
       - 12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626
       seed: ''
+      maxDroppedPacketsPercentage: 30
   tipsel:
     maxDeltaTxYoungestRootSnapshotIndexToLSMI: 2
     maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI: 7
@@ -110,19 +108,11 @@ hornet_configuration:
       retentionRulesTipsLimit: 20
       maxReferencedTipAgeSeconds: 3
       maxApprovers: 2
-  warpsync:
-    advancementRange: 200
   node:
     alias: ''
     showAliasInGetNodeInfo: false
     disablePlugins: "{{ hornet_disable_plugins }}"
     enablePlugins: "{{ hornet_enable_plugins }}"
-  logger:
-    level: info
-    disableCaller: true
-    encoding: console
-    outputPaths:
-    - stdout
   spammer:
     address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
     depth: 1
@@ -153,8 +143,6 @@ hornet_configuration:
     webBindAddress: "{{ hornet_monitor_internal_address }}:{{ hornet_monitor_port }}"
     websocket:
       uri: ''
-  mqtt:
-    config: "{{ hornet_mqtt_config_file }}"
   zmq:
     bindAddress: 127.0.0.1:{{ hornet_ports.zmq.port }}
   profiling:

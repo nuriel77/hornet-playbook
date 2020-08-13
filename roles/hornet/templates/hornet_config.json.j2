@@ -24,7 +24,6 @@
   "dashboard": {
     "bindAddress": "{{ c.bindAddress }}",
     "theme": "{{ c.theme }}",
-    "dev": {{ c.dev | bool | lower | string }},
     "basicAuth": {
       "enabled": {{ c.basicAuth.enabled  | bool | lower | string }},
       "username": "{{ c.basicAuth.username }}",
@@ -32,15 +31,10 @@
       "passwordSalt": "{{ c.basicAuth.passwordSalt }}"
     }
   },
-{% set c = hornet_configuration.db %}
-  "db": {
-    "path": "{{ c.path }}"
-  },
 {% set c = hornet_configuration.snapshots %}
   "snapshots": {
     "loadType": "{{ c.loadType }}",
     "local": {
-      "depth": {{ c.local.depth | int }},
       "intervalSynced": {{ c.local.intervalSynced | int }},
       "intervalUnsynced": {{ c.local.intervalUnsynced | int }},
       "path": "{{ c.local.path }}",
@@ -60,25 +54,6 @@
   "spentAddresses": {
     "enabled": {{ c.enabled | bool | lower | string }}
   },
-{% set c = hornet_configuration.coordinator %}
-  "coordinator": {
-    "address": "{{ c.address }}",
-    "securityLevel": {{ c.securityLevel | int }},
-    "merkleTreeDepth": {{ c.merkleTreeDepth | int }},
-    "mwm": {{ c.mwm | int }},
-    "stateFilePath": "{{ c.stateFilePath }}",
-    "merkleTreeFilePath": "{{ c.merkleTreeFilePath }}",
-    "intervalSeconds": {{ c.intervalSeconds | int }},
-    "checkpoints": {
-      "maxTrackedTails": {{ c.checkpoints.maxTrackedTails | int }}
-    },
-    "tipsel": {
-      "minHeaviestBranchUnconfirmedTransactionsThreshold": {{ c.tipsel.minHeaviestBranchUnconfirmedTransactionsThreshold | int }},
-      "maxHeaviestBranchTipsPerCheckpoint": {{ c.tipsel.maxHeaviestBranchTipsPerCheckpoint | int }},
-      "randomTipsPerCheckpoint": {{ c.tipsel.randomTipsPerCheckpoint | int }},
-      "heaviestBranchSelectionDeadlineMilliseconds": {{ c.tipsel.heaviestBranchSelectionDeadlineMilliseconds | int }}
-    }
-  },
 {% set c = hornet_configuration.network %}
   "network": {
     "preferIPv6": {{ c.preferIPv6 | bool | lower | string }},
@@ -90,28 +65,9 @@
       "bindAddress": "{{ c.autopeering.bindAddress }}",
       "runAsEntryNode": {{ c.autopeering.runAsEntryNode | bool | lower | string }},
       "entryNodes": {{ c.autopeering.entryNodes | to_nice_json(indent=8) }},
-      "seed": "{{ c.autopeering.seed }}"
+      "seed": "{{ c.autopeering.seed }}",
+      "maxDroppedPacketsPercentage": {{ c.autopeering.maxDroppedPacketsPercentage | int }}
     }
-  },
-{% set c = hornet_configuration.tipsel %}
-  "tipsel": {
-    "maxDeltaTxYoungestRootSnapshotIndexToLSMI": {{ c.maxDeltaTxYoungestRootSnapshotIndexToLSMI | int }},
-    "maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI": {{ c.maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI | int }},
-    "belowMaxDepth": {{ c.belowMaxDepth | int }},
-    "nonLazy": {
-      "retentionRulesTipsLimit": {{ c.nonLazy.retentionRulesTipsLimit | int }},
-      "maxReferencedTipAgeSeconds": {{ c.nonLazy.maxReferencedTipAgeSeconds | int }},
-      "maxApprovers": {{ c.nonLazy.maxApprovers | int }}
-    },
-    "semiLazy": {
-      "retentionRulesTipsLimit": {{ c.semiLazy.retentionRulesTipsLimit | int }},
-      "maxReferencedTipAgeSeconds": {{ c.semiLazy.maxReferencedTipAgeSeconds | int }},
-      "maxApprovers": {{ c.semiLazy.maxApprovers | int }}
-    }
-  },
-{% set c = hornet_configuration.warpsync %}
-  "warpsync": {
-    "advancementRange": {{ c.advancementRange | int }}
   },
 {% set c = hornet_configuration.node %}
   "node": {
@@ -119,13 +75,6 @@
     "showAliasInGetNodeInfo": {{ c.showAliasInGetNodeInfo | bool | lower | string }},
     "disablePlugins": {{ c.disablePlugins | to_nice_json(indent=6) }},
     "enablePlugins": {{ c.enablePlugins | to_nice_json(indent=6) }}
-  },
-{% set c = hornet_configuration.logger %}
-  "logger": {
-    "level": "{{ c.level }}",
-    "disableCaller": {{ c.disableCaller | bool | lower | string }},
-    "encoding": "{{ c.encoding }}",
-    "outputPaths": {{ c.outputPaths | to_nice_json(indent=6) }}
   },
 {% set c = hornet_configuration.spammer %}
   "spammer": {
@@ -164,10 +113,6 @@
     "websocket": {
       "uri": "{{ c.websocket.uri }}"
     }
-  },
-{% set c = hornet_configuration.mqtt %}
-  "mqtt": {
-    "config": "{{ c.config }}"
   },
 {% set c = hornet_configuration.zmq %}
   "zmq": {
