@@ -568,7 +568,7 @@ function set_primary_ip()
 }
 
 function display_requirements_url() {
-    echo "Only Debian, Ubuntu 18.04LTS, Ubuntu 19.x, Raspbian, CentOS 7 and 8 are supported."
+    echo "Only Debian, Ubuntu 18.04LTS, Ubuntu 20.04LTS, Raspbian, CentOS 7 and 8 are supported (all 64 bit)."
 }
 
 function check_arch() {
