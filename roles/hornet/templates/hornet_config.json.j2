@@ -65,8 +65,7 @@
       "bindAddress": "{{ c.autopeering.bindAddress }}",
       "runAsEntryNode": {{ c.autopeering.runAsEntryNode | bool | lower | string }},
       "entryNodes": {{ c.autopeering.entryNodes | to_nice_json(indent=8) }},
-      "seed": "{{ c.autopeering.seed }}",
-      "maxDroppedPacketsPercentage": {{ c.autopeering.maxDroppedPacketsPercentage | int }}
+      "seed": "{{ c.autopeering.seed }}"
     }
   },
 {% set c = hornet_configuration.node %}
@@ -83,7 +82,7 @@
     "message": "{{ c.message }}",
     "tag": "{{ c.tag }}",
     "tagSemiLazy": "{{ c.tagSemiLazy }}",
-    "cpuMaxUsage": {{ c.cpuMaxUsage | int }},
+    "cpuMaxUsage": {{ c.cpuMaxUsage | float }},
     "tpsRateLimit": {{ c.tpsRateLimit | int }},
     "bundleSize": {{ c.bundleSize }},
     "valueSpam": {{ c.valueSpam | bool | lower | string }},
