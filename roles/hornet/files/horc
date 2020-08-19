@@ -16,6 +16,7 @@ clear
 [ -f "/opt/hornet-playbook/inventory-multi" ] && INVENTORY_FILE=inventory-multi || INVENTORY_FILE=inventory
 
 : "${EDITOR:=nano}"
+
 VERSION_TEMP=0.6.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
@@ -658,7 +659,7 @@ function run_custom_updates(){
                 touch "${_UPDATE}.completed"
             fi
         else
-            echo "$(basename ${_UPDATE}) already updated. To force rerun this update remove the file '$(pwd)/${_UPDATE}' and rerun horc."
+            echo "$(basename ${_UPDATE}) already updated. To force rerun this update remove the file '${_UPDATE}' and rerun horc."
         fi
     done
 
