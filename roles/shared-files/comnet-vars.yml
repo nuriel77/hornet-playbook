@@ -14,6 +14,7 @@ hornet_configuration:
     - getNodeInfo
     - getBalances
     - checkConsistency
+    - getTipInfo
     - getTransactionsToApprove
     - getInclusionStates
     - getNodeAPIConfiguration
@@ -34,19 +35,14 @@ hornet_configuration:
   dashboard:
     bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
     theme: default
-    dev: false
     basicAuth:
       enabled: false
       username: ''
       passwordHash: ''
       passwordSalt: ''
-  db:
-    path: mainnetdb
-    debug: false
   snapshots:
     loadType: local
     local:
-      depth: 50
       intervalSynced: 200
       intervalUnsynced: 1000
       path: snapshot/export.bin
@@ -72,7 +68,13 @@ hornet_configuration:
     stateFilePath: coordinator/state
     merkleTreeFilePath: coordinator/tree
     intervalSeconds: 60
-    checkpointTransactions: 5
+    checkpoints:
+      maxTrackedTails: 10000
+    tipsel:
+      minHeaviestBranchUnconfirmedTransactionsThreshold: 20
+      maxHeaviestBranchTipsPerCheckpoint: 10
+      randomTipsPerCheckpoint: 2
+      heaviestBranchSelectionDeadlineMilliseconds: 100
   network:
     preferIPv6: false
     gossip:
@@ -87,31 +89,34 @@ hornet_configuration:
       - "J1Hn5r9pS5FkLeYqXWstC2Zyjxj73grEWvjuene3qjM9@entrynode.comnet.tanglebay.org:14636"
       seed: ''
   tipsel:
-    belowMaxDepthTransactionLimit: 10000
-    maxDepth: 5
-  warpsync:
-    advancementRange: 50
+    maxDeltaTxYoungestRootSnapshotIndexToLSMI: 2
+    maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI: 7
+    belowMaxDepth: 15
+    nonLazy:
+      retentionRulesTipsLimit: 100
+      maxReferencedTipAgeSeconds: 3
+      maxApprovers: 2
+    semiLazy:
+      retentionRulesTipsLimit: 20
+      maxReferencedTipAgeSeconds: 3
+      maxApprovers: 2
   node:
     alias: ''
     showAliasInGetNodeInfo: false
     disablePlugins: "{{ hornet_disable_plugins }}"
     enablePlugins: "{{ hornet_enable_plugins }}"
-  logger:
-    level: info
-    disableCaller: true
-    encoding: console
-    outputPaths:
-    - stdout
   spammer:
     address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
     depth: 1
-    message: Spamming with HORNET tipselect, thank you for using HORNET playbook
+    message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
     tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
+    tagSemiLazy: ''
     cpuMaxUsage: 0.8
     tpsRateLimit: 0
     bundleSize: 1
     valueSpam: false
     workers: 0
+    semiLazyTipsLimit: 30
   graph:
     webRootPath: tanglevisualiser/webroot
     domain: ''
@@ -130,8 +135,6 @@ hornet_configuration:
     webBindAddress: "{{ hornet_monitor_internal_address }}:{{ hornet_monitor_port }}"
     websocket:
       uri: ''
-  mqtt:
-    config: "{{ hornet_mqtt_config_file }}"
   zmq:
     bindAddress: 127.0.0.1:{{ hornet_ports.zmq.port }}
   profiling:
