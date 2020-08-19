@@ -89,30 +89,6 @@
     "workers": {{ c.workers | int }},
     "semiLazyTipsLimit": {{ c.semiLazyTipsLimit | int }}
   },
-{% set c = hornet_configuration.graph %}
-  "graph": {
-    "webRootPath": "{{ c.webRootPath }}",
-    "domain": "{{ c.domain }}",
-    "webSocket": {
-      "uri": "{{ c.webSocket.uri }}"
-    },
-    "bindAddress": "{{ c.bindAddress }}",
-    "networkName": "{{ c.networkName }}",
-    "explorerTxLink": "{{ c.explorerTxLink }}",
-    "explorerBundleLink": "{{ c.explorerBundleLink }}"
-  },
-{% set c = hornet_configuration.monitor %}
-  "monitor": {
-    "tangleMonitorPath": "{{ c.tangleMonitorPath }}",
-    "domain": "{{ c.domain }}",
-    "initialTransactionsCount": {{ c.initialTransactionsCount | int }},
-    "remoteApiPort": {{ c.remoteApiPort | int }},
-    "apiBindAddress": "{{ c.apiBindAddress }}",
-    "webBindAddress": "{{ c.webBindAddress }}",
-    "websocket": {
-      "uri": "{{ c.websocket.uri }}"
-    }
-  },
 {% set c = hornet_configuration.zmq %}
   "zmq": {
     "bindAddress": "{{ c.bindAddress }}"

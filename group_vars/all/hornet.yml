@@ -74,9 +74,7 @@ hornet_ports:
 hornet_disable_plugins:
 - Spammer
 - ZMQ
-- Monitor
 - MQTT
-- Graph
 - Coordinator
 hornet_enable_plugins:
 - Autopeering
