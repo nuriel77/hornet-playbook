@@ -91,7 +91,7 @@ if [[ "$SKIP_CONFIRM" != true ]]
 then
     read -p "Do you wish to proceed? [y/N] " yn
     if echo "$yn" | grep -v -iq "^y"; then
-        echo Cancelled
+        echo Canceled
         exit 1
     fi
 fi
