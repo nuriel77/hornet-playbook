@@ -184,6 +184,8 @@ It is possible to edit `/var/lib/hornet/config.json` manually and restart HORNET
 
 The recommended way to configure the file without having to worry about it getting overwritten is by copying the variables file to a new overwrite file.
 
+**NOTE** due to recent changes the method below may differ. (WIP)
+
 Copy the config variables file to a new file:
 ```sh
 cp /opt/hornet-playbook/group_vars/all/hornet-config-file.yml /opt/hornet-playbook/group_vars/all/z-append.yml
@@ -354,26 +356,26 @@ The Hornet private tangle setup is documented [here](https://github.com/gohornet
 
 Before doing anything make sure you've stopped hornet: `sudo systemctl stop hornet`.
 
-Make sure you remove (or backup to another location) `/var/lib/hornet/mainnetdb/*` so there are no conflicts with a previous database.
+Make sure you remove (or backup to another location) `/var/lib/hornet/mainnetdb/*` and `/var/lib/hornet/snapshot/*` to ensure there are no conflicts with a previous database and snapshot.
 
-Next you'll have to edit `/var/lib/hornet/config.json`: make sure you set the values specified in the `coordinator` configuration as shown [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle#configuration). Same for `snapshots`, follow the example in the document (`loadType` etc). Note that the correct path for the playbook's base directory is `snapshot/` thus you should end up configuring `snapshot/snapshot.csv` in the configuration.
+Next you'll have to edit `/var/lib/hornet/config.json`: make sure you set the values specified in the `coordinator` configuration as shown [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle#configuration). Same for `snapshots`, follow the example in the document (`loadType` etc). **Note** that the correct path for the playbook's base directory is `snapshot/` thus you should end up configuring `snapshot/snapshot.csv` in the configuration.
 
 To generate the **merkle tree root** when using docker you need 2 parameters: a. the image name, b. your COO_SEED.
 
-For example below we're using `gohornet/hornet:v0.4.0-rc13` as the image with a random COO_SEED:
+For example below we're using `gohornet/hornet:v0.5.0` as the image with a random COO_SEED:
 ```sh
-docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json -v /var/lib/hornet/snapshot:/app/snapshot gohornet/hornet:v0.4.0-rc13 tool merkle
+docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json -v /var/lib/hornet/snapshot:/app/snapshot gohornet/hornet:v0.5.0- tool merkle
 ```
 
-Following the tutorial, you'll be adding the `merkle tree root` value as the `address` value in the `coordinator` in the `config.json`.
+Following HORNET's official tutorial you'll have to add the `merkle tree root` value as the `address` value in the `coordinator` in `/var/lib/hornet/config.json`.
 
 Note that the state file and merkle tree file path are `coordinator/state` and `coordinator/tree`.
 
-The following step is to create the `snapshot.csv`. You should to that in `/var/lib/hornet/snapshot/snapshot.csv` as this is mounted into the HORNET docker container.
+The following step is to create the `snapshot.csv`. You should do that in `/var/lib/hornet/snapshot/snapshot.csv` as this is mounted into the HORNET docker container.
 
-Here's an example of the coordinator bootstrap command, as before, providing the COO_SEED and the docker image to use:
+Next, here's an example of the coordinator bootstrap command, as before, providing the COO_SEED and the docker image to use:
 ```sh
-docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/mainnetdb:/app/mainnetdb -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/snapshot:/app/snapshot -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json gohornet/hornet:v0.4.0-rc13 --cooBootstrap
+docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/mainnetdb:/app/mainnetdb -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/snapshot:/app/snapshot -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json gohornet/hornet:v0.5.0 --cooBootstrap
 ```
 Bootstrap is ended once you see milestones being issued. At this point you can stop the process with CTRL-c. It will look like this:
 ```
