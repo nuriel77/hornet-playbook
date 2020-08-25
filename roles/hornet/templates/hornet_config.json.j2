@@ -54,6 +54,27 @@
   "spentAddresses": {
     "enabled": {{ c.enabled | bool | lower | string }}
   },
+{%- if hornet_configuration.coordinator %}
+{% set c = hornet_configuration.coordinator %}
+  "coordinator": {
+    "address": "{{ c.address }}",
+    "securityLevel": {{ c.securityLevel | int }},
+    "merkleTreeDepth": {{ c.merkleTreeDepth | int }},
+    "mwm": {{ c.mwm | int }},
+    "stateFilePath": "{{ c.stateFilePath }}",
+    "merkleTreeFilePath": "{{ c.merkleTreeFilePath }}",
+    "intervalSeconds": {{ c.intervalSeconds | int }},
+    "checkpoints": {
+      "maxTrackedTails": {{ c.checkpoints.maxTrackedTails | int }}
+    },
+    "tipsel": {
+      "minHeaviestBranchUnconfirmedTransactionsThreshold": {{ c.tipsel.minHeaviestBranchUnconfirmedTransactionsThreshold | int }},
+      "maxHeaviestBranchTipsPerCheckpoint": {{ c.tipsel.maxHeaviestBranchTipsPerCheckpoint | int }},
+      "randomTipsPerCheckpoint": {{ c.tipsel.randomTipsPerCheckpoint | int }},
+      "heaviestBranchSelectionDeadlineMilliseconds": {{ c.tipsel.heaviestBranchSelectionDeadlineMilliseconds | int }}
+    }
+  },
+{%- endif %}
 {% set c = hornet_configuration.network %}
   "network": {
     "preferIPv6": {{ c.preferIPv6 | bool | lower | string }},
