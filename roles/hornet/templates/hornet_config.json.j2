@@ -54,7 +54,7 @@
   "spentAddresses": {
     "enabled": {{ c.enabled | bool | lower | string }}
   },
-{%- if hornet_configuration.coordinator %}
+{%- if 'coordinator' in hornet_configuration %}
 {% set c = hornet_configuration.coordinator %}
   "coordinator": {
     "address": "{{ c.address }}",
