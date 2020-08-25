@@ -76,7 +76,7 @@ hornet_configuration:
   coordinator:
     address: "UOMFQOULWQLXQQHFMFRQQTRDKDHVMRFFEGZ9LDU9TFZZ9CHDLZSIAHA9MXNSLYOERCHDUVDFEEZAEOBEW"
     securityLevel: 2
-    merkleTreeDepth": 23
+    merkleTreeDepth: 23
     mwm: 10
     stateFilePath: coordinator/state
     merkleTreeFilePath: coordinator/tree
