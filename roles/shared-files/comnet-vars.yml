@@ -1,161 +1,26 @@
-# Configuration for comnet
+# Configuration for comnet (main config override values)
 #
 # config.json
-hornet_configuration:
-  useProfile: auto
-  httpAPI:
-    excludeHealthCheckFromAuth: false
-    basicAuth:
-      enabled: false
-      username: ''
-      passwordHash: ''
-      passwordSalt: ''
-    permitRemoteAccess:
-    - getNodeInfo
-    - getBalances
-    - checkConsistency
-    - getTipInfo
-    - getTransactionsToApprove
-    - getInclusionStates
-    - getNodeAPIConfiguration
-    - wereAddressesSpentFrom
-    - broadcastTransactions
-    - findTransactions
-    - storeTransactions
-    - getTrytes
-    - attachToTangle
-    - interruptAttachingToTangle
-    whitelistedAddresses: []
-    bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
-    limits:
-      bodyLengthBytes: 1000000
-      findTransactions: 100000
-      getTrytes: 1000
-      requestsList: 1000
-  dashboard:
-    bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
-    theme: default
-    basicAuth:
-      enabled: false
-      username: ''
-      passwordHash: ''
-      passwordSalt: ''
-  snapshots:
-    loadType: local
-    local:
-      intervalSynced: 200
-      intervalUnsynced: 1000
-      path: snapshot/export.bin
-      downloadURLs:
-      - https://ls.manapotion.io/comnet/export.bin
-    global:
-      path: snapshot/snapshotMainnet.txt
-      spentAddressesPaths:
-      - previousEpochsSpentAddresses1.txt
-      - previousEpochsSpentAddresses2.txt
-      - previousEpochsSpentAddresses3.txt
-      index: 1050000
-    pruning:
-      enabled: true
-      delay: 1000
-  spentAddresses:
-    enabled: true
-  network:
-    preferIPv6: false
-    gossip:
-      bindAddress: "0.0.0.0:{{ hornet_ports.peering.port }}"
-      reconnectAttemptIntervalSeconds: 60
-    autopeering:
-      bindAddress: "0.0.0.0:{{ hornet_ports.autopeering.port }}"
-      runAsEntryNode: false
-      entryNodes:
-      - "iotaCrvEWGfaeA1HutcULjD4uZnPhEnD5xNGfGs8vhe@enter.comnet.thetangle.org:14647"
-      - "GLZAWBGqvm6ZRT7jGMFAKyUJNPdvx4i5A1GPRZbGS6C9@enter.comnet.hornet.zone:14627"
-      - "J1Hn5r9pS5FkLeYqXWstC2Zyjxj73grEWvjuene3qjM9@entrynode.comnet.tanglebay.org:14636"
-      seed: ''
-  coordinator:
-    address: "UOMFQOULWQLXQQHFMFRQQTRDKDHVMRFFEGZ9LDU9TFZZ9CHDLZSIAHA9MXNSLYOERCHDUVDFEEZAEOBEW"
-    securityLevel: 2
-    merkleTreeDepth: 23
-    mwm: 10
-    stateFilePath: coordinator/state
-    merkleTreeFilePath: coordinator/tree
-    intervalSeconds: 60
-    checkpoints:
-      maxTrackedTails: 10000
-    tipsel:
-      minHeaviestBranchUnconfirmedTransactionsThreshold: 20
-      maxHeaviestBranchTipsPerCheckpoint: 10
-      randomTipsPerCheckpoint: 2
-      heaviestBranchSelectionDeadlineMilliseconds: 100
-  tipsel:
-    maxDeltaTxYoungestRootSnapshotIndexToLSMI: 2
-    maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI: 7
-    belowMaxDepth: 15
-    nonLazy:
-      retentionRulesTipsLimit: 100
-      maxReferencedTipAgeSeconds: 3
-      maxApprovers: 2
-    semiLazy:
-      retentionRulesTipsLimit: 20
-      maxReferencedTipAgeSeconds: 3
-      maxApprovers: 2
-  node:
-    alias: ''
-    showAliasInGetNodeInfo: false
-    disablePlugins: "{{ hornet_disable_plugins }}"
-    enablePlugins: "{{ hornet_enable_plugins }}"
-  spammer:
-    address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
-    depth: 1
-    message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
-    tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
-    tagSemiLazy: ''
-    cpuMaxUsage: 0.8
-    tpsRateLimit: 0
-    bundleSize: 1
-    valueSpam: false
-    workers: 0
-    semiLazyTipsLimit: 30
-  zmq:
-    bindAddress: 127.0.0.1:{{ hornet_ports.zmq.port }}
-  profiling:
-    bindAddress: 127.0.0.1:6060
-  prometheus:
-    bindAddress: 127.0.0.1:9312
-    goMetrics: true
-    processMetrics: true
-    promhttpMetrics: true
 
-#
-# peers.json
-# Example:
-#  - identity: example1.neighbor.com:15600
-#    preferIPv6: false
-#    alias: first_node
-#  - identity: example2.neighbor.com:15600
-#    alias: second_node
-#    preferIPv6: false
-hornet_peers: []
-hornet_accept_any_connection: "false"
-hornet_max_peers: 5
+# snapshots
+hornet_config_snapshots_local_intervalSynced: 50
+hornet_config_snapshots_local_downloadURLs:
+  - https://ls.manapotion.io/comnet/export.bin
+hornet_config_snapshots_pruning_delay: 1000
 
-#
-# mqtt_config.json
-mqtt_worker_number: 4096
-mqtt_internal_port: "11883"
-mqtt_internal_address: 127.0.0.1
-mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
-mqtt_ws_path: /ws
-mqtt_tls_enabled: "false"
-mqtt_ca_file: tls/ca/cacert.pem
-mqtt_cert_file: tls/server/cert.pem
-mqtt_key_file: tls/server/key.pem
+# network
+hornet_config_network_autopeering_entryNodes:
+  - "iotaCrvEWGfaeA1HutcULjD4uZnPhEnD5xNGfGs8vhe@enter.comnet.thetangle.org:14647"
+  - "GLZAWBGqvm6ZRT7jGMFAKyUJNPdvx4i5A1GPRZbGS6C9@enter.comnet.hornet.zone:14627"
+  - "J1Hn5r9pS5FkLeYqXWstC2Zyjxj73grEWvjuene3qjM9@entrynode.comnet.tanglebay.org:14636"
 
-#
-# Aliases used in generic roles (e.g. ansible-monitoring)
-node_db_path: "{{ hornet_config.db.path }}"
-node_zmq_port: "{{ hornet_ports.zmq.port }}"
-node_enable_plugins: "{{ hornet_config.node.enablePlugins }}"
-node_api_port: "{{ hornet_ports.api.port }}"
-node_api_port_remote: "14267"
+# coordinator
+hornet_config_coordinator_address: "UOMFQOULWQLXQQHFMFRQQTRDKDHVMRFFEGZ9LDU9TFZZ9CHDLZSIAHA9MXNSLYOERCHDUVDFEEZAEOBEW"
+hornet_config_coordinator_merkleTreeDepth: 23
+hornet_config_coordinator_mwm: 10
+hornet_config_coordinator_intervalSeconds: 60
+hornet_config_coordinator_tipsel_randomTipsPerCheckpoint: 2
+
+# tipsel
+hornet_config_tipsel_maxDeltaTxYoungestRootSnapshotIndexToLSMI: 2
+hornet_config_tipsel_maxDeltaTxOldestRootSnapshotIndexToLSMI: 7

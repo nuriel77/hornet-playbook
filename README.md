@@ -184,13 +184,11 @@ It is possible to edit `/var/lib/hornet/config.json` manually and restart HORNET
 
 The recommended way to configure the file without having to worry about it getting overwritten is by copying the variables file to a new overwrite file.
 
-**NOTE** due to recent changes the method below may differ. (WIP)
-
 Copy the config variables file to a new file:
 ```sh
 cp /opt/hornet-playbook/group_vars/all/hornet-config-file.yml /opt/hornet-playbook/group_vars/all/z-append.yml
 ```
-Edit the `/opt/hornet-playbook/group_vars/all/z-append.yml` as required (using nano, vi or your preferred editor). The variable names are similar to how you'd read the `config.json`. For example `hornet_coo_merkle_tree_depth` would correspond to `coordinator.merkleTreeFilePath` in `config.json`. If you want to see the actual mapping you can view the template file in `/opt/hornet-playbook/roles/hornet/templates/config.json.j2`.
+Edit the `/opt/hornet-playbook/group_vars/all/z-append.yml` as required (using nano, vi or your preferred editor). The variable names are similar to how you'd read the `config.json`. For example `hornet_config_snapshots_local_downloadURLs` corresponds to `snapshots.local.downloadURLs` in `config.json`. If you want to see the actual mapping you can view the template file in `/opt/hornet-playbook/roles/hornet/templates/config.json.j2`.
 
 Then re-run the playbook while tagging the task to update the configuration file. Any variables you have overwritten and modified in `z-append.yml` will be applied and take precedence.
 ```sh
