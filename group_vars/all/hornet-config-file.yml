@@ -4,121 +4,141 @@
 
 #
 # config.json
-hornet_configuration:
-  useProfile: auto
-  httpAPI:
-    excludeHealthCheckFromAuth: false
-    basicAuth:
-      enabled: false
-      username: ''
-      passwordHash: ''
-      passwordSalt: ''
-    permitRemoteAccess:
-    - getNodeInfo
-    - getBalances
-    - checkConsistency
-    - getTipInfo
-    - getTransactionsToApprove
-    - getInclusionStates
-    - getNodeAPIConfiguration
-    - wereAddressesSpentFrom
-    - broadcastTransactions
-    - findTransactions
-    - storeTransactions
-    - getTrytes
-    - attachToTangle
-    - interruptAttachingToTangle
-    whitelistedAddresses: []
-    bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
-    limits:
-      bodyLengthBytes: 1000000
-      findTransactions: 1000
-      getTrytes: 1000
-      requestsList: 1000
-  dashboard:
-    bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
-    theme: default
-    basicAuth:
-      enabled: false
-      username: ''
-      passwordHash: ''
-      passwordSalt: ''
-  snapshots:
-    loadType: local
-    local:
-      intervalSynced: 50
-      intervalUnsynced: 1000
-      path: snapshot/export.bin
-      downloadURLs:
-      - https://ls.manapotion.io/export.bin
-      - https://x-vps.com/export.bin
-      - https://dbfiles.iota.org/mainnet/hornet/latest-export.bin
-    global:
-      path: snapshot/snapshotMainnet.txt
-      spentAddressesPaths:
-      - previousEpochsSpentAddresses1.txt
-      - previousEpochsSpentAddresses2.txt
-      - previousEpochsSpentAddresses3.txt
-      index: 1050000
-    pruning:
-      enabled: true
-      delay: 10000
-  spentAddresses:
-    enabled: true
-  network:
-    preferIPv6: false
-    gossip:
-      bindAddress: "0.0.0.0:{{ hornet_ports.peering.port }}"
-      reconnectAttemptIntervalSeconds: 60
-    autopeering:
-      bindAddress: "0.0.0.0:{{ hornet_ports.autopeering.port }}"
-      runAsEntryNode: false
-      entryNodes:
-      - "FvfwJuCMoWJvcJLSYww7whPxouZ9WFJ55uyxTxKxJ1ez@enter.hornet.zone:14626"
-      - "EkSLZ4uvSTED1x6KaGzqxoGxjbytt2rPVfbJk1LRLCGL@enter.manapotion.io:18626"
-      - "iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627"
-      - "12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626"
-      - "DboTc1v61Xdyvggj8VRszy92ScUTLgfwZaHvXsU8zr7e@entrynode.tanglebay.org:14626"
-      - "31Tz9meznQMm7qSDUgyMmYVeHUCGA7za5Suvbom5hpE9@bender.iota.autopeering.com:14626"
-      seed: ''
-  tipsel:
-    maxDeltaTxYoungestRootSnapshotIndexToLSMI: 2
-    maxDeltaTxApproveesOldestRootSnapshotIndexToLSMI: 7
-    belowMaxDepth: 15
-    nonLazy:
-      retentionRulesTipsLimit: 100
-      maxReferencedTipAgeSeconds: 3
-      maxApprovers: 2
-    semiLazy:
-      retentionRulesTipsLimit: 20
-      maxReferencedTipAgeSeconds: 3
-      maxApprovers: 2
-  node:
-    alias: ''
-    showAliasInGetNodeInfo: false
-    disablePlugins: "{{ hornet_disable_plugins }}"
-    enablePlugins: "{{ hornet_enable_plugins }}"
-  spammer:
-    address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
-    depth: 1
-    message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
-    tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
-    tagSemiLazy: ''
-    cpuMaxUsage: 0.8
-    tpsRateLimit: 0
-    bundleSize: 1
-    valueSpam: false
-    workers: 0
-    semiLazyTipsLimit: 30
-  zmq:
-    bindAddress: 127.0.0.1:{{ hornet_ports.zmq.port }}
-  profiling:
-    bindAddress: 127.0.0.1:6060
-  prometheus:
-    bindAddress: 127.0.0.1:9312
-    goMetrics: true
-    processMetrics: true
-    promhttpMetrics: true
+
+# useProfile
+hornet_config_useProfile: auto
+
+# httpAPI
+hornet_config_httpAPI_excludeHealthCheckFromAuth: false
+hornet_config_httpAPI_basicAuth_enabled: false
+hornet_config_httpAPI_basicAuth_username: ''
+hornet_config_httpAPI_basicAuth_passwordHash: ''
+hornet_config_httpAPI_basicAuth_passwordSalt: ''
+hornet_config_httpAPI_permitRemoteAccess:
+  - getNodeInfo
+  - getBalances
+  - checkConsistency
+  - getTipInfo
+  - getTransactionsToApprove
+  - getInclusionStates
+  - getNodeAPIConfiguration
+  - wereAddressesSpentFrom
+  - broadcastTransactions
+  - findTransactions
+  - storeTransactions
+  - getTrytes
+  - attachToTangle
+  - interruptAttachingToTangle
+hornet_config_httpAPI_whitelistedAddresses: []
+hornet_config_httpAPI_bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
+hornet_config_httpAPI_limits_bodyLengthBytes: 1000000
+hornet_config_httpAPI_limits_findTransactions: 1000
+hornet_config_httpAPI_limits_getTrytes: 1000
+hornet_config_httpAPI_limits_requestsList: 1000
+
+# dashboard
+hornet_config_dashboard_bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
+hornet_config_dashboard_theme: default
+hornet_config_dashboard_basicAuth_enabled: false
+hornet_config_dashboard_basicAuth_username: ''
+hornet_config_dashboard_basicAuth_passwordHash: ''
+hornet_config_dashboard_basicAuth_passwordSalt: ''
+
+# snapshots
+hornet_config_snapshots_loadType: local
+hornet_config_snapshots_local_intervalSynced: 50
+hornet_config_snapshots_local_intervalUnsynced: 1000
+hornet_config_snapshots_local_path: snapshot/export.bin
+hornet_config_snapshots_local_downloadURLs:
+  - https://ls.manapotion.io/export.bin
+  - https://x-vps.com/export.bin
+  - https://dbfiles.iota.org/mainnet/hornet/latest-export.bin
+hornet_config_snapshots_global_path: snapshot/snapshotMainnet.txt
+hornet_config_snapshots_global_spentAddressesPaths:
+  - previousEpochsSpentAddresses1.txt
+  - previousEpochsSpentAddresses2.txt
+  - previousEpochsSpentAddresses3.txt
+hornet_config_snapshots_global_index: 1050000
+hornet_config_snapshots_pruning_enabled: true
+hornet_config_snapshots_pruning_delay: 10000
+
+# spentAddresses
+hornet_config_spentAddresses_enabled: true
+
+# coordinator
+hornet_config_coordinator_address: "UDYXTZBE9GZGPM9SSQV9LTZNDLJIZMPUVVXYXFYVBLIEUHLSEWFTKZZLXYRHHWVQV9MNNX9KZC9D9UZWZ"
+hornet_config_coordinator_securityLevel: 2
+hornet_config_coordinator_merkleTreeDepth: 24
+hornet_config_coordinator_mwm: 14
+hornet_config_coordinator_stateFilePath: coordinator/state
+hornet_config_coordinator_merkleTreeFilePath: coordinator/tree
+hornet_config_coordinator_milestoneMerkleTreeHashFunc: BLAKE2b-512
+hornet_config_coordinator_intervalSeconds: 10
+hornet_config_coordinator_checkpoints_maxTrackedTails: 10000
+hornet_config_coordinator_tipsel_minHeaviestBranchUnconfirmedTransactionsThreshold: 20
+hornet_config_coordinator_tipsel_maxHeaviestBranchTipsPerCheckpoint: 10
+hornet_config_coordinator_tipsel_randomTipsPerCheckpoint: 3
+hornet_config_coordinator_tipsel_heaviestBranchSelectionDeadlineMilliseconds: 100
+
+# network
+hornet_config_network_preferIPv6: false
+hornet_config_network_gossip_bindAddress: "0.0.0.0:{{ hornet_ports.peering.port }}"
+hornet_config_network_gossip_reconnectAttemptIntervalSeconds: 60
+hornet_config_network_autopeering_bindAddress: "0.0.0.0:{{ hornet_ports.autopeering.port }}"
+hornet_config_network_autopeering_runAsEntryNode: false
+hornet_config_network_autopeering_entryNodes:
+  - "FvfwJuCMoWJvcJLSYww7whPxouZ9WFJ55uyxTxKxJ1ez@enter.hornet.zone:14626"
+  - "EkSLZ4uvSTED1x6KaGzqxoGxjbytt2rPVfbJk1LRLCGL@enter.manapotion.io:18626"
+  - "iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627"
+  - "12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626"
+  - "DboTc1v61Xdyvggj8VRszy92ScUTLgfwZaHvXsU8zr7e@entrynode.tanglebay.org:14626"
+  - "31Tz9meznQMm7qSDUgyMmYVeHUCGA7za5Suvbom5hpE9@bender.iota.autopeering.com:14626"
+hornet_config_network_autopeering_seed: ''
+
+# tipsel
+hornet_config_tipsel_maxDeltaTxYoungestRootSnapshotIndexToLSMI: 8
+hornet_config_tipsel_maxDeltaTxOldestRootSnapshotIndexToLSMI: 13
+hornet_config_tipsel_belowMaxDepth: 15
+hornet_config_tipsel_nonLazy_retentionRulesTipsLimit: 100
+hornet_config_tipsel_nonLazy_maxReferencedTipAgeSeconds: 3
+hornet_config_tipsel_nonLazy_maxApprovers: 2
+hornet_config_tipsel_semiLazy_retentionRulesTipsLimit: 20
+hornet_config_tipsel_semiLazy_maxReferencedTipAgeSeconds: 3
+hornet_config_tipsel_semiLazy_maxApprovers: 2
+
+# node
+hornet_config_node_alias: ''
+hornet_config_node_showAliasInGetNodeInfo: false
+hornet_config_node_disablePlugins: "{{ hornet_disable_plugins }}"
+hornet_config_node_enablePlugins: "{{ hornet_enable_plugins }}"
+
+# spammer
+hornet_config_spammer_address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
+hornet_config_spammer_depth: 1
+hornet_config_spammer_message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
+hornet_config_spammer_tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
+hornet_config_spammer_tagSemiLazy: ''
+hornet_config_spammer_cpuMaxUsage: 0.8
+hornet_config_spammer_tpsRateLimit: 0
+hornet_config_spammer_bundleSize: 1
+hornet_config_spammer_valueSpam: false
+hornet_config_spammer_workers: 0
+hornet_config_spammer_semiLazyTipsLimit: 30
+
+# zmq
+hornet_config_zmq_bindAddress: "127.0.0.1:{{ hornet_ports.zmq.port }}"
+
+# profiling
+hornet_config_profiling_bindAddress: 127.0.0.1:6060
+
+# prometheus
+hornet_config_prometheus_bindAddress: 127.0.0.1:9312
+hornet_config_prometheus_goMetrics: true
+hornet_config_prometheus_processMetrics: true
+hornet_config_prometheus_promhttpMetrics: true
+hornet_config_prometheus_fileServiceDiscovery_enabled: false
+hornet_config_prometheus_fileServiceDiscovery_path: target.json
+hornet_config_prometheus_fileServiceDiscovery_target: "{{ hornet_config_prometheus_bindAddress }}"
 
 #
 # peers.json
