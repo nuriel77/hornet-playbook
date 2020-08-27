@@ -9,6 +9,7 @@
       "passwordSalt": "{{ hornet_config_httpAPI_basicAuth_passwordSalt }}"
     },
     "permitRemoteAccess": {{ hornet_config_httpAPI_permitRemoteAccess | to_nice_json(indent=6) }},
+    "permittedRoutes": {{ hornet_config_httpAPI_permittedRoutes | to_nice_json(indent=6) }},
     "whitelistedAddresses": {{ hornet_config_httpAPI_whitelistedAddresses | to_nice_json(indent=6) }},
     "bindAddress": "{{ hornet_config_httpAPI_bindAddress }}",
     "limits": {
@@ -102,6 +103,12 @@
     "disablePlugins": {{ hornet_config_node_disablePlugins | to_nice_json(indent=6) }},
     "enablePlugins": {{ hornet_config_node_enablePlugins | to_nice_json(indent=6) }}
   },
+  "logger": {
+    "level": "{{ hornet_config_logger_level }}",
+    "disableCaller": {{ hornet_config_logger_disableCaller | bool | lower | string }},
+    "encoding": "{{ hornet_config_logger_encoding }}",
+    "outputPaths": {{ hornet_config_logger_outputPaths | to_nice_json(indent=6) }}
+  },
   "spammer": {
     "address": "{{ hornet_config_spammer_address }}",
     "depth": {{ hornet_config_spammer_depth | int }},
@@ -113,7 +120,7 @@
     "bundleSize": {{ hornet_config_spammer_bundleSize }},
     "valueSpam": {{ hornet_config_spammer_valueSpam | bool | lower | string }},
     "workers": {{ hornet_config_spammer_workers | int }},
-    "semiLazyTipsLimit": {{ hornet_config_spammer_semiLazyTipsLimit | int }}
+    "autostart": {{ hornet_config_spammer_autostart | bool | lower | string }}
   },
   "zmq": {
     "bindAddress": "{{ hornet_config_zmq_bindAddress }}"

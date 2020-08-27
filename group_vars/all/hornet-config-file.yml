@@ -29,6 +29,8 @@ hornet_config_httpAPI_permitRemoteAccess:
   - getTrytes
   - attachToTangle
   - interruptAttachingToTangle
+hornet_config_httpAPI_permittedRoutes:
+  - healthz
 hornet_config_httpAPI_whitelistedAddresses: []
 hornet_config_httpAPI_bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
 hornet_config_httpAPI_limits_bodyLengthBytes: 1000000
@@ -112,6 +114,13 @@ hornet_config_node_showAliasInGetNodeInfo: false
 hornet_config_node_disablePlugins: "{{ hornet_disable_plugins }}"
 hornet_config_node_enablePlugins: "{{ hornet_enable_plugins }}"
 
+# logger
+hornet_config_logger_level: info
+hornet_config_logger_disableCaller: true
+hornet_config_logger_encoding: console
+hornet_config_logger_outputPaths:
+  - stdout
+
 # spammer
 hornet_config_spammer_address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
 hornet_config_spammer_depth: 1
@@ -123,7 +132,7 @@ hornet_config_spammer_tpsRateLimit: 0
 hornet_config_spammer_bundleSize: 1
 hornet_config_spammer_valueSpam: false
 hornet_config_spammer_workers: 0
-hornet_config_spammer_semiLazyTipsLimit: 30
+hornet_config_spammer_autostart: false
 
 # zmq
 hornet_config_zmq_bindAddress: "127.0.0.1:{{ hornet_ports.zmq.port }}"
