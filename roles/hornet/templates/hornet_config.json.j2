@@ -89,12 +89,14 @@
     "nonLazy": {
       "maxApprovers": {{ hornet_config_tipsel_nonLazy_maxApprovers | int }},
       "maxReferencedTipAgeSeconds": {{ hornet_config_tipsel_nonLazy_maxReferencedTipAgeSeconds | int }},
-      "retentionRulesTipsLimit": {{ hornet_config_tipsel_semiLazy_retentionRulesTipsLimit | int }}
+      "retentionRulesTipsLimit": {{ hornet_config_tipsel_semiLazy_retentionRulesTipsLimit | int }},
+      "spammerTipsThreshold": {{ hornet_config_tipsel_nonLazy_spammerTipsThreshold | int }}
     },
     "semiLazy": {
       "maxApprovers": {{ hornet_config_tipsel_semiLazy_maxApprovers | int }},
       "maxReferencedTipAgeSeconds": {{ hornet_config_tipsel_semiLazy_maxReferencedTipAgeSeconds | int }},
-      "retentionRulesTipsLimit": {{ hornet_config_tipsel_semiLazy_retentionRulesTipsLimit | int }}
+      "retentionRulesTipsLimit": {{ hornet_config_tipsel_semiLazy_retentionRulesTipsLimit | int }},
+      "spammerTipsThreshold": {{ hornet_config_tipsel_semiLazy_spammerTipsThreshold | int }}
     }
   },
   "node": {
@@ -116,11 +118,14 @@
     "tag": "{{ hornet_config_spammer_tag }}",
     "tagSemiLazy": "{{ hornet_config_spammer_tagSemiLazy }}",
     "cpuMaxUsage": {{ hornet_config_spammer_cpuMaxUsage | float }},
-    "tpsRateLimit": {{ hornet_config_spammer_tpsRateLimit | int }},
+    "tpsRateLimit": {{ hornet_config_spammer_tpsRateLimit | float }},
     "bundleSize": {{ hornet_config_spammer_bundleSize }},
     "valueSpam": {{ hornet_config_spammer_valueSpam | bool | lower | string }},
     "workers": {{ hornet_config_spammer_workers | int }},
     "autostart": {{ hornet_config_spammer_autostart | bool | lower | string }}
+  },
+  "WarpSync": {
+    "advancementRange": {{ hornet_config_WarpSync_advancementRange | int }}
   },
   "zmq": {
     "bindAddress": "{{ hornet_config_zmq_bindAddress }}"

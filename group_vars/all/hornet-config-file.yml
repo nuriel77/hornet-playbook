@@ -104,9 +104,11 @@ hornet_config_tipsel_belowMaxDepth: 15
 hornet_config_tipsel_nonLazy_retentionRulesTipsLimit: 100
 hornet_config_tipsel_nonLazy_maxReferencedTipAgeSeconds: 3
 hornet_config_tipsel_nonLazy_maxApprovers: 2
+hornet_config_tipsel_nonLazy_spammerTipsThreshold: 0
 hornet_config_tipsel_semiLazy_retentionRulesTipsLimit: 20
 hornet_config_tipsel_semiLazy_maxReferencedTipAgeSeconds: 3
 hornet_config_tipsel_semiLazy_maxApprovers: 2
+hornet_config_tipsel_semiLazy_spammerTipsThreshold: 30
 
 # node
 hornet_config_node_alias: ''
@@ -127,12 +129,15 @@ hornet_config_spammer_depth: 1
 hornet_config_spammer_message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
 hornet_config_spammer_tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
 hornet_config_spammer_tagSemiLazy: ''
-hornet_config_spammer_cpuMaxUsage: 0.8
-hornet_config_spammer_tpsRateLimit: 0
+hornet_config_spammer_cpuMaxUsage: 0.5
+hornet_config_spammer_tpsRateLimit: 0.1
 hornet_config_spammer_bundleSize: 1
 hornet_config_spammer_valueSpam: false
 hornet_config_spammer_workers: 0
 hornet_config_spammer_autostart: false
+
+# warpsync
+hornet_config_WarpSync_advancementRange: 50
 
 # zmq
 hornet_config_zmq_bindAddress: "127.0.0.1:{{ hornet_ports.zmq.port }}"
