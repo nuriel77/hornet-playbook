@@ -151,9 +151,6 @@
           {%- endif -%}
 
     - name: clone hornet repository
-      when:
-        - "server_arch != 'amd64'"
-        - build_image|default(False)|bool
       git:
         repo: '{{ hornet_git_url }}'
         dest: '{{ hornet_git_dest }}'
