@@ -6,13 +6,13 @@
 hornet_config_snapshots_local_intervalSynced: 50
 hornet_config_snapshots_local_downloadURLs:
   - https://ls.manapotion.io/comnet/export.bin
-hornet_config_snapshots_pruning_delay: 1000
+hornet_config_snapshots_pruning_delay: 60480
 
 # network
 hornet_config_network_autopeering_entryNodes:
   - "iotaCrvEWGfaeA1HutcULjD4uZnPhEnD5xNGfGs8vhe@enter.comnet.thetangle.org:14647"
   - "GLZAWBGqvm6ZRT7jGMFAKyUJNPdvx4i5A1GPRZbGS6C9@enter.comnet.hornet.zone:14627"
-  - "J1Hn5r9pS5FkLeYqXWstC2Zyjxj73grEWvjuene3qjM9@entrynode.comnet.tanglebay.org:14636"
+  - "J1Hn5r9pS5FkLeYqXWstC2Zyjxj73grEWvjuene3qjM9@entrynode.comnet.einfachiota.de:14636"
 
 # coordinator
 hornet_config_coordinator_address: "UOMFQOULWQLXQQHFMFRQQTRDKDHVMRFFEGZ9LDU9TFZZ9CHDLZSIAHA9MXNSLYOERCHDUVDFEEZAEOBEW"

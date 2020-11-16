@@ -62,7 +62,7 @@ hornet_config_snapshots_global_spentAddressesPaths:
   - previousEpochsSpentAddresses3.txt
 hornet_config_snapshots_global_index: 1050000
 hornet_config_snapshots_pruning_enabled: true
-hornet_config_snapshots_pruning_delay: 10000
+hornet_config_snapshots_pruning_delay: 60480
 
 # spentAddresses
 hornet_config_spentAddresses_enabled: true
@@ -93,7 +93,7 @@ hornet_config_network_autopeering_entryNodes:
   - "EkSLZ4uvSTED1x6KaGzqxoGxjbytt2rPVfbJk1LRLCGL@enter.manapotion.io:18626"
   - "iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627"
   - "12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626"
-  - "DboTc1v61Xdyvggj8VRszy92ScUTLgfwZaHvXsU8zr7e@entrynode.tanglebay.org:14626"
+  - "DboTc1v61Xdyvggj8VRszy92ScUTLgfwZaHvXsU8zr7e@entrynode.einfachiota.de:14626"
   - "31Tz9meznQMm7qSDUgyMmYVeHUCGA7za5Suvbom5hpE9@bender.iota.autopeering.com:14626"
 hornet_config_network_autopeering_seed: ''
 
