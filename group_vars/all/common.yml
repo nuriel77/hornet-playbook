@@ -2,11 +2,10 @@ configure_firewall: true
 install_system_deps: true
 ssh_port: "22"
 
-# The username to use when accessing iota-pm
-# though the webserver
+# The username to use when accessing dashboards
 fullnode_user: iotaadmin
 
-# The password to use when accessing iota-pm
-# through the webserver
-# PLEASE CHANGE THIS BEFORE INSTALLATION!!!
+# The password to use when accessing dashboards
+# should be overwritten in a variable-overwrite file
+# most likely you'll set this during the automated installation
 fullnode_user_password: 'AllTangle81'
