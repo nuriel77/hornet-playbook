@@ -8,4 +8,4 @@ fullnode_user: iotaadmin
 # The password to use when accessing dashboards
 # should be overwritten in a variable-overwrite file
 # most likely you'll set this during the automated installation
-fullnode_user_password: 'AllTangle81'
+fullnode_user_password: ''
