@@ -5,116 +5,136 @@
 #
 # config.json
 
-# useProfile
-hornet_config_useProfile: auto
+# restAPI
+hornet_config_restAPI_jwtAuth_enabled: false
+hornet_config_restAPI_jwtAuth_salt: 'HORNET'
+hornet_config_restAPI_excludeHealthCheckFromAuth: false
+hornet_config_restAPI_permittedRoutes:
+  - "/health"
+  - "/mqtt"
+  - "/api/v1/info"
+  - "/api/v1/tips"
+  - "/api/v1/messages/:messageID"
+  - "/api/v1/messages/:messageID/metadata"
+  - "/api/v1/messages/:messageID/raw"
+  - "/api/v1/messages/:messageID/children"
+  - "/api/v1/messages"
+  - "/api/v1/transactions/:transactionID/included-message"
+  - "/api/v1/milestones/:milestoneIndex"
+  - "/api/v1/milestones/:milestoneIndex/utxo-changes"
+  - "/api/v1/outputs/:outputID"
+  - "/api/v1/addresses/:address"
+  - "/api/v1/addresses/:address/outputs"
+  - "/api/v1/addresses/ed25519/:address"
+  - "/api/v1/addresses/ed25519/:address/outputs"
+  - "/api/v1/treasury"
 
-# httpAPI
-hornet_config_httpAPI_excludeHealthCheckFromAuth: false
-hornet_config_httpAPI_basicAuth_enabled: false
-hornet_config_httpAPI_basicAuth_username: ''
-hornet_config_httpAPI_basicAuth_passwordHash: ''
-hornet_config_httpAPI_basicAuth_passwordSalt: ''
-hornet_config_httpAPI_permitRemoteAccess:
-  - getNodeInfo
-  - getBalances
-  - checkConsistency
-  - getTipInfo
-  - getTransactionsToApprove
-  - getInclusionStates
-  - getNodeAPIConfiguration
-  - wereAddressesSpentFrom
-  - broadcastTransactions
-  - findTransactions
-  - storeTransactions
-  - getTrytes
-  - attachToTangle
-  - interruptAttachingToTangle
-hornet_config_httpAPI_permittedRoutes:
-  - healthz
-hornet_config_httpAPI_whitelistedAddresses: []
-hornet_config_httpAPI_bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
-hornet_config_httpAPI_limits_bodyLengthBytes: 1000000
-hornet_config_httpAPI_limits_findTransactions: 1000
-hornet_config_httpAPI_limits_getTrytes: 1000
-hornet_config_httpAPI_limits_requestsList: 1000
+hornet_config_restAPI_whitelistedAddresses:
+  - "127.0.0.1"
+  - "::1"
+
+hornet_config_restAPI_bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
+hornet_config_restAPI_powEnabled: true
+hornet_config_restAPI_powWorkerCount: 1
+hornet_config_restAPI_limits_bodyLength: 1M
+hornet_config_restAPI_limits_maxResults: 1000
 
 # dashboard
 hornet_config_dashboard_bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
-hornet_config_dashboard_theme: default
-hornet_config_dashboard_basicAuth_enabled: false
-hornet_config_dashboard_basicAuth_username: ''
-hornet_config_dashboard_basicAuth_passwordHash: ''
-hornet_config_dashboard_basicAuth_passwordSalt: ''
+hornet_config_dashboard_auth_sessionTimeout: 72h
+hornet_config_dashboard_auth_username: admin
+hornet_config_dashboard_auth_passwordHash: '0000000000000000000000000000000000000000000000000000000000000000'
+hornet_config_dashboard_auth_passwordSalt: '0000000000000000000000000000000000000000000000000000000000000000'
+
+# db
+hornet_config_db_engine: rocksdb
+hornet_config_db_path: "{{ hornet_db_path }}"
+hornet_config_db_autoRevalidation: false
 
 # snapshots
-hornet_config_snapshots_loadType: local
-hornet_config_snapshots_local_intervalSynced: 50
-hornet_config_snapshots_local_intervalUnsynced: 1000
-hornet_config_snapshots_local_path: snapshot/export.bin
-hornet_config_snapshots_local_downloadURLs:
-  - https://ls.manapotion.io/export.bin
-  - https://x-vps.com/export.bin
-  - https://dbfiles.iota.org/mainnet/hornet/latest-export.bin
-hornet_config_snapshots_global_path: snapshot/snapshotMainnet.txt
-hornet_config_snapshots_global_spentAddressesPaths:
-  - previousEpochsSpentAddresses1.txt
-  - previousEpochsSpentAddresses2.txt
-  - previousEpochsSpentAddresses3.txt
-hornet_config_snapshots_global_index: 1050000
-hornet_config_snapshots_pruning_enabled: true
-hornet_config_snapshots_pruning_delay: 60480
+hornet_config_snapshots_depth: 50
+hornet_config_snapshots_interval: 200
+hornet_config_snapshots_fullPath: snapshots/mainnet/full_snapshot.bin
+hornet_config_snapshots_deltaPath: snapshots/mainnet/delta_snapshot.bin
+hornet_config_snapshots_deltaSizeThresholdPercentage: 50.0
+hornet_config_snapshots_downloadURLs:
+  - full: https://chrysalis-dbfiles.iota.org/snapshots/hornet/latest-full_snapshot.bin
+    delta: https://chrysalis-dbfiles.iota.org/snapshots/hornet/latest-delta_snapshot.bin
 
-# spentAddresses
-hornet_config_spentAddresses_enabled: true
+# pruning
+hornet_config_pruning_enabled: true
+hornet_config_pruning_delay: 60480
+hornet_config_pruneReceipts: false
 
-# coordinator
-hornet_config_coordinator_address: "UDYXTZBE9GZGPM9SSQV9LTZNDLJIZMPUVVXYXFYVBLIEUHLSEWFTKZZLXYRHHWVQV9MNNX9KZC9D9UZWZ"
-hornet_config_coordinator_securityLevel: 2
-hornet_config_coordinator_merkleTreeDepth: 24
-hornet_config_coordinator_mwm: 14
-hornet_config_coordinator_stateFilePath: coordinator/state
-hornet_config_coordinator_merkleTreeFilePath: coordinator/tree
-hornet_config_coordinator_milestoneMerkleTreeHashFunc: BLAKE2b-512
-hornet_config_coordinator_intervalSeconds: 10
-hornet_config_coordinator_checkpoints_maxTrackedTails: 10000
-hornet_config_coordinator_tipsel_minHeaviestBranchUnconfirmedTransactionsThreshold: 20
-hornet_config_coordinator_tipsel_maxHeaviestBranchTipsPerCheckpoint: 10
-hornet_config_coordinator_tipsel_randomTipsPerCheckpoint: 3
-hornet_config_coordinator_tipsel_heaviestBranchSelectionDeadlineMilliseconds: 100
+# protocol
+hornet_config_protocol_networkID: c2-mainnet
+hornet_config_protocol_bech32HRP: iota
+hornet_config_protocol_minPoWScore: 4000
+hornet_config_protocol_milestonePublicKeyCount: 2
+hornet_config_protocol_publicKeyRanges:
+  - key: "a9b46fe743df783dedd00c954612428b34241f5913cf249d75bed3aafd65e4cd"
+    start: 0
+    end: 777600
+  - key: "365fb85e7568b9b32f7359d6cbafa9814472ad0ecbad32d77beaf5dd9e84c6ba"
+    start: 0
+    end: 1555200
 
-# network
-hornet_config_network_preferIPv6: false
-hornet_config_network_gossip_bindAddress: "0.0.0.0:{{ hornet_ports.peering.port }}"
-hornet_config_network_gossip_reconnectAttemptIntervalSeconds: 60
-hornet_config_network_autopeering_bindAddress: "0.0.0.0:{{ hornet_ports.autopeering.port }}"
-hornet_config_network_autopeering_runAsEntryNode: false
-hornet_config_network_autopeering_entryNodes:
-  - "FvfwJuCMoWJvcJLSYww7whPxouZ9WFJ55uyxTxKxJ1ez@enter.hornet.zone:14626"
-  - "EkSLZ4uvSTED1x6KaGzqxoGxjbytt2rPVfbJk1LRLCGL@enter.manapotion.io:18626"
-  - "iotaMk9Rg8wWo1DDeG7fwV9iJ41hvkwFX8w6MyTQgDu@enter.thetangle.org:14627"
-  - "12w9FrzMdDQ42aBgFrv1siHuJMhuZ4SMVHRFSS7Zb72W@entrynode.iotatoken.nl:14626"
-  - "DboTc1v61Xdyvggj8VRszy92ScUTLgfwZaHvXsU8zr7e@entrynode.einfachiota.de:14626"
-  - "31Tz9meznQMm7qSDUgyMmYVeHUCGA7za5Suvbom5hpE9@bender.iota.autopeering.com:14626"
-hornet_config_network_autopeering_seed: ''
+# pow
+hornet_config_pow_refreshTipsInterval: 5s
+
+# requests
+hornet_config_requests_discardOlderThan: 15s
+hornet_config_requests_pendingReEnqueueInterval: 5s
+
+# receipts
+hornet_config_receipts_backup_enabled: false
+hornet_config_receipts_backup_folder: receipts
+
+# validator
+hornet_config_validator_validate: false
+hornet_config_validator_api_address: http://localhost:14266  # TODO: move to ports config
+hornet_config_validator_api_timeout: 5s
+hornet_config_validator_coordinator_address: UDYXTZBE9GZGPM9SSQV9LTZNDLJIZMPUVVXYXFYVBLIEUHLSEWFTKZZLXYRHHWVQV9MNNX9KZC9D9UZWZ
+hornet_config_validator_coordinator_merkleTreeDepth: 24
+
+# tangle
+hornet_config_tangle_milestoneTimeout: 30s
 
 # tipsel
-hornet_config_tipsel_maxDeltaTxYoungestRootSnapshotIndexToLSMI: 8
-hornet_config_tipsel_maxDeltaTxOldestRootSnapshotIndexToLSMI: 13
+hornet_config_tipsel_maxDeltaMsgYoungestConeRootIndexToCMI: 8
+hornet_config_tipsel_maxDeltaMsgOldestConeRootIndexToCMI: 13
 hornet_config_tipsel_belowMaxDepth: 15
 hornet_config_tipsel_nonLazy_retentionRulesTipsLimit: 100
-hornet_config_tipsel_nonLazy_maxReferencedTipAgeSeconds: 3
-hornet_config_tipsel_nonLazy_maxApprovers: 2
+hornet_config_tipsel_nonLazy_maxReferencedTipAge: 3s
+hornet_config_tipsel_nonLazy_maxChildren: 30
 hornet_config_tipsel_nonLazy_spammerTipsThreshold: 0
 hornet_config_tipsel_semiLazy_retentionRulesTipsLimit: 20
-hornet_config_tipsel_semiLazy_maxReferencedTipAgeSeconds: 3
-hornet_config_tipsel_semiLazy_maxApprovers: 2
+hornet_config_tipsel_semiLazy_maxReferencedTipAge: 3s
+hornet_config_tipsel_semiLazy_maxChildren: 2
 hornet_config_tipsel_semiLazy_spammerTipsThreshold: 30
 
 # node
-hornet_config_node_alias: ''
-hornet_config_node_showAliasInGetNodeInfo: false
+hornet_config_node_alias: 'HORNET Playbook node'
+hornet_config_node_profile: auto
 hornet_config_node_disablePlugins: "{{ hornet_disable_plugins }}"
 hornet_config_node_enablePlugins: "{{ hornet_enable_plugins }}"
+
+# p2p
+hornet_config_p2p_bindMultiAddresses:
+  - "/ip4/0.0.0.0/tcp/15600"
+hornet_config_p2p_connectionManager_highWatermark: 10
+hornet_config_p2p_connectionManager_lowWatermark: 5
+hornet_config_p2p_gossipUnknownPeersLimit: 4
+hornet_config_p2p_identityPrivateKey: ""
+hornet_config_p2p_peerStore:
+  path: "./p2pstore"
+hornet_config_p2p_reconnectInterval: 30s
+
+# p2pdisc
+hornet_config_p2pdisc_advertiseInterval: 30s
+hornet_config_p2pdisc_maxDiscoveredPeerConns: 4
+hornet_config_p2pdisc_rendezvousPoint: between-two-vertices
+hornet_config_p2pdisc_routingTableRefreshPeriod: 60s
 
 # logger
 hornet_config_logger_level: info
@@ -123,36 +143,45 @@ hornet_config_logger_encoding: console
 hornet_config_logger_outputPaths:
   - stdout
 
+# warpsync
+hornet_config_warpsync_advancementRange: 150
+
 # spammer
-hornet_config_spammer_address: HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999
-hornet_config_spammer_depth: 1
-hornet_config_spammer_message: "Spamming with HORNET tipselect, thank you for using HORNET playbook"
-hornet_config_spammer_tag: HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES
-hornet_config_spammer_tagSemiLazy: ''
-hornet_config_spammer_cpuMaxUsage: 0.5
-hornet_config_spammer_tpsRateLimit: 0.1
-hornet_config_spammer_bundleSize: 1
-hornet_config_spammer_valueSpam: false
+hornet_config_spammer_message: "IOTA Hornet Playbook"
+hornet_config_spammer_index: "Hornet Playbook Spammer"
+hornet_config_spammer_indexSemiLazy: "Hornet Playbook Spammer Lazy"
+hornet_config_spammer_cpuMaxUsage: 0.8
+hornet_config_spammer_mpsRateLimit: 5.0
 hornet_config_spammer_workers: 0
 hornet_config_spammer_autostart: false
 
-# warpsync
-hornet_config_WarpSync_advancementRange: 50
-
-# zmq
-hornet_config_zmq_bindAddress: "127.0.0.1:{{ hornet_ports.zmq.port }}"
+# mqtt
+mqtt_internal_port: "11883"
+mqtt_internal_address: 127.0.0.1
+hornet_config_mqtt_bindAddress: "{{ mqtt_internal_address }}:{{ mqtt_internal_port }}"
+hornet_config_mqtt_wsPort: 1888  # TODO: move to ports config
+hornet_config_mqtt_workerCount: 100
 
 # profiling
 hornet_config_profiling_bindAddress: 127.0.0.1:6060
 
 # prometheus
 hornet_config_prometheus_bindAddress: 127.0.0.1:9312
-hornet_config_prometheus_goMetrics: true
-hornet_config_prometheus_processMetrics: true
-hornet_config_prometheus_promhttpMetrics: true
-hornet_config_prometheus_fileServiceDiscovery_enabled: false
-hornet_config_prometheus_fileServiceDiscovery_path: target.json
-hornet_config_prometheus_fileServiceDiscovery_target: "{{ hornet_config_prometheus_bindAddress }}"
+hornet_config_prometheus_fileServiceDiscovery:
+  enabled: false
+  path: target.json
+  target: 127.0.0.1:9312
+hornet_config_prometheus_databaseMetrics: true
+hornet_config_prometheus_nodeMetrics: true
+hornet_config_prometheus_gossipMetrics: true
+hornet_config_prometheus_cachesMetrics: true
+hornet_config_prometheus_restAPIMetrics: true
+hornet_config_prometheus_migrationMetrics: true
+hornet_config_prometheus_coordinatorMetrics: true
+hornet_config_prometheus_debugMetrics: false
+hornet_config_prometheus_goMetrics: false
+hornet_config_prometheus_processMetrics: false
+hornet_config_prometheus_promhttpMetrics: false
 
 #
 # peers.json
@@ -168,20 +197,8 @@ hornet_accept_any_connection: "false"
 hornet_max_peers: 5
 
 #
-# mqtt_config.json
-mqtt_worker_number: 4096
-mqtt_internal_port: "11883"
-mqtt_internal_address: 127.0.0.1
-mqtt_proxy_port: "{{ hornet_ports.mqtt.port }}"
-mqtt_ws_path: /ws
-mqtt_tls_enabled: "false"
-mqtt_ca_file: tls/ca/cacert.pem
-mqtt_cert_file: tls/server/cert.pem
-mqtt_key_file: tls/server/key.pem
-
-#
 # Aliases used in generic roles (e.g. ansible-monitoring)
-node_db_path: "{{ hornet_config.db.path }}"
+node_db_path: "{{ hornet_config_db_path }}"
 node_zmq_port: "{{ hornet_ports.zmq.port }}"
 node_enable_plugins: "{{ hornet_config.node.enablePlugins }}"
 node_api_port: "{{ hornet_ports.api.port }}"
