@@ -189,7 +189,7 @@
     - "{{ hornet_home_path }}"
     - "{{ hornet_db_path }}"
     - "{{ hornet_p2pstore_path }}"
-    - "{{ hornet_home_path }}/snapshot"
+    - "{{ hornet_home_path }}/snapshots"
     - "{{ hornet_home_path }}/coordinator"
 
 # Import visualiser and monitor repos
