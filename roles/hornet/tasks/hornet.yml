@@ -148,7 +148,7 @@
           {%- if hornet_version == 'latest' -%}
             {{ hornet_release_json.content | from_json | json_query('tag_name') }}
           {%- else -%}
-            {{ hornet_version }}
+            {{ hornet_version | replace('v','') }}
           {%- endif -%}
 
     - name: clone hornet repository
