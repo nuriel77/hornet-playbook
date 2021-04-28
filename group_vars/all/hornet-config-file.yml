@@ -159,6 +159,7 @@ hornet_config_spammer_autostart: false
 # mqtt
 mqtt_internal_port: "11883"
 mqtt_internal_address: 127.0.0.1
+mqtt_ws_path: /ws
 hornet_config_mqtt_bindAddress: "{{ mqtt_internal_address }}:{{ mqtt_internal_port }}"
 hornet_config_mqtt_wsPort: 1888  # TODO: move to ports config
 hornet_config_mqtt_workerCount: 100
