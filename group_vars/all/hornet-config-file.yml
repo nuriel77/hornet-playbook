@@ -202,3 +202,4 @@ node_zmq_port: "{{ hornet_ports.zmq.port }}"
 node_enable_plugins: "{{ hornet_config.node.enablePlugins }}"
 node_api_port: "{{ hornet_ports.api.port }}"
 node_api_port_remote: "14267"
+hornet_db_source: ''
