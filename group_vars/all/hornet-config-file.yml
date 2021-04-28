@@ -128,7 +128,7 @@ hornet_config_p2p_connectionManager_lowWatermark: 5
 hornet_config_p2p_gossipUnknownPeersLimit: 4
 hornet_config_p2p_identityPrivateKey: ""
 hornet_config_p2p_peerStore:
-  path: "/app/p2pstore"
+  path: "./p2p/store"
 hornet_config_p2p_reconnectInterval: 30s
 
 # p2pdisc
