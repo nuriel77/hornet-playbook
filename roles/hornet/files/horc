@@ -433,6 +433,12 @@ function upgrade_hornet() {
 ### Get DB ###
 function get_db() {
     local CONFIG_FILE
+
+    # TODO: fix db download
+    pause "Sorry, this feature is still work-in-progress for new Hornet 1.0.0 release"
+    clear
+    return
+
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
     # Playbook's default sources
