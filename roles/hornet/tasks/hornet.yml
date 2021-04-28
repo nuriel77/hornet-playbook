@@ -275,6 +275,7 @@
   notify:
     - restart hornet
   tags:
+    - never
     - download_snapshot_db
 
 # Image
