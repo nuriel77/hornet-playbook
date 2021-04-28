@@ -178,6 +178,8 @@ Point your browser to your host's IP address or fully qualified domain name with
 https://my-node.io:8081
 ```
 
+Note that the first time you connect you'll have to entre the username and password you've configured during the installation. **However** there's one more "dashboard" to login to for which you should just use username: `admin` and password: `admin`.
+
 ## Overwrite Hornet Config
 
 It is possible to edit `/var/lib/hornet/config.json` manually and restart HORNET to apply the changes. Re-running the playbook will not overwrite your changes by default.
