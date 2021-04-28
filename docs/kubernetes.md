@@ -2,7 +2,7 @@
 
 Example:
 
-![k8s_cluster](https://raw.githubusercontent.com/nuriel77/hornet-playbook/master/docs/images/k8s_hornet.png)
+![k8s_cluster](https://raw.githubusercontent.com/nuriel77/hornet-playbook/main/docs/images/k8s_hornet.png)
 
 # Introduction
 

@@ -34,7 +34,7 @@ service:
       nodePort: 31201
 
 # Hornet Secret config name.
-# Create this secret first as suggested here: https://github.com/nuriel77/hornet-playbook/blob/master/docs/kubernetes.md#prepare
+# Create this secret first as suggested here: https://github.com/nuriel77/hornet-playbook/blob/main/docs/kubernetes.md#prepare
 # Use the example JSON from above URL. Make sure the ports match the configuration here.
 hornetConfig: hornet-config
 

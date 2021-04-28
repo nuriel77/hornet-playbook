@@ -323,7 +323,7 @@ EOF
 
 To proceed with the installation, please re-run:
 
-bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/master/fullnode_install.sh)
+bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/main/fullnode_install.sh)
 
 (make sure to run it as user root)
 
@@ -341,7 +341,7 @@ and allow the node installer to proceed with the installation.
 
 
 >>> To reboot run: 'reboot', and when the server is back online:
-bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/master/fullnode_install.sh)
+bash <(curl -s https://raw.githubusercontent.com/nuriel77/hornet-playbook/main/fullnode_install.sh)
 
 !! Remember to run this command as user 'root' !!
 
