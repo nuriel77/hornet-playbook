@@ -79,7 +79,7 @@
   "tipsel": {
     "maxDeltaMsgYoungestConeRootIndexToCMI": {{ hornet_config_tipsel_maxDeltaMsgYoungestConeRootIndexToCMI | int }},
     "maxDeltaMsgOldestConeRootIndexToCMI": {{ hornet_config_tipsel_maxDeltaMsgOldestConeRootIndexToCMI | int }},
-    "belowMaxDepth": {{ hornet_config_tipsel_belowMaxDepth| int }},
+    "belowMaxDepth": {{ hornet_config_tipsel_belowMaxDepth | int }},
     "nonLazy": {
       "retentionRulesTipsLimit": {{ hornet_config_tipsel_nonLazy_retentionRulesTipsLimit | int }},
       "maxReferencedTipAge": "{{ hornet_config_tipsel_nonLazy_maxReferencedTipAge }}",
@@ -111,7 +111,7 @@
     "reconnectInterval": "{{ hornet_config_p2p_reconnectInterval }}"
   },
   "p2pdisc": {
-    "advertiseInterval": "{{ hornet_config_p2pdisc_advertiseInterval }},
+    "advertiseInterval": "{{ hornet_config_p2pdisc_advertiseInterval }}",
     "maxDiscoveredPeerConns": {{ hornet_config_p2pdisc_maxDiscoveredPeerConns | int }},
     "rendezvousPoint": "{{ hornet_config_p2pdisc_rendezvousPoint }}",
     "routingTableRefreshPeriod": "{{ hornet_config_p2pdisc_routingTableRefreshPeriod }}"
