@@ -1608,7 +1608,7 @@ function run_main_menu() {
 }
 
 whiptail --title "Please Upgrade" \
-         --msgbox "Apologies, but the hornet-playbook cannot support the legacy Hornet version any longer. Please completely re-install your node (OS) with the new hornet-playbook which supports the new Hornet release.\n\nhttps://github.com/nuriel77/hornet-playbook#installation" \
+         --msgbox "Apologies, but the hornet-playbook cannot support the legacy Hornet version any longer, and Horc cannot upgrade to the Hornet v1.0 release. Please completely re-install your node (OS) with the new hornet-playbook which supports the new Hornet release.\n\nhttps://github.com/nuriel77/hornet-playbook#installation" \
          13 $WIDTH
 exit 1
 
