@@ -11,7 +11,7 @@ EnvironmentFile=-{{ config_dir }}/hornet
 ExecStartPre=-/bin/bash -c "/usr/bin/docker rm %p || /bin/true"
 ExecStart=/usr/bin/docker run \
   --name %p \
-  -w app \
+  -w /app \
   --net=host \
   --user={{ hornet_uid.stdout }} \
   --cap-drop=ALL \
