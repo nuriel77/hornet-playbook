@@ -141,13 +141,14 @@
         return_content: yes
       register: hornet_release_json
 
+# TODO: if v is omitted from dockerhub tag, don't use this: {%- if hornet_version[0] != 'v' -%}v{%- endif -%}{{ hornet_version }}
     - name: get release tag
       set_fact:
         hornet_tag: >-
           {%- if hornet_version == 'latest' -%}
             {{ hornet_release_json.content | from_json | json_query('tag_name') }}
           {%- else -%}
-            {%- if hornet_version[0] != 'v' -%}v{%- endif -%}{{ hornet_version }}
+            {{ hornet_version }}
           {%- endif -%}
 
     - name: clone hornet repository
