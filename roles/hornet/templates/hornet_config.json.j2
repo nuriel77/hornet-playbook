@@ -62,14 +62,14 @@
       "folder": "{{ hornet_config_receipts_backup_folder }}"
     },
     "validator": {
-      "validate": {{ hornet_config_validator_validate | bool | string | lower }},
+      "validate": {{ hornet_config_receipts_validator_validate | bool | string | lower }},
       "api": {
-        "address": "{{ hornet_config_validator_api_address }}",
-        "timeout": "{{ hornet_config_validator_api_timeout }}"
+        "address": "{{ hornet_config_receipts_validator_api_address }}",
+        "timeout": "{{ hornet_config_receipts_validator_api_timeout }}"
       },
       "coordinator": {
-        "address": "{{ hornet_config_validator_coordinator_address }}",
-        "merkleTreeDepth": {{ hornet_config_validator_coordinator_merkleTreeDepth | int }}
+        "address": "{{ hornet_config_receipts_validator_coordinator_address }}",
+        "merkleTreeDepth": {{ hornet_config_receipts_validator_coordinator_merkleTreeDepth | int }}
       }
     }
   },
