@@ -265,19 +265,19 @@
   with_items:
     - {"src": "templates/peering.json.j2", "dest": "{{ hornet_peers_config }}"}
 
-- name: download hornet snapshot DB (can take a while)
-  get_url:
-    url: "{{ hornet_db_source }}"
-    dest: "{{ hornet_db_tar }}"
-    mode: 0644
-    owner: "{{ hornet_user }}"
-    group: "{{ hornet_group }}"
-    force: "{{ overwrite | default('no') }}"
-  notify:
-    - restart hornet
-  tags:
-    - never
-    - download_snapshot_db
+# TODO: setup once urls are finalized
+#- name: download hornet snapshot DB (can take a while)
+#  get_url:
+#    url: "{{ hornet_db_source }}"
+#    dest: "{{ hornet_db_tar }}"
+#    mode: 0644
+#    owner: "{{ hornet_user }}"
+#    group: "{{ hornet_group }}"
+#    force: "{{ overwrite | default('no') }}"
+#  notify:
+#    - restart hornet
+#  tags:
+#    - download_snapshot_db
 
 # Image
 - name: build hornet image task
