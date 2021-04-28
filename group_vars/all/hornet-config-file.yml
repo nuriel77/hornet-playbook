@@ -92,7 +92,8 @@ hornet_config_receipts_backup_folder: receipts
 
 # validator
 hornet_config_receipts_validator_validate: false
-hornet_config_receipts_validator_api_address: http://localhost:14266  # TODO: move to ports config
+# TODO: move to ports config:
+hornet_config_receipts_validator_api_address: http://localhost:14266
 hornet_config_receipts_validator_api_timeout: 5s
 hornet_config_receipts_validator_coordinator_address: UDYXTZBE9GZGPM9SSQV9LTZNDLJIZMPUVVXYXFYVBLIEUHLSEWFTKZZLXYRHHWVQV9MNNX9KZC9D9UZWZ
 hornet_config_receipts_validator_coordinator_merkleTreeDepth: 24
