@@ -1,5 +1,5 @@
 # Overview
-See [kubernetes](https://github.com/nuriel77/hornet-playbook/blob/master/docs/kubernetes.md)
+See [kubernetes](https://github.com/nuriel77/hornet-playbook/blob/main/docs/kubernetes.md)
 
 # Configure
 

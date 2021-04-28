@@ -21,8 +21,8 @@ VERSION_TEMP=0.6.3
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
-: "${HORNET_BRANCH:=master}"
-: "${HORC_BRANCH:=master}"
+: "${HORNET_BRANCH:=main}"
+: "${HORC_BRANCH:=main}"
 CUR_DIR="$(pwd)"
 
 PID_FILE="/var/run/horc.pid"
