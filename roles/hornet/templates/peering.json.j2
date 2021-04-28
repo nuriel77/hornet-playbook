@@ -1,5 +1,3 @@
 {
-  "acceptAnyConnection": {{ hornet_accept_any_connection | bool | lower | string }},
-  "maxPeers": {{ hornet_max_peers }},
   "peers": {{ hornet_peers | to_nice_json(indent=4) }}
 }

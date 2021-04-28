@@ -3,6 +3,7 @@ _site/
 .*.swp
 group_vars/all/*.local.yml
 group_vars/all/z-*.yml
+group_vars/all/hornet-append.yml
 inventory-multi
 custom_updates/*.completed
 gilt.dev.yml

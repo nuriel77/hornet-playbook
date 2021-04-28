@@ -11,6 +11,7 @@ EnvironmentFile=-{{ config_dir }}/hornet
 ExecStartPre=-/bin/bash -c "/usr/bin/docker rm %p || /bin/true"
 ExecStart=/usr/bin/docker run \
   --name %p \
+  -w /app \
   --net=host \
   --user={{ hornet_uid.stdout }} \
   --cap-drop=ALL \
@@ -18,9 +19,9 @@ ExecStart=/usr/bin/docker run \
   -v {{ hornet_db_path }}:/app/mainnetdb:rw,Z \
   -v {{ hornet_config }}:/app/config.json:ro,Z \
   -v {{ hornet_peers_config }}:/app/peering.json:rw,Z \
-  -v {{ hornet_home_path }}/{{ hornet_mqtt_config_file }}:/app/{{ hornet_mqtt_config_file }}:ro,Z \
+  -v {{ hornet_p2pstore_path }}:/app/p2p:rw,Z \
   -v {{ hornet_home_path }}/{{ hornet_profiles_config_file }}:/app/{{ hornet_profiles_config_file }}:ro,Z \
-  -v {{ hornet_home_path }}/snapshot:/app/snapshot:rw,Z \
+  -v {{ hornet_home_path }}/snapshots:/app/snapshots:rw,Z \
   -v {{ hornet_home_path }}/coordinator:/app/coordinator:rw,Z \
   -v {{ hornet_monitor_path }}/frontend:/app/tanglemonitor/frontend:ro,Z \
   -v {{ tanglevisualiser_path }}/webroot:/app/tanglevisualiser/webroot:ro,Z \

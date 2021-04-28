@@ -141,20 +141,21 @@
         return_content: yes
       register: hornet_release_json
 
+# TODO: if v is omitted from dockerhub tag, don't use this: {%- if hornet_version[0] != 'v' -%}v{%- endif -%}{{ hornet_version }}
     - name: get release tag
       set_fact:
         hornet_tag: >-
           {%- if hornet_version == 'latest' -%}
-            {{ hornet_release_json.content | from_json | json_query('tag_name') }}
+            {{ hornet_release_json.content | from_json | json_query('tag_name') | replace('v','') }}
           {%- else -%}
-            {%- if hornet_version[0] != 'v' -%}v{%- endif -%}{{ hornet_version }}
+            {{ hornet_version | replace('v','') }}
           {%- endif -%}
 
     - name: clone hornet repository
       git:
         repo: '{{ hornet_git_url }}'
         dest: '{{ hornet_git_dest }}'
-        version: '{{ hornet_tag }}'
+        version: 'v{{ hornet_tag }}'
         recursive: no
 
 # User
@@ -187,7 +188,8 @@
   with_items:
     - "{{ hornet_home_path }}"
     - "{{ hornet_db_path }}"
-    - "{{ hornet_home_path }}/snapshot"
+    - "{{ hornet_p2pstore_path }}"
+    - "{{ hornet_home_path }}/snapshots"
     - "{{ hornet_home_path }}/coordinator"
 
 # Import visualiser and monitor repos
@@ -246,7 +248,6 @@
     force: "{{ overwrite | default('no') }}"
     backup: yes
   with_items:
-    - {"src": "templates/{{ hornet_mqtt_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_mqtt_config_file }}"}
     - {"src": "templates/{{ hornet_profiles_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_profiles_config_file }}"}
   tags: hornet_config_files
   notify:
@@ -265,18 +266,19 @@
   with_items:
     - {"src": "templates/peering.json.j2", "dest": "{{ hornet_peers_config }}"}
 
-- name: download hornet snapshot DB (can take a while)
-  get_url:
-    url: "{{ hornet_db_source }}"
-    dest: "{{ hornet_db_tar }}"
-    mode: 0644
-    owner: "{{ hornet_user }}"
-    group: "{{ hornet_group }}"
-    force: "{{ overwrite | default('no') }}"
-  notify:
-    - restart hornet
-  tags:
-    - download_snapshot_db
+# TODO: setup once urls are finalized
+#- name: download hornet snapshot DB (can take a while)
+#  get_url:
+#    url: "{{ hornet_db_source }}"
+#    dest: "{{ hornet_db_tar }}"
+#    mode: 0644
+#    owner: "{{ hornet_user }}"
+#    group: "{{ hornet_group }}"
+#    force: "{{ overwrite | default('no') }}"
+#  notify:
+#    - restart hornet
+#  tags:
+#    - download_snapshot_db
 
 # Image
 - name: build hornet image task

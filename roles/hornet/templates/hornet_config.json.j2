@@ -1,109 +1,120 @@
 {
-  "useProfile": "{{ hornet_config_useProfile }}",
-  "httpAPI": {
-    "excludeHealthCheckFromAuth": {{ hornet_config_httpAPI_excludeHealthCheckFromAuth | bool | lower | string }},
-    "basicAuth": {
-      "enabled": {{ hornet_config_httpAPI_basicAuth_enabled | bool | lower | string }},
-      "username": "{{ hornet_config_httpAPI_basicAuth_username }}",
-      "passwordHash": "{{ hornet_config_httpAPI_basicAuth_passwordHash }}",
-      "passwordSalt": "{{ hornet_config_httpAPI_basicAuth_passwordSalt }}"
+  "restAPI": {
+    "jwtAuth": {
+      "enabled": {{ hornet_config_restAPI_jwtAuth_enabled | bool | string | lower }},
+      "salt": "{{ hornet_config_restAPI_jwtAuth_salt }}"
     },
-    "permitRemoteAccess": {{ hornet_config_httpAPI_permitRemoteAccess | to_nice_json(indent=6) }},
-    "permittedRoutes": {{ hornet_config_httpAPI_permittedRoutes | to_nice_json(indent=6) }},
-    "whitelistedAddresses": {{ hornet_config_httpAPI_whitelistedAddresses | to_nice_json(indent=6) }},
-    "bindAddress": "{{ hornet_config_httpAPI_bindAddress }}",
+    "excludeHealthCheckFromAuth": {{ hornet_config_restAPI_excludeHealthCheckFromAuth | bool | string | lower }},
+    "permittedRoutes": {{ hornet_config_restAPI_permittedRoutes | to_nice_json(indent=4) }},
+    "whitelistedAddresses": {{ hornet_config_restAPI_whitelistedAddresses | to_nice_json(indent=4) }},
+    "bindAddress": "{{ hornet_config_restAPI_bindAddress }}",
+    "powEnabled": {{ hornet_config_restAPI_powEnabled | bool | string | lower }},
+    "powWorkerCount": {{ hornet_config_restAPI_powWorkerCount | int }},
     "limits": {
-      "bodyLengthBytes": {{ hornet_config_httpAPI_limits_bodyLengthBytes | int }},
-      "findTransactions": {{ hornet_config_httpAPI_limits_findTransactions | int }},
-      "getTrytes": {{ hornet_config_httpAPI_limits_getTrytes | int }},
-      "requestsList": {{ hornet_config_httpAPI_limits_requestsList | int }}
+      "bodyLength": "{{ hornet_config_restAPI_limits_bodyLength }}",
+      "maxResults": {{ hornet_config_restAPI_limits_maxResults | int }}
     }
   },
   "dashboard": {
     "bindAddress": "{{ hornet_config_dashboard_bindAddress }}",
-    "theme": "{{ hornet_config_dashboard_theme }}",
-    "basicAuth": {
-      "enabled": {{ hornet_config_dashboard_basicAuth_enabled | bool | lower | string }},
-      "username": "{{ hornet_config_dashboard_basicAuth_username }}",
-      "passwordHash": "{{ hornet_config_dashboard_basicAuth_passwordHash }}",
-      "passwordSalt": "{{ hornet_config_dashboard_basicAuth_passwordSalt }}"
+    "auth": {
+      "sessionTimeout": "{{ hornet_config_dashboard_auth_sessionTimeout }}",
+      "username": "{{ hornet_config_dashboard_auth_username }}",
+      "passwordHash": "{{ hornet_config_dashboard_auth_passwordHash }}",
+      "passwordSalt": "{{ hornet_config_dashboard_auth_passwordSalt }}"
     }
+  },
+  "db": {
+    "engine": "{{ hornet_config_db_engine }}",
+    "path": "{{ hornet_config_db_path }}",
+    "autoRevalidation": {{ hornet_config_db_autoRevalidation | bool | string | lower }}
   },
   "snapshots": {
-    "loadType": "{{ hornet_config_snapshots_loadType }}",
-    "local": {
-      "intervalSynced": {{ hornet_config_snapshots_local_intervalSynced | int }},
-      "intervalUnsynced": {{ hornet_config_snapshots_local_intervalUnsynced | int }},
-      "path": "{{ hornet_config_snapshots_local_path }}",
-      "downloadURLs": {{ hornet_config_snapshots_local_downloadURLs | to_nice_json(indent=8) }}
+    "depth": {{ hornet_config_snapshots_depth | int }},
+    "interval": {{ hornet_config_snapshots_interval | int }},
+    "fullPath": "{{ hornet_config_snapshots_fullPath }}",
+    "deltaPath": "{{ hornet_config_snapshots_deltaPath }}",
+    "deltaSizeThresholdPercentage": {{ hornet_config_snapshots_deltaSizeThresholdPercentage | float }},
+    "downloadURLs": {{ hornet_config_snapshots_downloadURLs | to_nice_json(indent=4) }}
+  },
+  "pruning": {
+    "enabled": {{ hornet_config_pruning_enabled | bool | string | lower }},
+    "delay": {{ hornet_config_pruning_delay | int }},
+    "pruneReceipts": {{ hornet_config_pruneReceipts | bool | string | lower }}
+  },
+  "protocol": {
+    "networkID": "{{ hornet_config_protocol_networkID }}",
+    "bech32HRP": "{{ hornet_config_protocol_bech32HRP }}",
+    "minPoWScore": {{ hornet_config_protocol_minPoWScore | int }},
+    "milestonePublicKeyCount": {{ hornet_config_protocol_milestonePublicKeyCount | int }},
+    "publicKeyRanges": {{ hornet_config_protocol_publicKeyRanges | to_nice_json(indent=4) }}
+  },
+  "pow": {
+    "refreshTipsInterval": "{{ hornet_config_pow_refreshTipsInterval }}"
+  },
+  "requests": {
+    "discardOlderThan": "{{ hornet_config_requests_discardOlderThan }}",
+    "pendingReEnqueueInterval": "{{ hornet_config_requests_pendingReEnqueueInterval }}"
+  },
+  "receipts": {
+    "backup": {
+      "enabled": {{ hornet_config_receipts_backup_enabled | bool | string | lower }},
+      "folder": "{{ hornet_config_receipts_backup_folder }}"
     },
-    "global": {
-      "path": "{{ hornet_config_snapshots_global_path }}",
-      "spentAddressesPaths": {{ hornet_config_snapshots_global_spentAddressesPaths | to_nice_json(indent=8) }},
-      "index": {{ hornet_config_snapshots_global_index | int }}
-    },
-    "pruning": {
-      "enabled": {{ hornet_config_snapshots_pruning_enabled | bool | lower | string }},
-      "delay": {{ hornet_config_snapshots_pruning_delay | int }}
+    "validator": {
+      "validate": {{ hornet_config_receipts_validator_validate | bool | string | lower }},
+      "api": {
+        "address": "{{ hornet_config_receipts_validator_api_address }}",
+        "timeout": "{{ hornet_config_receipts_validator_api_timeout }}"
+      },
+      "coordinator": {
+        "address": "{{ hornet_config_receipts_validator_coordinator_address }}",
+        "merkleTreeDepth": {{ hornet_config_receipts_validator_coordinator_merkleTreeDepth | int }}
+      }
     }
   },
-  "spentAddresses": {
-    "enabled": {{  hornet_config_spentAddresses_enabled| bool | lower | string }}
-  },
-  "coordinator": {
-    "address": "{{ hornet_config_coordinator_address }}",
-    "securityLevel": {{ hornet_config_coordinator_securityLevel | int }},
-    "merkleTreeDepth": {{ hornet_config_coordinator_merkleTreeDepth | int }},
-    "mwm": {{ hornet_config_coordinator_mwm | int }},
-    "stateFilePath": "{{ hornet_config_coordinator_stateFilePath }}",
-    "merkleTreeFilePath": "{{ hornet_config_coordinator_merkleTreeFilePath }}",
-    "milestoneMerkleTreeHashFunc": "{{ hornet_config_coordinator_milestoneMerkleTreeHashFunc }}",
-    "intervalSeconds": {{ hornet_config_coordinator_intervalSeconds | int }},
-    "checkpoints": {
-      "maxTrackedTails": {{ hornet_config_coordinator_checkpoints_maxTrackedTails | int }}
-    },
-    "tipsel": {
-      "minHeaviestBranchUnconfirmedTransactionsThreshold": {{ hornet_config_coordinator_tipsel_minHeaviestBranchUnconfirmedTransactionsThreshold | int }},
-      "maxHeaviestBranchTipsPerCheckpoint": {{ hornet_config_coordinator_tipsel_maxHeaviestBranchTipsPerCheckpoint | int }},
-      "randomTipsPerCheckpoint": {{ hornet_config_coordinator_tipsel_randomTipsPerCheckpoint | int }},
-      "heaviestBranchSelectionDeadlineMilliseconds": {{ hornet_config_coordinator_tipsel_heaviestBranchSelectionDeadlineMilliseconds | int }}
-    }
-  },
-  "network": {
-    "preferIPv6": {{ hornet_config_network_preferIPv6 | bool | lower | string }},
-    "gossip": {
-      "bindAddress": "{{ hornet_config_network_gossip_bindAddress }}",
-      "reconnectAttemptIntervalSeconds": {{ hornet_config_network_gossip_reconnectAttemptIntervalSeconds | int }}
-    },
-    "autopeering": {
-      "bindAddress": "{{ hornet_config_network_autopeering_bindAddress }}",
-      "runAsEntryNode": {{ hornet_config_network_autopeering_runAsEntryNode | bool | lower | string }},
-      "entryNodes": {{ hornet_config_network_autopeering_entryNodes | to_nice_json(indent=8) }},
-      "seed": "{{ hornet_config_network_autopeering_seed }}"
-    }
+  "tangle": {
+    "milestoneTimeout": "{{ hornet_config_tangle_milestoneTimeout }}"
   },
   "tipsel": {
+    "maxDeltaMsgYoungestConeRootIndexToCMI": {{ hornet_config_tipsel_maxDeltaMsgYoungestConeRootIndexToCMI | int }},
+    "maxDeltaMsgOldestConeRootIndexToCMI": {{ hornet_config_tipsel_maxDeltaMsgOldestConeRootIndexToCMI | int }},
     "belowMaxDepth": {{ hornet_config_tipsel_belowMaxDepth | int }},
-    "maxDeltaTxOldestRootSnapshotIndexToLSMI": {{ hornet_config_tipsel_maxDeltaTxOldestRootSnapshotIndexToLSMI | int }},
-    "maxDeltaTxYoungestRootSnapshotIndexToLSMI": {{ hornet_config_tipsel_maxDeltaTxYoungestRootSnapshotIndexToLSMI | int }},
     "nonLazy": {
-      "maxApprovers": {{ hornet_config_tipsel_nonLazy_maxApprovers | int }},
-      "maxReferencedTipAgeSeconds": {{ hornet_config_tipsel_nonLazy_maxReferencedTipAgeSeconds | int }},
-      "retentionRulesTipsLimit": {{ hornet_config_tipsel_semiLazy_retentionRulesTipsLimit | int }},
+      "retentionRulesTipsLimit": {{ hornet_config_tipsel_nonLazy_retentionRulesTipsLimit | int }},
+      "maxReferencedTipAge": "{{ hornet_config_tipsel_nonLazy_maxReferencedTipAge }}",
+      "maxChildren": {{ hornet_config_tipsel_nonLazy_maxChildren | int }},
       "spammerTipsThreshold": {{ hornet_config_tipsel_nonLazy_spammerTipsThreshold | int }}
     },
     "semiLazy": {
-      "maxApprovers": {{ hornet_config_tipsel_semiLazy_maxApprovers | int }},
-      "maxReferencedTipAgeSeconds": {{ hornet_config_tipsel_semiLazy_maxReferencedTipAgeSeconds | int }},
       "retentionRulesTipsLimit": {{ hornet_config_tipsel_semiLazy_retentionRulesTipsLimit | int }},
+      "maxReferencedTipAge": "{{ hornet_config_tipsel_semiLazy_maxReferencedTipAge }}",
+      "maxChildren": {{ hornet_config_tipsel_semiLazy_maxChildren | int }},
       "spammerTipsThreshold": {{ hornet_config_tipsel_semiLazy_spammerTipsThreshold | int }}
     }
   },
   "node": {
     "alias": "{{ hornet_config_node_alias }}",
-    "showAliasInGetNodeInfo": {{ hornet_config_node_showAliasInGetNodeInfo | bool | lower | string }},
-    "disablePlugins": {{ hornet_config_node_disablePlugins | to_nice_json(indent=6) }},
-    "enablePlugins": {{ hornet_config_node_enablePlugins | to_nice_json(indent=6) }}
+    "profile": "{{ hornet_config_node_profile }}",
+    "disablePlugins": {{ hornet_config_node_disablePlugins | to_nice_json(indent=4) }},
+    "enablePlugins": {{ hornet_config_node_enablePlugins | to_nice_json(indent=4) }}
+  },
+  "p2p": {
+    "bindMultiAddresses": {{ hornet_config_p2p_bindMultiAddresses | to_nice_json(indent=4) }},
+    "connectionManager": {
+      "highWatermark": {{ hornet_config_p2p_connectionManager_highWatermark | int }},
+      "lowWatermark": {{ hornet_config_p2p_connectionManager_lowWatermark | int }}
+    },
+    "gossipUnknownPeersLimit": {{ hornet_config_p2p_gossipUnknownPeersLimit | int }},
+    "identityPrivateKey": "{{ hornet_config_p2p_identityPrivateKey }}",
+    "peerStore": {{ hornet_config_p2p_peerStore | to_nice_json(indent=4) }},
+    "reconnectInterval": "{{ hornet_config_p2p_reconnectInterval }}"
+  },
+  "p2pdisc": {
+    "advertiseInterval": "{{ hornet_config_p2pdisc_advertiseInterval }}",
+    "maxDiscoveredPeerConns": {{ hornet_config_p2pdisc_maxDiscoveredPeerConns | int }},
+    "rendezvousPoint": "{{ hornet_config_p2pdisc_rendezvousPoint }}",
+    "routingTableRefreshPeriod": "{{ hornet_config_p2pdisc_routingTableRefreshPeriod }}"
   },
   "logger": {
     "level": "{{ hornet_config_logger_level }}",
@@ -111,37 +122,39 @@
     "encoding": "{{ hornet_config_logger_encoding }}",
     "outputPaths": {{ hornet_config_logger_outputPaths | to_nice_json(indent=6) }}
   },
+  "warpsync": {
+    "advancementRange": {{ hornet_config_warpsync_advancementRange | int }}
+  },
   "spammer": {
-    "address": "{{ hornet_config_spammer_address }}",
-    "depth": {{ hornet_config_spammer_depth | int }},
     "message": "{{ hornet_config_spammer_message }}",
-    "tag": "{{ hornet_config_spammer_tag }}",
-    "tagSemiLazy": "{{ hornet_config_spammer_tagSemiLazy }}",
+    "index": "{{ hornet_config_spammer_index }}",
+    "indexSemiLazy": "{{ hornet_config_spammer_indexSemiLazy }}",
     "cpuMaxUsage": {{ hornet_config_spammer_cpuMaxUsage | float }},
-    "tpsRateLimit": {{ hornet_config_spammer_tpsRateLimit | float }},
-    "bundleSize": {{ hornet_config_spammer_bundleSize }},
-    "valueSpam": {{ hornet_config_spammer_valueSpam | bool | lower | string }},
+    "mpsRateLimit": {{ hornet_config_spammer_mpsRateLimit | float }},
     "workers": {{ hornet_config_spammer_workers | int }},
-    "autostart": {{ hornet_config_spammer_autostart | bool | lower | string }}
+    "autostart": {{ hornet_config_spammer_autostart | bool | string | lower }}
   },
-  "WarpSync": {
-    "advancementRange": {{ hornet_config_WarpSync_advancementRange | int }}
-  },
-  "zmq": {
-    "bindAddress": "{{ hornet_config_zmq_bindAddress }}"
+  "mqtt": {
+    "bindAddress": "{{ hornet_config_mqtt_bindAddress }}",
+    "wsPort": {{ hornet_config_mqtt_wsPort | int }},
+    "workerCount": {{ hornet_config_mqtt_workerCount | int }}
   },
   "profiling": {
     "bindAddress": "{{ hornet_config_profiling_bindAddress }}"
   },
   "prometheus": {
     "bindAddress": "{{ hornet_config_prometheus_bindAddress }}",
-    "goMetrics": {{ hornet_config_prometheus_goMetrics | bool | lower | string }},
-    "processMetrics": {{ hornet_config_prometheus_processMetrics | bool | lower | string }},
-    "promhttpMetrics": {{ hornet_config_prometheus_promhttpMetrics | bool | lower | string }},
-    "fileServiceDiscovery": {
-      "enabled": {{ hornet_config_prometheus_fileServiceDiscovery_enabled | bool | lower | string }},
-      "path": "{{ hornet_config_prometheus_fileServiceDiscovery_path }}",
-      "target": "{{ hornet_config_prometheus_fileServiceDiscovery_target }}"
-    }
+    "fileServiceDiscovery": {{ hornet_config_prometheus_fileServiceDiscovery | to_nice_json(indent=4) }},
+    "databaseMetrics": {{ hornet_config_prometheus_databaseMetrics | bool | string | lower }},
+    "nodeMetrics": {{ hornet_config_prometheus_nodeMetrics | bool | string | lower }},
+    "gossipMetrics": {{ hornet_config_prometheus_gossipMetrics | bool | string | lower }},
+    "cachesMetrics": {{ hornet_config_prometheus_cachesMetrics | bool | string | lower }},
+    "restAPIMetrics": {{ hornet_config_prometheus_restAPIMetrics | bool | string | lower }},
+    "migrationMetrics": {{ hornet_config_prometheus_migrationMetrics | bool | string | lower }},
+    "coordinatorMetrics": {{ hornet_config_prometheus_coordinatorMetrics | bool | string | lower }},
+    "debugMetrics": {{ hornet_config_prometheus_debugMetrics | bool | string | lower }},
+    "goMetrics": {{ hornet_config_prometheus_goMetrics | bool | string | lower }},
+    "processMetrics": {{ hornet_config_prometheus_processMetrics | bool | string | lower }},
+    "promhttpMetrics": {{ hornet_config_prometheus_promhttpMetrics | bool | string | lower }}
   }
 }
