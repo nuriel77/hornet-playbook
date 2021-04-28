@@ -67,7 +67,7 @@ hornet_config_pruning_delay: 60480
 hornet_config_pruneReceipts: false
 
 # protocol
-hornet_config_protocol_networkID: c2-mainnet
+hornet_config_protocol_networkID: chrysalis-mainnet
 hornet_config_protocol_bech32HRP: iota
 hornet_config_protocol_minPoWScore: 4000
 hornet_config_protocol_milestonePublicKeyCount: 2
