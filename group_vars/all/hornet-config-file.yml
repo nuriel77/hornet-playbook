@@ -48,7 +48,7 @@ hornet_config_dashboard_auth_passwordSalt: '000000000000000000000000000000000000
 
 # db
 hornet_config_db_engine: rocksdb
-hornet_config_db_path: "{{ hornet_db_path }}"
+hornet_config_db_path: "/app/mainnetdb"
 hornet_config_db_autoRevalidation: false
 
 # snapshots
