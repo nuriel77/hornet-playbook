@@ -1,124 +1,164 @@
 {
-  "useProfile": "auto",
-  "httpAPI": {
-    "excludeHealthCheckFromAuth": false,
-    "basicAuth": {
+  "restAPI": {
+    "jwtAuth": {
       "enabled": false,
-      "username": "",
-      "passwordHash": "",
-      "passwordSalt": ""
+      "salt": "HORNET"
     },
-    "permitRemoteAccess": [
-      "getNodeInfo",
-      "getBalances",
-      "checkConsistency",
-      "getTransactionsToApprove",
-      "getInclusionStates",
-      "getNodeAPIConfiguration",
-      "wereAddressesSpentFrom",
-      "broadcastTransactions",
-      "findTransactions",
-      "storeTransactions",
-      "getTrytes",
-      "attachToTangle",
-      "interruptAttachingToTangle"
+    "excludeHealthCheckFromAuth": false,
+    "permittedRoutes": [
+      "/health",
+      "/mqtt",
+      "/api/v1/info",
+      "/api/v1/tips",
+      "/api/v1/messages/:messageID",
+      "/api/v1/messages/:messageID/metadata",
+      "/api/v1/messages/:messageID/raw",
+      "/api/v1/messages/:messageID/children",
+      "/api/v1/messages",
+      "/api/v1/transactions/:transactionID/included-message",
+      "/api/v1/milestones/:milestoneIndex",
+      "/api/v1/milestones/:milestoneIndex/utxo-changes",
+      "/api/v1/outputs/:outputID",
+      "/api/v1/addresses/:address",
+      "/api/v1/addresses/:address/outputs",
+      "/api/v1/addresses/ed25519/:address",
+      "/api/v1/addresses/ed25519/:address/outputs",
+      "/api/v1/treasury"
     ],
-    "whitelistedAddresses": ["192.168.0.0/16"],
+    "whitelistedAddresses": [
+      "127.0.0.1",
+      "::1"
+    ],
     "bindAddress": "0.0.0.0:14265",
+    "powEnabled": true,
+    "powWorkerCount": 1,
     "limits": {
-      "bodyLengthBytes": 1000000,
-      "findTransactions": 100000,
-      "getTrytes": 1000,
-      "requestsList": 1000
+      "bodyLength": "1M",
+      "maxResults": 1000
     }
   },
   "dashboard": {
-    "bindAddress": "0.0.0.0:8081",
-    "theme": "default",
-    "dev": false,
-    "basicAuth": {
-      "enabled": false,
-      "username": "",
-      "passwordHash": "",
-      "passwordSalt": ""
+    "bindAddress": "localhost:8081",
+    "auth": {
+      "sessionTimeout": "72h",
+      "username": "admin",
+      "passwordHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "passwordSalt": "0000000000000000000000000000000000000000000000000000000000000000"
     }
   },
   "db": {
-    "path": "db/mainnetdb",
-    "debug": false
+    "engine": "rocksdb",
+    "path": "mainnetdb",
+    "autoRevalidation": false
   },
   "snapshots": {
-    "loadType": "local",
-    "local": {
-      "depth": 50,
-      "intervalSynced": 50,
-      "intervalUnsynced": 1000,
-      "path": "db/snapshot/export.bin",
-      "downloadURL": "https://ls.manapotion.io/export.bin"
+    "depth": 50,
+    "interval": 200,
+    "fullPath": "snapshots/mainnet/full_snapshot.bin",
+    "deltaPath": "snapshots/mainnet/delta_snapshot.bin",
+    "deltaSizeThresholdPercentage": 50.0,
+    "downloadURLs": [
+      {
+        "full": "https://chrysalis-dbfiles.iota.org/snapshots/hornet/latest-full_snapshot.bin",
+        "delta": "https://chrysalis-dbfiles.iota.org/snapshots/hornet/latest-delta_snapshot.bin"
+      }
+    ]
+  },
+  "pruning": {
+    "enabled": true,
+    "delay": 60480,
+    "pruneReceipts": false
+  },
+  "protocol": {
+    "networkID": "chrysalis-mainnet",
+    "bech32HRP": "iota",
+    "minPoWScore": 4000,
+    "milestonePublicKeyCount": 2,
+    "publicKeyRanges": [
+      {
+        "key": "a9b46fe743df783dedd00c954612428b34241f5913cf249d75bed3aafd65e4cd",
+        "start": 0,
+        "end": 777600
+      },
+      {
+        "key": "365fb85e7568b9b32f7359d6cbafa9814472ad0ecbad32d77beaf5dd9e84c6ba",
+        "start": 0,
+        "end": 1555200
+      }
+    ]
+  },
+  "pow": {
+    "refreshTipsInterval": "5s"
+  },
+  "requests": {
+    "discardOlderThan": "15s",
+    "pendingReEnqueueInterval": "5s"
+  },
+  "receipts": {
+    "backup": {
+      "enabled": false,
+      "folder": "receipts"
     },
-    "global": {
-      "path": "db/snapshot/snapshotMainnet.txt",
-      "spentAddressesPaths": [
-        "previousEpochsSpentAddresses1.txt",
-        "previousEpochsSpentAddresses2.txt",
-        "previousEpochsSpentAddresses3.txt"
-      ],
-      "index": 1050000
-    },
-    "pruning": {
-      "enabled": true,
-      "delay": 10000
+    "validator": {
+      "validate": false,
+      "api": {
+        "address": "http://localhost:14266",
+        "timeout": "5s"
+      },
+      "coordinator": {
+        "address": "UDYXTZBE9GZGPM9SSQV9LTZNDLJIZMPUVVXYXFYVBLIEUHLSEWFTKZZLXYRHHWVQV9MNNX9KZC9D9UZWZ",
+        "merkleTreeDepth": 24
+      }
     }
   },
-  "spentAddresses": {
-    "enabled": true
-  },
-  "coordinator": {
-    "address": "EQSAUZXULTTYZCLNJNTXQTQHOMOFZERHTCGTXOLTVAHKSA9OGAZDEKECURBRIXIJWNPFCQIOVFVVXJVD9",
-    "securityLevel": 2,
-    "merkleTreeDepth": 23,
-    "mwm": 14,
-    "stateFilePath": "coordinator/state",
-    "merkleTreeFilePath": "coordinator/tree",
-    "intervalSeconds": 60,
-    "checkpointTransactions": 5
-  },
-  "network": {
-    "preferIPv6": false,
-    "gossip": {
-      "bindAddress": "0.0.0.0:31200",
-      "reconnectAttemptIntervalSeconds": 60
-    },
-    "autopeering": {
-      "bindAddress": "0.0.0.0:31201",
-      "runAsEntryNode": false,
-      "entryNodes": [
-        "LehlDBPJ6kfcfLOK6kAU4nD7B/BdR7SJhai7yFCbCCM=@enter.hornet.zone:14626",
-        "zEiNuQMDfZ6F8QDisa1ndX32ykBTyYCxbtkO0vkaWd0=@enter.manapotion.io:18626",
-        "EsY+zvaselQYA33AVNzrYIGLplboIh4r8oO+vLKQAVM=@entrynode.tanglebay.org:14626"
-      ],
-      "seed": ""
-    }
+  "tangle": {
+    "milestoneTimeout": "30s"
   },
   "tipsel": {
-    "belowMaxDepthTransactionLimit": 20000,
-    "maxDepth": 3
+    "maxDeltaMsgYoungestConeRootIndexToCMI": 8,
+    "maxDeltaMsgOldestConeRootIndexToCMI": 13,
+    "belowMaxDepth": 15,
+    "nonLazy": {
+      "retentionRulesTipsLimit": 100,
+      "maxReferencedTipAge": "3s",
+      "maxChildren": 30,
+      "spammerTipsThreshold": 0
+    },
+    "semiLazy": {
+      "retentionRulesTipsLimit": 20,
+      "maxReferencedTipAge": "3s",
+      "maxChildren": 2,
+      "spammerTipsThreshold": 30
+    }
   },
   "node": {
-    "alias": "",
-    "showAliasInGetNodeInfo": false,
-    "disablePlugins": [
-      "ZMQ",
-      "Spammer",
-      "Monitor",
-      "MQTT",
-      "Graph",
-      "Coordinator"
-    ],
+    "alias": "HORNET node",
+    "profile": "auto",
+    "disablePlugins": [],
     "enablePlugins": [
-      "Autopeering",
-      "Prometheus"
+      "Spammer"
     ]
+  },
+  "p2p": {
+    "bindMultiAddresses": [
+      "/ip4/0.0.0.0/tcp/15600"
+    ],
+    "connectionManager": {
+      "highWatermark": 10,
+      "lowWatermark": 5
+    },
+    "gossipUnknownPeersLimit": 4,
+    "identityPrivateKey": "",
+    "peerStore": {
+      "path": "./p2pstore"
+    },
+    "reconnectInterval": "30s"
+  },
+  "p2pdisc": {
+    "advertiseInterval": "30s",
+    "maxDiscoveredPeerConns": 4,
+    "rendezvousPoint": "between-two-vertices",
+    "routingTableRefreshPeriod": "60s"
   },
   "logger": {
     "level": "info",
@@ -128,52 +168,43 @@
       "stdout"
     ]
   },
+  "warpsync": {
+    "advancementRange": 150
+  },
   "spammer": {
-    "address": "HORNET99INTEGRATED99SPAMMER999999999999999999999999999999999999999999999999999999",
-    "depth": 1,
-    "message": "Spamming with HORNET tipselect, thank you for using HORNET playbook",
-    "tag": "HORNET99INTEGRATED99SPAMMER99PLAYBOOK99RULES",
+    "message": "IOTA - A new dawn",
+    "index": "HORNET Spammer",
+    "indexSemiLazy": "HORNET Spammer Semi-Lazy",
     "cpuMaxUsage": 0.8,
-    "tpsRateLimit": 0.0,
-    "bundleSize": 1,
-    "valueSpam": false,
-    "workers": 0
-  },
-  "graph": {
-    "webRootPath": "tanglevisualiser/webroot",
-    "domain": "",
-    "webSocket": {
-      "uri": ""
-    },
-    "bindAddress": "0.0.0.0:8083",
-    "networkName": "meets HORNET",
-    "explorerTxLink": "http://localhost:8081/explorer/tx/",
-    "explorerBundleLink": "http://localhost:8081/explorer/bundle/"
-  },
-  "monitor": {
-    "tangleMonitorPath": "tanglemonitor/frontend",
-    "domain": "",
-    "initialTransactionsCount": 15000,
-    "remoteApiPort": 32433,
-    "apiBindAddress": "0.0.0.0:4433",
-    "webBindAddress": "0.0.0.0:4434",
-    "websocket": {
-      "uri": ""
-    }
+    "mpsRateLimit": 5.0,
+    "workers": 0,
+    "autostart": false
   },
   "mqtt": {
-    "config": "mqtt_config.json"
-  },
-  "zmq": {
-    "bindAddress": "0.0.0.0:5556"
+    "bindAddress": "localhost:1883",
+    "wsPort": 1888,
+    "workerCount": 100
   },
   "profiling": {
-    "bindAddress": "0.0.0.0:6060"
+    "bindAddress": "localhost:6060"
   },
   "prometheus": {
-    "bindAddress": "0.0.0.0:9311",
-    "goMetrics": true,
-    "processMetrics": true,
-    "promhttpMetrics": true
+    "bindAddress": "localhost:9311",
+    "fileServiceDiscovery": {
+      "enabled": false,
+      "path": "target.json",
+      "target": "localhost:9311"
+    },
+    "databaseMetrics": true,
+    "nodeMetrics": true,
+    "gossipMetrics": true,
+    "cachesMetrics": true,
+    "restAPIMetrics": true,
+    "migrationMetrics": true,
+    "coordinatorMetrics": true,
+    "debugMetrics": false,
+    "goMetrics": false,
+    "processMetrics": false,
+    "promhttpMetrics": false
   }
 }

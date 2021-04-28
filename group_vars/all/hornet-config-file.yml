@@ -1,5 +1,5 @@
 # These are the default variables that configure:
-# peering.json, config.json and mqtt_config.json
+# peering.json and config.json
 # To override, copy the file to z-append.yml and edit as required.
 
 #
@@ -184,7 +184,7 @@ hornet_config_prometheus_processMetrics: false
 hornet_config_prometheus_promhttpMetrics: false
 
 #
-# peers.json
+# peering.json
 # Example:
 #  - identity: example1.neighbor.com:15600
 #    preferIPv6: false
@@ -193,10 +193,7 @@ hornet_config_prometheus_promhttpMetrics: false
 #    alias: second_node
 #    preferIPv6: false
 hornet_peers: []
-hornet_accept_any_connection: "false"
-hornet_max_peers: 5
 
-#
 # Aliases used in generic roles (e.g. ansible-monitoring)
 node_db_path: "{{ hornet_config_db_path }}"
 node_zmq_port: "{{ hornet_ports.zmq.port }}"

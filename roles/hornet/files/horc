@@ -17,12 +17,12 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=0.6.3
+VERSION_TEMP=1.0.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
-: "${HORNET_BRANCH:=master}"
-: "${HORC_BRANCH:=master}"
+: "${HORNET_BRANCH:=main}"
+: "${HORC_BRANCH:=main}"
 CUR_DIR="$(pwd)"
 
 PID_FILE="/var/run/horc.pid"
@@ -1234,8 +1234,7 @@ function configure_files_menu() {
     "a)" "Hornet System Config" \
     "b)" "Hornet Main Config" \
     "c)" "Hornet Neighbors Config" \
-    "d)" "Hornet MQTT Config" \
-    "e)" "HAProxy Config" \
+    "d)" "HAProxy Config" \
     "Z)" "Choose Editor" \
     3>&1 1>&2 2>&3
 }
@@ -1267,11 +1266,6 @@ function configure_files() {
             ;;
 
         "d)")
-            edit_config "/var/lib/hornet/mqtt_config.json" "hornet"
-            configure_files
-            ;;
-
-        "e)")
             edit_config "/etc/haproxy/haproxy.cfg" "haproxy" "reload"
             configure_files
             ;;

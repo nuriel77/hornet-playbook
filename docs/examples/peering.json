@@ -1,5 +1,3 @@
 {
-  "acceptAnyConnection": false,
-  "maxPeers": 5,
   "peers": []
 }

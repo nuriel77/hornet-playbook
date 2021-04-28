@@ -246,7 +246,6 @@
     force: "{{ overwrite | default('no') }}"
     backup: yes
   with_items:
-    - {"src": "templates/{{ hornet_mqtt_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_mqtt_config_file }}"}
     - {"src": "templates/{{ hornet_profiles_config_file }}.j2", "dest": "{{ hornet_home_path }}/{{ hornet_profiles_config_file }}"}
   tags: hornet_config_files
   notify:

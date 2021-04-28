@@ -2,83 +2,66 @@
   "custom": {
     "caches": {
       "addresses": {
-        "cacheTimeMs": 100,
+        "cacheTime": "100ms",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": false,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "approvers": {
-        "cacheTimeMs": 1500,
+      "children": {
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": false,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "tags": {
-        "cacheTimeMs": 100,
+      "indexations": {
+        "cacheTime": "100ms",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": false,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
-        }
-      },
-      "bundles": {
-        "cacheTimeMs": 1500,
-        "leakDetection": {
-          "enabled": false,
-          "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
-        }
-      },
-      "bundletransactions": {
-        "cacheTimeMs": 500,
-        "leakDetection": {
-          "enabled": false,
-          "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
       "milestones": {
-        "cacheTimeMs": 500,
+        "cacheTime": "500ms",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": false,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "transactions": {
-        "cacheTimeMs": 1500,
+      "messages": {
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": false,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "unconfirmedTx": {
-        "cacheTimeMs": 100,
+      "unreferencedMessages": {
+        "cacheTime": "100ms",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": false,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "incomingTransactionFilter": {
-        "cacheTimeMs": 2000,
+      "incomingMessagesFilter": {
+        "cacheTime": "2s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": false,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
-        }
-      },
-      "refsInvalidBundle": {
-        "cacheTimeMs": 180000,
-        "leakDetection": {
-          "enabled": false,
-          "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       }
     }
@@ -86,83 +69,66 @@
   "debug": {
     "caches": {
       "addresses": {
-        "cacheTimeMs": 1500,
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": true,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "approvers": {
-        "cacheTimeMs": 1500,
+      "children": {
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": true,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "tags": {
-        "cacheTimeMs": 1500,
+      "indexations": {
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": true,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
-        }
-      },
-      "bundles": {
-        "cacheTimeMs": 1500,
-        "leakDetection": {
-          "enabled": true,
-          "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
-        }
-      },
-      "bundletransactions": {
-        "cacheTimeMs": 500,
-        "leakDetection": {
-          "enabled": true,
-          "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
       "milestones": {
-        "cacheTimeMs": 1500,
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": true,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "transactions": {
-        "cacheTimeMs": 1500,
+      "messages": {
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": true,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "unconfirmedTx": {
-        "cacheTimeMs": 1500,
+      "unreferencedMessages": {
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": true,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       },
-      "incomingTransactionFilter": {
-        "cacheTimeMs": 1500,
+      "incomingMessagesFilter": {
+        "cacheTime": "1.5s",
+        "releaseExecutorWorkerCount": 10,
         "leakDetection": {
           "enabled": true,
           "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
-        }
-      },
-      "refsInvalidBundle": {
-        "cacheTimeMs": 180000,
-        "leakDetection": {
-          "enabled": true,
-          "maxConsumersPerObject": 50,
-          "maxConsumerHoldTimeSec": 30
+          "maxConsumerHoldTime": "30s"
         }
       }
     }
