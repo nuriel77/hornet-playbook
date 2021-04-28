@@ -155,7 +155,7 @@
       git:
         repo: '{{ hornet_git_url }}'
         dest: '{{ hornet_git_dest }}'
-        version: '{{ hornet_tag }}'
+        version: 'v{{ hornet_tag }}'
         recursive: no
 
 # User
