@@ -43,6 +43,8 @@ hornet_config_restAPI_limits_maxResults: 1000
 hornet_config_dashboard_bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
 hornet_config_dashboard_auth_sessionTimeout: 72h
 hornet_config_dashboard_auth_username: admin
+
+# Password is 'admin' but will be overwritten but what user configures during the installation.
 hornet_config_dashboard_auth_passwordHash: 'cf1c814adb24e76ca283b0333c54c15d4cb879b49ca37ddc1ae5ef6918843ca2'
 hornet_config_dashboard_auth_passwordSalt: '813704633fba4dec0f45ab6f0213bb1b7ff8fadf20ccdc2cec02a20777291276'
 

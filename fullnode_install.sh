@@ -184,10 +184,10 @@ function init_centos_7(){
       python-pip\
       python3-pip
     if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath
+        /usr/bin/pip install jmespath scrypt
     fi
     if [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath
+        /usr/bin/pip3 install jmespath scrypt
     fi
 }
 
@@ -217,7 +217,7 @@ function init_centos_8(){
       python3-pip\
       cracklib\
       redhat-lsb-core
-    pip3 --disable-pip-version-check install ansible jmespath
+    pip3 --disable-pip-version-check install ansible jmespath scrypt
     echo "$PATH" | grep -q '/usr/local/bin' || export PATH=$PATH:/usr/local/bin
     grep PATH /root/.bashrc | grep -q '/usr/local/bin' || echo 'export PATH=$PATH:/usr/local/bin' >> /root/.bashrc
 }
@@ -256,10 +256,10 @@ function init_ubuntu(){
     [[ ! "$VER" =~ ^20 ]] && apt-get install python-pip -y
 
     if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath
+        /usr/bin/pip install jmespath scrypt
     fi
     if [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath
+        /usr/bin/pip3 install jmespath scrypt
     fi
 }
 
@@ -298,10 +298,10 @@ function init_debian(){
                     python-pip \
                     python-backports.functools-lru-cache -y
     if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath
+        /usr/bin/pip install jmespath scrypt
     fi
     if [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath
+        /usr/bin/pip3 install jmespath scrypt
     fi
 }
 
@@ -418,7 +418,16 @@ Only ASCII characters are allowed:
     # Ensure we escape single quotes (using single quotes) because we need to
     # encapsulate the password with single quotes for the Ansible variable file
     PASSWORD_A=$(echo "${PASSWORD_A}" | sed "s/'/''/g")
+
+    # Generate salt+hashed password for hornet dashboard
+    SALT_PASS=$(_PASSWORD="$PASSWORD_A" /usr/bin/python3 -c "import scrypt, os; salt = os.urandom(32); password = os.environ.get('_PASSWORD'); scrypt_key = scrypt.hash(password, salt, N=1<<15, r=8, p=1, buflen=32); print(f'{salt.hex()}:{scrypt_key.hex()}');")
+    SALT=$(cut -d: -f1 <<<"$SALT_PASS")
+    HASHED_PASSWORD=$(cut -d: -f2 <<<"$SALT_PASS")
+
     echo "fullnode_user_password: '${PASSWORD_A}'" >> "$INSTALLER_OVERRIDE_FILE"
+    echo "hornet_config_dashboard_auth_passwordSalt: $SALT" >> "$INSTALLER_OVERRIDE_FILE"
+    echo "hornet_config_dashboard_auth_passwordHash: $HASHED_PASSWORD" >> "$INSTALLER_OVERRIDE_FILE"
+
     chmod 600 "$INSTALLER_OVERRIDE_FILE"
 }
 
@@ -447,6 +456,7 @@ Only ASCII characters are allowed:
     esac
 
     echo "fullnode_user: '${ADMIN_USER}'" >> "$INSTALLER_OVERRIDE_FILE"
+    echo "hornet_config_dashboard_auth_username: '{{ fullnode_user }}'" >> "$INSTALLER_OVERRIDE_FILE"
 
 }
 
