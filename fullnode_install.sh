@@ -419,10 +419,15 @@ Only ASCII characters are allowed:
     # encapsulate the password with single quotes for the Ansible variable file
     PASSWORD_A=$(echo "${PASSWORD_A}" | sed "s/'/''/g")
 
-    SALT_PASS=$(_PASSWORD="$PASSWORD_A" /usr/bin/python3 -c "import scrypt, os; salt = os.urandom(32); password = os.environ.get('_PASSWORD'); scrypt_key = scrypt.hash(password, salt, N=1<<15, r=8, p=1, buflen=32); print(f\"{salt.hex()}:{scrypt_key.hex()}\");"
-    echo "$SALT_PASS"
-    exit
+    # Generate salt+hashed password for hornet dashboard
+    SALT_PASS=$(_PASSWORD="$PASSWORD_A" /usr/bin/python3 -c "import scrypt, os; salt = os.urandom(32); password = os.environ.get('_PASSWORD'); scrypt_key = scrypt.hash(password, salt, N=1<<15, r=8, p=1, buflen=32); print(f'{salt.hex()}:{scrypt_key.hex()}');")
+    SALT=$(cut -d: -f1 <<<"$SALT_PASS")
+    HASHED_PASSWORD=$(cut -d: -f2 <<<"$SALT_PASS")
+
     echo "fullnode_user_password: '${PASSWORD_A}'" >> "$INSTALLER_OVERRIDE_FILE"
+    echo "hornet_config_dashboard_auth_passwordSalt: $SALT" >> "$INSTALLER_OVERRIDE_FILE"
+    echo "hornet_config_dashboard_auth_passwordHash: $HASHED_PASSWORD" >> "$INSTALLER_OVERRIDE_FILE"
+
     chmod 600 "$INSTALLER_OVERRIDE_FILE"
 }
 
