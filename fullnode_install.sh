@@ -456,6 +456,7 @@ Only ASCII characters are allowed:
     esac
 
     echo "fullnode_user: '${ADMIN_USER}'" >> "$INSTALLER_OVERRIDE_FILE"
+    echo "hornet_config_dashboard_auth_username: '{{ fullnode_user }}'" >> "$INSTALLER_OVERRIDE_FILE"
 
 }
 
