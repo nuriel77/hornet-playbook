@@ -2,8 +2,15 @@ upstream hornet_dashboard {
     server {{ hornet_dashboard_internal_address }}:{{ hornet_dashboard_internal_port }};
 }
 
-# Rate limit requestsi
+upstream hornet_api {
+    server {{ hornet_config_restAPI_bindAddress }};
+}
+
+# Rate limit requests
 limit_req_zone $binary_remote_addr zone=hornet_dashboard:{{ nginx_shared_mem_rate_limit | default('2m') }} rate={{ nginx_req_per_sec | default('5') }}r/s;
+
+# Ralte limit API
+limit_req_zone $binary_remote_addr zone=hornet_api:{{ nginx_shared_mem_rate_limit_api | default('2m') }} rate={{ nginx_req_per_sec_api | default('50') }}r/s;
 
 server {
     limit_req zone=hornet_dashboard burst={{ vhost_nginx_burst_limit | default('20') }};
@@ -27,6 +34,10 @@ server {
     location /ws {
         proxy_pass http://hornet_dashboard/ws;
         proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_read_timeout 86400;
@@ -34,5 +45,22 @@ server {
 
     location / {
         proxy_pass http://hornet_dashboard;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+        proxy_pass_request_headers on;
+        proxy_set_header Connection "keep-alive";
+        proxy_store off;
+    }
+
+    location /health {
+        auth_basic off;
+        proxy_pass http://hornet_api/health;
+    }
+
+    location /api {
+        auth_basic off;
+        proxy_pass http://hornet_api;
     }
 }
