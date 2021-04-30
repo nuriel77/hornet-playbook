@@ -22,7 +22,7 @@ upstream alertmanager {
 limit_req_zone $binary_remote_addr zone=hornet_dashboard:{{ nginx_shared_mem_rate_limit | default('2m') }} rate={{ nginx_req_per_sec | default('25') }}r/s;
 
 # Rate limit API
-limit_req_zone $binary_remote_addr zone=hornet_api:{{ nginx_shared_mem_rate_limit_api | default('2m') }} rate={{ nginx_req_per_sec_api | default('75') }}r/s;
+limit_req_zone $binary_remote_addr zone=hornet_api:{{ nginx_shared_mem_rate_limit_api | default('2m') }} rate={{ nginx_req_per_sec_api | default('500') }}r/s;
 
 server {
     listen {{ hornet_dashboard_proxy_port }} default_server ssl http2;
@@ -76,7 +76,7 @@ server {
 
     # hornet api
     location /api {
-        limit_req zone=hornet_api burst={{ vhost_nginx_burst_limit | default('500') }};
+        limit_req zone=hornet_api burst={{ vhost_nginx_burst_limit | default('750') }};
         auth_basic off;
         proxy_pass http://hornet_api;
     }
