@@ -183,8 +183,8 @@ hornet_config_prometheus_restAPIMetrics: true
 hornet_config_prometheus_migrationMetrics: true
 hornet_config_prometheus_coordinatorMetrics: true
 hornet_config_prometheus_debugMetrics: false
-hornet_config_prometheus_goMetrics: false
-hornet_config_prometheus_processMetrics: false
+hornet_config_prometheus_goMetrics: true
+hornet_config_prometheus_processMetrics: true
 hornet_config_prometheus_promhttpMetrics: false
 
 #
