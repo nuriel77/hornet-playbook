@@ -40,7 +40,7 @@ hornet_config_restAPI_limits_bodyLength: 1M
 hornet_config_restAPI_limits_maxResults: 1000
 
 # dashboard
-hornet_config_dashboard_bindAddress: "{{ hornet_graph_internal_address }}:{{ hornet_dashboard_internal_port }}"
+hornet_config_dashboard_bindAddress: "127.0.0.1::{{ hornet_dashboard_internal_port }}"
 hornet_config_dashboard_auth_sessionTimeout: 72h
 hornet_config_dashboard_auth_username: admin
 
