@@ -1112,19 +1112,6 @@ function update_config() {
     pause "${MSG}Press ENTER to return to menu."
 }
 
-### IRITop ###
-function view_iritop() {
-    which iritop >/dev/null 2>&1
-    if [[ $? -ne 0 ]]; then
-         whiptail --title "Missing iritop" \
-         --msgbox "Error: cannot find 'iritop' utility!" \
-         8 $WIDTH
-         return 1
-    fi
-
-    iritop
-}
-
 ### Notice ###
 function how_to_setup() {
     whiptail --title "HORC v${VERSION} - Instructions" \
@@ -1390,9 +1377,8 @@ function main_menu() {
     "k)" "Show LatestMilestoneIndex" \
     "l)" "Get new snapshot DB" \
     "m)" "Neighbors" \
-    "n)" "View IRITOP" \
-    "o)" "Toggle ComNet" \
-    "p)" "Update config.json" \
+    "n)" "Toggle ComNet" \
+    "o)" "Update config.json" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1477,16 +1463,11 @@ function run_main_menu() {
             ;;
 
         "n)")
-            view_iritop
-            run_main_menu
-            ;;
-
-        "o)")
             toggle_comnet
             run_main_menu
             ;;
 
-        "p)")
+        "o)")
             update_config
             run_main_menu
             ;;
