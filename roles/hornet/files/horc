@@ -798,6 +798,10 @@ function list_neighbors() {
 
 ### Node info ###
 function show_lmsi() {
+    pause "Sorry, this is still work-in-progress. Press ENTER to return to menu."
+    clear
+    return
+
     if [ ! -f "$HOME/.nbctl" ]; then
         whiptail --title "Missing .nbctl" \
                  --msgbox "Error: cannot find $HOME/.nbctl" \
@@ -827,6 +831,10 @@ function show_lmsi() {
 }
 
 function get_node_info() {
+    pause "Sorry, this is still work-in-progress. Press ENTER to return to menu."
+    clear
+    return
+
     if [ ! -f $HOME/.nbctl ]; then
         whiptail --title "Missing .nbctl" \
                  --msgbox "Error: cannot find $HOME/.nbctl" \
@@ -1181,7 +1189,7 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZMQ,MQTT,Autopeering,Prometheus,Coordinator"
+    export DISABLE_PLUGINS="Spammer,ZMQ,MQTT,Prometheus,Coordinator"
     declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
@@ -1209,7 +1217,6 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 17 60 "${#DI
         Spammer           "...         Spammer" "${PLUGINS_STATE[Spammer]}" \
         ZMQ               "...         ZeroMQ" "${PLUGINS_STATE[ZMQ]}" \
         MQTT              "...         MQTT" "${PLUGINS_STATE[MQTT]}" \
-        Autopeering       "...         Hornet Autopeering" "${PLUGINS_STATE[Autopeering]}" \
         Prometheus        "...         Prometheus Metrics" "${PLUGINS_STATE[Prometheus]}" \
         Coordinator       "...  (*dev) Comnet Coordinator" "${PLUGINS_STATE[Coordinator]}" \
         3>&1 1>&2 2>&3)
@@ -1265,6 +1272,10 @@ print(yaml.dump(obj))
 
 ### Toggle Comnet ###
 function toggle_comnet(){
+    pause "Sorry, this is still work-in-progress. Press ENTER to return to menu."
+    clear
+    return
+
     local TO="comnet"
     local FROM="mainnet"
     local MSG
@@ -1320,6 +1331,10 @@ function neighbors_menu(){
 }
 
 function neighbors(){
+    pause "Sorry, this is still work-in-progress. Press ENTER to return to menu."
+    clear
+    return
+
     local CHOICE
     CHOICE=$(neighbors_menu)
     RC=$?
