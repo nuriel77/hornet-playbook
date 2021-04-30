@@ -2,9 +2,9 @@
   version: main
   dst: roles/docker/
 
-- git: https://github.com/nuriel77/ansible-haproxy-iota.git
-  version: main
-  dst: roles/haproxy/
+#- git: https://github.com/nuriel77/ansible-haproxy-iota.git
+#  version: main
+#  dst: roles/haproxy/
 
 - git: https://github.com/nuriel77/ansible-nginx.git
   # TODO: REPLACE WITH main:
