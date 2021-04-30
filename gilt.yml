@@ -12,5 +12,6 @@
   dst: roles/nginx/
 
 - git: https://github.com/nuriel77/ansible-monitoring.git
-  version: main
+  # TODO: REPLACE WITH main:
+  version: grafana/subpath
   dst: roles/monitoring/
