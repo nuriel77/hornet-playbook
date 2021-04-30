@@ -96,7 +96,7 @@ server {
     }
 
     # prometheus
-    location /prometheus {
+    location /prometheus/ {
         proxy_pass http://prometheus;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Server $host;
@@ -108,7 +108,7 @@ server {
     }
 
     # alertmanager
-    location /alertmanager {
+    location /alertmanager/ {
         proxy_pass http://alertmanager;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Server $host;
