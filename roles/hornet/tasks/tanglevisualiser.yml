@@ -1,5 +1,0 @@
-- name: clone tangle visualiser repository
-  git:
-    repo: '{{ tanglevisualiser_git_url }}'
-    dest: '{{ tanglevisualiser_path }}'
-    version: '{{ tanglevisualiser_version | default(omit) }}'

@@ -2,14 +2,16 @@
   version: main
   dst: roles/docker/
 
-- git: https://github.com/nuriel77/ansible-haproxy-iota.git
-  version: main
-  dst: roles/haproxy/
+#- git: https://github.com/nuriel77/ansible-haproxy-iota.git
+#  version: main
+#  dst: roles/haproxy/
 
 - git: https://github.com/nuriel77/ansible-nginx.git
-  version: main
+  # TODO: REPLACE WITH main:
+  version: add/certbot
   dst: roles/nginx/
 
 - git: https://github.com/nuriel77/ansible-monitoring.git
-  version: main
+  # TODO: REPLACE WITH main:
+  version: grafana/subpath
   dst: roles/monitoring/

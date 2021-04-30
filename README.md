@@ -102,7 +102,6 @@ gohornet/hornet      v0.2.1              c97cba628d38        2 hours ago        
 golang              1.13                a1072a078890        8 days ago          803MB
 certbot/certbot     latest              3b7ec24cacc3        11 days ago         148MB
 nginx               latest              231d40e811cd        3 weeks ago         126MB
-haproxy             2.0.8               142dd6fe8afb        7 weeks ago         91.2MB
 alpine              latest              965ea09ff2eb        7 weeks ago         5.55MB
 ```
 
@@ -110,9 +109,9 @@ Note that an image consists of a "REPOSITORY" name and a "TAG".
 
 Images with `<node>` are "dangling" images that have been used for building a docker image (you can use `horc` to cleanup unused images).
 
-Delete a certain image using the image's ID. Images can also be referenced by the image's repository:tag as syntax, e.g. `haproxy:2.0.8`:
+Delete a certain image using the image's ID. Images can also be referenced by the image's repository:tag as syntax, e.g. `nginx:latest`:
 ```sh
-docker rmi b7b60a909a8f
+docker rmi 231d40e811cd
 ```
 
 ## View Docker Containers
@@ -173,12 +172,13 @@ horc
 
 ## Hornet Dashboard
 
-Point your browser to your host's IP address or fully qualified domain name with port 8081, e.g.:
+Point your browser to your host's IP address or fully qualified domain name, e.g.:
 ```sh
-https://my-node.io:8081
+https://my-node.io
 ```
+Note that if you haven't configured the HTTPS certificate via `horc` you will get a warning about a self-signed certificate being used.
 
-Note that the first time you connect you'll have to entre the username and password you've configured during the installation. **However** there's one more "dashboard" to login to for which you should just use username: `admin` and password: `admin`.
+The first time you connect you'll have to entre the username and password you've configured during the installation. **However** there's one more "dashboard" to login to for which you should just use username: `admin` and password: `admin`.
 
 ## Overwrite Hornet Config
 
@@ -215,20 +215,16 @@ Enabling a certificate will allow you to connect to your node with IOTA's offici
 
 ## Ports
 
-Here's a list of ports configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy, or `HAproxy` for the API port. The internal ports are not accessible externally.
+Below is a list of ports and URL paths configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy. The internal ports are not accessible externally.
 
-NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL | DESCRIPTION
--------------------|---------------|---------------|----------|--------------------------------
-Hornet API         | 14265         | 14267         | TCP      | Used for wallet/API calls
-Hornet autopeering | 14626         | 14626         | UDP      | Autopeering
-Hornet peering     | 15600         | 15600         | TCP      | Main peering port
-Dashboard          | 8087          | 8081          | TCP      | Main dashboard
-Monitor            | 14434         | 4434          | TCP      | Tangle monitor (via plugin)
-Monitor API        | 14433         | 4433          | TCP      | Tangle monitor API (via plugin)
-Visualiser         | 18083         | 8083          | TCP      | Tangle visualiser
-Grafana            | 3000          | 5555          | TCP      | Grafana monitoring
-Prometheus         | 9090          | 8999          | TCP      | Prometheus metrics
-Alertmanager       | 9093          | 9993          | TCP      | Alertmanager for prometheus
+NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL | URL PATH       | DESCRIPTION
+-------------------|---------------|---------------|----------|---------------------------------------------
+Dashboard          | 8087          | 443           | HTTPS    | /              | Main dashboard
+Hornet API         | 14265         | 443           | HTTPS    | /api           | Used for wallet/API calls
+Hornet peering     | 15600         | 15600         | TCP      | not applicable | Main peering port
+Grafana            | 3000          | 443           | HTTPS    | /grafana       | Grafana monitoring /grafana
+Prometheus         | 9090          | 443           | HTTPS    | /prometheus    | Prometheus metrics
+Alertmanager       | 9093          | 443           | HTTPS    | /alertmanager  | Alertmanager for prometheus
 
 All the external ports have been made accessible in the firewall. There is no need to configure the firewall on the node.
 
@@ -236,7 +232,7 @@ All the external ports have been made accessible in the firewall. There is no ne
 
 If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
 
-Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
+Ports: 80/tcp (for certificate verification/enabling HTTPS), 443/tcp and 15600/tcp
 
 ## Peers
 
@@ -263,7 +259,7 @@ nbctl -r -n somepeer.com:12345
 
 ## Monitoring
 
-If you have monitoring enabled you can point your browser to `https://your-ip-or-domain:5555`. That will open Grafana where some monitoring dashboards are available.
+If you have monitoring enabled you can point your browser to `https://your-ip-or-domain/grafana`. That will open Grafana where some monitoring dashboards are available.
 
 Monitoring applications (e.g. node-exporter, prometheus, etc) and dashboards can be upgraded using the command:
 ```sh
@@ -295,7 +291,7 @@ If you receive this error when trying to browse to the dashboard then:
 * nginx (the webserver/proxy) is working properly
 * the back-end to which it is trying to connect isn't working properly.
 
-Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io:8081` would tell nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly, e.g. checking logs: see [Control Hornet](#control-hornet).
+Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io` tells nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly, e.g. checking logs: see [Control Hornet](#control-hornet).
 
 ### Connection not Private
 
@@ -397,6 +393,9 @@ Now you can start up HORNET using `sudo systemctl start hornet`
 ## Support the Project
 
 To create, test and maintain this playbook requires many hours of work and resources. This is done wholeheartedly for the IOTA community.
+
+
+**NOTE** Have not migrated yet to the new network. If you'd like to donate, please visit again soon once I've done migrating. Thank you.
 
 If you liked this project and would like to leave a donation you can use this IOTA address:
 ```

@@ -463,7 +463,7 @@ Only ASCII characters are allowed:
 # Installation selection menu
 function set_selections() {
     local RC RESULTS RESULTS_ARRAY CHOICE SKIP_TAGS
-    SKIP_TAGS="--skip-tags=_"
+    SKIP_TAGS="--skip-tags=_,loadbalancer_role"
     DISABLE_MONITORING_DEFAULT="ON"
     DISABLE_MONITORING_MSG=" (recommended)"
 
@@ -483,11 +483,10 @@ Please choose additional installation options.
 Note that defaults have been set according to your system's configuration.
 
 Select/unselect options using space and click Enter to proceed.
-        " 24 78 6 \
+        " 24 78 5 \
         "INSTALL_DOCKER"           "Install Docker runtime (recommended)" ON \
         "INSTALL_NGINX"            "Install nginx webserver (recommended)" ON \
         "SKIP_FIREWALL_CONFIG"     "Skip configuring firewall" OFF \
-        "ENABLE_HAPROXY"           "Enable HAProxy (recommended)" ON \
         "DISABLE_MONITORING"       "Disable node monitoring${DISABLE_MONITORING_MSG}" "$DISABLE_MONITORING_DEFAULT" \
         "ENABLE_COMNET"            "Run this node on the comnet" OFF \
         3>&1 1>&2 2>&3)
@@ -514,9 +513,6 @@ Select/unselect options using space and click Enter to proceed.
             '"DISABLE_MONITORING"')
                 SKIP_TAGS+=",monitoring_role"
                 DISABLE_MONITORING="true"
-                ;;
-            '"ENABLE_HAPROXY"')
-                ENABLE_HAPROXY="true"
                 ;;
             '"ENABLE_COMNET"')
                 ENABLE_COMNET="true"
@@ -545,7 +541,6 @@ Please confirm you want to proceed with the installation?" \
     [ "$INSTALL_NGINX" = true ] && echo "install_nginx: true" >>"$INSTALLER_OVERRIDE_FILE"
     [ "$SKIP_FIREWALL_CONFIG" = true ] && echo "configure_firewall: false" >>"$INSTALLER_OVERRIDE_FILE"
     [ "$DISABLE_MONITORING" = true ] && echo "disable_monitoring: true" >>"$INSTALLER_OVERRIDE_FILE"
-    [ "$ENABLE_HAPROXY" = true ] && echo "lb_bind_addresses: ['0.0.0.0']" >>"$INSTALLER_OVERRIDE_FILE"
     INSTALL_OPTIONS+=" $SKIP_TAGS"
 }
 
@@ -554,7 +549,6 @@ function set_defaults() {
 install_docker: true
 install_nginx: true
 configure_firewall: false
-lb_bind_addresses: ['0.0.0.0']
 EOF
 
     if [[ "$PLAYBOOK_LIGHT" = true ]] || [[ "$OS" =~ ^Raspbian ]]
@@ -847,7 +841,7 @@ then
     # Get the administrators username
     set_admin_username
 
-    # web access (ipm, haproxy, grafana, etc)
+    # web access (dashboard, grafana, etc)
     get_admin_password
 fi
 
