@@ -200,7 +200,7 @@ function enable_https() {
     fi
 
     if ! (whiptail --title "Verify Details" \
-          --yesno "You entered email '${SSL_EMAIL}' and the domain '${SSL_DOMAIN}'\n\nIs this correct?" \
+          --yesno "You've entered email '${SSL_EMAIL}' and the domain '${SSL_DOMAIN}'\n\nIs this correct?" \
           --defaultno \
           12 $WIDTH) then
         return
