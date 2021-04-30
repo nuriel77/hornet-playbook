@@ -170,35 +170,25 @@ function verify_playbook() {
     fi
 }
 
-### Haproxy ###
-function haproxy_listen_all() {
-    # Expect to find 0.0.0.0 on same line or max 2 after var declaration.
-    # If not found, add bind to all interfaces to override file.
-    if ! grep ^lb_bind_addresses /opt/hornet-playbook/group_vars/all/z-installer-override.yml -A2 | grep -q '0.0.0.0'; then
-        echo "lb_bind_addresses: ['0.0.0.0']" >> /opt/hornet-playbook/group_vars/all/z-installer-override.yml
-    fi
-}
-
 function enable_https() {
-    local POW
     local SSL_EMAIL
     local SSL_DOMAIN
-    local ENABLE_NGINX_CERT
 
     if ! (whiptail --title "Enable HTTPS" \
-                 --yesno "This option will enable HTTPS on Hornet's API port via HAProxy (port 14267 by default).\nAny previous configuration to HAProxy configuration will be overwritten.\nDo you want to proceed?" \
+                 --yesno "This option will request a certificate for this node via certbot/letsencrypt using nginx.\nA domain name must be configured pointing to this node's IP address.\n\nDo you want to proceed?" \
                  --defaultno \
-                 12 $WIDTH) then
+                 14 $WIDTH) then
         return 1
     fi
 
-    if (whiptail --title "Enable PoW" \
-                 --yesno "Do you want to enable PoW (attachToTangle) on your node?" \
-                 --defaultno \
-                 12 $WIDTH) then
-            POW=enabled
-    else
-            POW=disabled
+    SSL_EMAIL=$(whiptail --inputbox "Enter your email address to register your TLS certificate with:" 8 $WIDTH --title "Enter Email" 3>&1 1>&2 2>&3)
+    if [[ $? -ne 0 ]]; then
+        return
+    fi
+
+    SSL_DOMAIN=$(whiptail --inputbox "Enter the domain name to register the TLS certificate with:" 8 $WIDTH --title "Enter FQDN" 3>&1 1>&2 2>&3)
+    if [[ $? -ne 0 ]]; then
+        return
     fi
 
     verify_playbook
@@ -209,69 +199,15 @@ function enable_https() {
          return 1
     fi
 
-    # Enable or disable PoW on this node via variable override file
-    if [[ "$POW" == "enabled" ]]; then
-        echo "haproxy_deny_regex: '(get|remove|add)Neighbors'" > /opt/hornet-playbook/group_vars/all/z-haproxy-regex-override.yml
-    else
-        echo "haproxy_deny_regex: '(get|remove|add)Neighbors|attachToTangle|interruptAttachingToTangle'" > /opt/hornet-playbook/group_vars/all/z-haproxy-regex-override.yml
-    fi
-
-    # Make sure we configure haproxy to listen on all interfaces, thereby enabling it.
-    haproxy_listen_all
-
-    # Enable haproxy https via variable override file
-    echo "haproxy_https: True" > /opt/hornet-playbook/group_vars/all/z-haproxy-enable-https.yml
-
-    cd /opt/hornet-playbook \
-      && git pull \
-      && ansible-playbook -i "$INVENTORY_FILE" \
-         site.yml -v \
-         --tags=py_docker,hornet_ssl,consul_role,loadbalancer_role,certbot \
-         --skip-tags=consul_register_node \
-         -e overwrite=yes
-
-    if [[ $? -ne 0 ]]; then
-        pause "Enabling HTTPS failed!!! Check output above for errors."
-        clear
-        return 1
-    else
-        clear
-        if ! (whiptail --title "Request SSL Certificate" \
-                 --yesno "HTTPS/SSL was enabled successfully. If you haven't done so yet, you can proceed in the next step to request a valid certificate for your domain. You must have a fully qualified domain name pointing to the IP address of your server.\n\nDo you want to proceed?" \
-                 --defaultno \
-                 18 $WIDTH) then
-            return
-        fi
-    fi
-
-    SSL_EMAIL=$(whiptail --inputbox "Enter your email address to register your SSL vertificate with:" 8 $WIDTH --title "Enter Email" 3>&1 1>&2 2>&3)
-    if [[ $? -ne 0 ]]; then
-        return
-    fi
-
-    SSL_DOMAIN=$(whiptail --inputbox "Enter the domain name to register the SSL certificate with:" 8 $WIDTH --title "Enter FQDN" 3>&1 1>&2 2>&3)
-    if [[ $? -ne 0 ]]; then
-        return
-    fi
-
-    if (whiptail --title "Configure Nginx" \
-        --yesno "Do you also want to configure this certificate for nginx (Dashboard etc.) ?" \
-        --defaultno \
-        12 $WIDTH) then
-        ENABLE_NGINX_CERT=yes
-    else
-        ENABLE_NGINX_CERT=false
-    fi
-
     if ! (whiptail --title "Verify Details" \
-          --yesno "You entered email '${SSL_EMAIL}' with domain '${SSL_DOMAIN}' and configure nginx with the certificate: '${ENABLE_NGINX_CERT}'\n\nIs this correct?" \
+          --yesno "You entered email '${SSL_EMAIL}' and the domain '${SSL_DOMAIN}'\n\nIs this correct?" \
           --defaultno \
           12 $WIDTH) then
         return
     fi
 
     # Run the script to request a certificate
-    /usr/local/bin/certbot-haproxy.sh "${SSL_EMAIL}" "${SSL_DOMAIN}"
+    /usr/local/bin/certbot-nginx.sh "${SSL_EMAIL}" "${SSL_DOMAIN}"
     if [[ $? -ne 0 ]]; then
         pause "SSL Certificate request failed. See output above for more details."
         clear
@@ -283,13 +219,8 @@ function enable_https() {
     # We need to make sure we find a directory.
     FULL_PATH=$(find /etc/letsencrypt/live -type d -name "${SSL_DOMAIN}*" -print -quit)
 
-    # Will ensure subsequent playbook runs will use haproxy.pem
-    if [ -f "${FULL_PATH}/haproxy.pem" ]; then
-        echo "ssl_certkey_file: ${FULL_PATH}/haproxy.pem" > /opt/hornet-playbook/group_vars/all/z-ssl-override.yml
-    fi
-
     # Will configure nginx to use the let's encrypt certificates
-    if [[ "$ENABLE_NGINX_CERT" == "yes" ]] && [ -f "${FULL_PATH}/cert.pem" ]; then
+    if [ -f "${FULL_PATH}/cert.pem" ]; then
         if ! grep -q "^ssl_cert_file: ${FULL_PATH}/fullchain.pem" /opt/hornet-playbook/group_vars/all/z-ssl-override.yml; then
             cat <<EOF >> /opt/hornet-playbook/group_vars/all/z-ssl-override.yml
 ssl_cert_file: ${FULL_PATH}/cert.pem
@@ -305,30 +236,6 @@ EOF
 
     pause "Done. Check above output to see the status of the request."
     clear
-}
-
-function enable_haproxy() {
-    local DEFAULT_MSG="Are you sure you want to enable wallet access only via HAProxy?\nThis will disable port 14265 externally and make 14267 accessible.\nIn addition, all the REMOTE_LIMIT_API commands will be under control of HAProxy and no longer via Hornet's configuration files."
-    [ -n "$1" ] && { DEFAULT_MSG=$1; }
-    if (whiptail --title "HAProxy" \
-                 --yesno "$DEFAULT_MSG" \
-                 --defaultno \
-                 8 $WIDTH) then
-        verify_playbook
-        if [[ $? -ne 0 ]]; then
-             whiptail --title "Error!" \
-                      --msgbox "ERROR: haproxy task failed." \
-                      8 $WIDTH
-             return 1
-        fi
-
-        # Make sure we configure haproxy to listen on all interfaces, thereby enabling it.
-        haproxy_listen_all
-
-        cd /opt/hornet-playbook && ansible-playbook -i inventory -v site.yml --tags=hornet_ssl,loadbalancer_role -e overwrite=yes
-        [[ $? -ne 0 ]] && MSG="Enabling HAProxy failed!!! Check output above for errors." || MSG="Installation finished successfully!"
-        pause "$MSG Press ENTER to return to menu."
-    fi
 }
 
 ### Hornet ###
@@ -1089,7 +996,6 @@ function services_menu() {
              15 $WIDTH 8 \
     "a)" "Hornet" \
     "b)" "Nginx" \
-    "c)" "HAproxy" \
     3>&1 1>&2 2>&3
 }
 
@@ -1109,11 +1015,6 @@ function services() {
 
         "b)")
             service nginx
-            services
-            ;;
-
-        "c)")
-            service haproxy
             services
             ;;
 
@@ -1240,7 +1141,6 @@ function configure_files_menu() {
     "a)" "Hornet System Config" \
     "b)" "Hornet Main Config" \
     "c)" "Hornet Neighbors Config" \
-    "d)" "HAProxy Config" \
     "Z)" "Choose Editor" \
     3>&1 1>&2 2>&3
 }
@@ -1268,11 +1168,6 @@ function configure_files() {
 
         "c)")
             edit_config "/var/lib/hornet/peering.json" "hornet"
-            configure_files
-            ;;
-
-        "d)")
-            edit_config "/etc/haproxy/haproxy.cfg" "haproxy" "reload"
             configure_files
             ;;
 
@@ -1490,15 +1385,14 @@ function main_menu() {
     "f)" "Rerun Playbook Installation" \
     "g)" "Clean Unused Docker Images" \
     "h)" "Update HORC and node scripts" \
-    "i)" "Enable HAProxy Access" \
-    "j)" "Enable HTTPS / Certificate" \
-    "k)" "Get Node Info" \
-    "l)" "Show LatestMilestoneIndex" \
-    "m)" "Get new snapshot DB" \
-    "n)" "Neighbors" \
-    "o)" "View IRITOP" \
-    "p)" "Toggle ComNet" \
-    "q)" "Update config.json" \
+    "i)" "Enable HTTPS / Certificate" \
+    "j)" "Get Node Info" \
+    "k)" "Show LatestMilestoneIndex" \
+    "l)" "Get new snapshot DB" \
+    "m)" "Neighbors" \
+    "n)" "View IRITOP" \
+    "o)" "Toggle ComNet" \
+    "p)" "Update config.json" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1558,46 +1452,41 @@ function run_main_menu() {
             ;;
 
         "i)")
-            enable_haproxy
-            run_main_menu
-            ;;
-
-        "j)")
             enable_https
             run_main_menu
             ;;
 
-        "k)")
+        "j)")
             get_node_info
             run_main_menu
             ;;
 
-        "l)")
+        "k)")
             show_lmsi
             run_main_menu
             ;;
 
-        "m)")
+        "l)")
             get_db
             run_main_menu
             ;;
 
-        "n)")
+        "m)")
             neighbors
             run_main_menu
             ;;
 
-        "o)")
+        "n)")
             view_iritop
             run_main_menu
             ;;
 
-        "p)")
+        "o)")
             toggle_comnet
             run_main_menu
             ;;
 
-        "q)")
+        "p)")
             update_config
             run_main_menu
             ;;
