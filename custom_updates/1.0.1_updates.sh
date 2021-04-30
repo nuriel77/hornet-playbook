@@ -16,3 +16,14 @@ ansible-playbook site.yml \
   -v \
   -e uninstall_playbook=true \
   --tags=uninstall_loadbalancer
+
+echo "Updating playbook"
+cp /var/lib/hornet/peering.json ~/.
+ansible-playbook site.yml \
+  -i inventory \
+  -v \
+  -e overwrite=yes \
+  --skip-tags=loadbalancer_role
+\cp ~/peering.json /var/lib/hornet/peering.json
+
+read -p "There were some major changes in this update: The Dashboard, Grafana, Prometheus and Alertmanager are reachable on the browser on the paths: /, /grafana, /prometheus and /alertmanager respectfully."
