@@ -61,24 +61,6 @@
         mode: 0755
       ignore_errors: yes
 
-    - name: download iritop
-      get_url:
-        url: https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/iritop.py
-        dest: /usr/bin/iritop
-        mode: 0755
-
-    - name: download iritop requirements
-      get_url:
-        url: https://raw.githubusercontent.com/maeck70/iritop/master/requirements.txt
-        dest: /tmp/iritop-requirements.txt
-        force: yes
-      ignore_errors: yes
-
-    - name: install iritop requirements
-      pip:
-        requirements: /tmp/iritop-requirements.txt
-      ignore_errors: yes
-
     - name: link python3 to python
       file:
         src: /usr/bin/python3
@@ -108,15 +90,6 @@
         backup: yes
       tags:
         - nbctl_config
-
-    - name: configure ~/.iritop
-      copy:
-        dest: "{{ ansible_env.HOME }}/.iritop"
-        content: "node: http://127.0.0.1:{{ node_api_port }}"
-        force: "{{ overwrite | default('no') }}"
-        backup: yes
-      tags:
-        - iritop_config
 
   tags:
     - scripts
