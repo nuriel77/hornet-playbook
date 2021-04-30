@@ -221,7 +221,7 @@ function enable_https() {
 
     # Will configure nginx to use the let's encrypt certificates
     if [ -f "${FULL_PATH}/cert.pem" ]; then
-        if ! grep -q "^ssl_cert_file: ${FULL_PATH}/fullchain.pem" /opt/hornet-playbook/group_vars/all/z-ssl-override.yml; then
+        if ! grep -q "^ssl_cert_file: ${FULL_PATH}/fullchain.pem" /opt/hornet-playbook/group_vars/all/z-ssl-override.yml >/dev/null 2>&1; then
             cat <<EOF >> /opt/hornet-playbook/group_vars/all/z-ssl-override.yml
 ssl_cert_file: ${FULL_PATH}/cert.pem
 ssl_key_file: ${FULL_PATH}/privkey.pem
