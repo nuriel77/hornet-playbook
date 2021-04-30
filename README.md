@@ -102,7 +102,6 @@ gohornet/hornet      v0.2.1              c97cba628d38        2 hours ago        
 golang              1.13                a1072a078890        8 days ago          803MB
 certbot/certbot     latest              3b7ec24cacc3        11 days ago         148MB
 nginx               latest              231d40e811cd        3 weeks ago         126MB
-haproxy             2.0.8               142dd6fe8afb        7 weeks ago         91.2MB
 alpine              latest              965ea09ff2eb        7 weeks ago         5.55MB
 ```
 
@@ -110,9 +109,9 @@ Note that an image consists of a "REPOSITORY" name and a "TAG".
 
 Images with `<node>` are "dangling" images that have been used for building a docker image (you can use `horc` to cleanup unused images).
 
-Delete a certain image using the image's ID. Images can also be referenced by the image's repository:tag as syntax, e.g. `haproxy:2.0.8`:
+Delete a certain image using the image's ID. Images can also be referenced by the image's repository:tag as syntax, e.g. `nginx:latest`:
 ```sh
-docker rmi b7b60a909a8f
+docker rmi 231d40e811cd
 ```
 
 ## View Docker Containers
@@ -219,13 +218,9 @@ Here's a list of ports configured by the playbook by default. External communica
 
 NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL | DESCRIPTION
 -------------------|---------------|---------------|----------|--------------------------------
-Hornet API         | 14265         | 14267         | TCP      | Used for wallet/API calls
-Hornet autopeering | 14626         | 14626         | UDP      | Autopeering
+Hornet API         | 14265         | 443           | HTTPS    | Used for wallet/API calls
+Dashboard          | 8087          | 443           | TCP      | Main dashboard
 Hornet peering     | 15600         | 15600         | TCP      | Main peering port
-Dashboard          | 8087          | 8081          | TCP      | Main dashboard
-Monitor            | 14434         | 4434          | TCP      | Tangle monitor (via plugin)
-Monitor API        | 14433         | 4433          | TCP      | Tangle monitor API (via plugin)
-Visualiser         | 18083         | 8083          | TCP      | Tangle visualiser
 Grafana            | 3000          | 5555          | TCP      | Grafana monitoring
 Prometheus         | 9090          | 8999          | TCP      | Prometheus metrics
 Alertmanager       | 9093          | 9993          | TCP      | Alertmanager for prometheus
@@ -236,7 +231,7 @@ All the external ports have been made accessible in the firewall. There is no ne
 
 If you are running the node in an internal network/lan you have to forward at least the following ports from the router to the node:
 
-Ports: 80/tcp (for certificate verification/enable HTTPS), 14267/tcp, 15600/tcp, 14626/udp
+Ports: 80/tcp (for certificate verification/enabling HTTPS), 443/tcp and 15600/tcp
 
 ## Peers
 
