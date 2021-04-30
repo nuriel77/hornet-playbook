@@ -31,6 +31,14 @@ hornet_timeout_stop: 900
 # connected to, and are either
 # served by a proxy or locally only.
 hornet_ports:
+  http:
+    port: 80
+    proto: tcp
+    allow: yes
+  dashboard:
+    port: 8081
+    proto: tcp
+    allow: yes
   peering:
     port: 15600
     proto: tcp
@@ -55,10 +63,6 @@ hornet_ports:
     port: 1883
     proto: tcp
     allow: no
-  dashboard:
-    port: 8081
-    proto: tcp
-    allow: yes
   tanglemonitor:
     port: 4434
     proto: tcp
