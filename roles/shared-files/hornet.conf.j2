@@ -6,18 +6,6 @@ upstream hornet_api {
     server {{ hornet_config_restAPI_bindAddress }};
 }
 
-upstream grafana {
-    server 127.0.0.1:{{ grafana_port }};
-}
-
-upstream prometheus {
-    server 127.0.0.1:{{ prom_port }};
-}
-
-upstream alertmanager {
-    server 127.0.0.1:{{ alertmanager_port }};
-}
-
 # Rate limit requests
 limit_req_zone $binary_remote_addr zone=hornet_dashboard:{{ nginx_shared_mem_rate_limit | default('2m') }} rate={{ nginx_req_per_sec | default('25') }}r/s;
 
@@ -82,8 +70,8 @@ server {
     }
 
     # grafana
-    location /grafana {
-        proxy_pass http://grafana;
+    location /grafana/ {
+        proxy_pass http://127.0.0.1:{{ grafana_port }}/;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Server $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -98,7 +86,7 @@ server {
 
     # prometheus
     location /prometheus/ {
-        proxy_pass http://prometheus;
+        proxy_pass http://127.0.0.1:{{ prom_port }}/;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Server $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -110,7 +98,7 @@ server {
 
     # alertmanager
     location /alertmanager/ {
-        proxy_pass http://alertmanager/;
+        proxy_pass http://127.0.0.1:{{ alertmanager_port }}/;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Server $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
