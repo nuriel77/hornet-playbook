@@ -654,7 +654,7 @@ function add_neighbors() {
     local NBCTL_OUTPUT
     local RC
 
-    NEIGHBORS=$(whiptail --inputbox "Enter a list of neighbors separated by space:" 8 $WIDTH --title "Add Neighbors" 3>&1 1>&2 2>&3)
+    NEIGHBORS=$(whiptail --inputbox "Enter a list of peers separated by space:" 8 $WIDTH --title "Add Peers" 3>&1 1>&2 2>&3)
     RC=$?
     if [[ $RC -ne 0 ]]; then
         return
@@ -670,8 +670,8 @@ function add_neighbors() {
 
     HEIGHT=$(expr $(echo "$NEIGHBORS"|tr ' ' '\n'|wc -l) + 8)
     NEIGHBORS_TO_ADD=$(echo "$NEIGHBORS"|tr ' ' '\n')
-    if (whiptail --title "Add Neighbors" \
-                 --yesno "The following neighbor(s) will be added:\n\n$NEIGHBORS_TO_ADD" \
+    if (whiptail --title "Add Peers" \
+                 --yesno "The following peer(s) will be added:\n\n$NEIGHBORS_TO_ADD" \
                  $HEIGHT $WIDTH) then
 
         # Run nbctl command
@@ -687,7 +687,7 @@ function add_neighbors() {
                NBCTL_OUTPUT="Failed to communicate with HORNET API port. Check if HORNET is active and if $HOME/.nbctl is configured correctly."
             fi
             HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 10)
-            whiptail --title "Adding Neighbors Failed" \
+            whiptail --title "Adding Peers Failed" \
                      --msgbox "Failure: $NBCTL_OUTPUT" \
                      $HEIGHT $WIDTH
         fi
@@ -702,26 +702,26 @@ function remove_neighbors() {
     local NEIGHBOR
     local HEIGHT
 
-    echo "Getting neighbors list..."
+    echo "Getting peers list..."
     NEIGHBORS=$(list_neighbors get | awk '{$1=$1}{print}' | tr -d ' ')
     RC=$?
     clear
     if [[ $RC -ne 0 ]]; then
-        whiptail --title "Neighbors Failed" \
-                 --msgbox "Failed to get list of neighbors: $NEIGHBORS" \
+        whiptail --title "Peers Failed" \
+                 --msgbox "Failed to get list of peers: $NEIGHBORS" \
                  8 $WIDTH
         return
     fi
     if [ "$NEIGHBORS" == "" ]; then
-        whiptail --title "No Neighbors" \
-                 --msgbox "There are no neighbors configured" \
+        whiptail --title "No Peers" \
+                 --msgbox "There are no peers configured" \
                  8 $WIDTH
         return
     fi
     HEIGHT=$(expr $(echo "$NEIGHBORS"|wc -l) + 5)
     NEIGHBORS_ARRAY=($(echo "$NEIGHBORS"))
     NEIGHBORS_ARRAY_INDEXED=($(echo "$NEIGHBORS" | awk '!/^ / && NF { print NR")"; print $1$2$3}'))
-    NEIGHBOR_INDEX=$(whiptail --title "Remove neighbors" --menu "Choose a neighbor" 25 $WIDTH 16  "${NEIGHBORS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
+    NEIGHBOR_INDEX=$(whiptail --title "Remove peers" --menu "Choose a peer" 25 $WIDTH 16  "${NEIGHBORS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
     if [ $? -eq 1 ]; then
         return
     fi
@@ -772,7 +772,7 @@ function list_neighbors() {
             return 1
         fi
         HEIGHT=$(expr $(echo "$NEIGHBORS_QUERY"|wc -l) + 7)
-        whiptail --title "List neighbors failed" \
+        whiptail --title "List peers failed" \
                  --msgbox "$NEIGHBORS_QUERY" \
                  $HEIGHT $WIDTH
         return 1
@@ -790,8 +790,8 @@ function list_neighbors() {
             FOR_WINDOW_LENGTH=$(($(echo "$NEIGHBORS"|wc -l)*2))
         fi
         local HEIGHT=$(expr $FOR_WINDOW_LENGTH + 8)
-        whiptail --title "List Neighbors" \
-                 --msgbox "Total: ${LENGTH} neighbor(s)\n\n${NEIGHBORS}" \
+        whiptail --title "List Peers" \
+                 --msgbox "Total: ${LENGTH} peer(s)\n\n${NEIGHBORS}" \
                  $HEIGHT $WIDTH
     fi
 }
@@ -1320,13 +1320,13 @@ function toggle_comnet(){
 
 ### Neighbors ###
 function neighbors_menu(){
-    whiptail --title "HORC v${__VERSION__} - Neighbors" \
+    whiptail --title "HORC v${__VERSION__} - Peers" \
              --menu "Choose an option" \
              --cancel-button "Back" \
               12 48 4 \
-    "a)" "Add Neighbors" \
-    "b)" "Remove neighbors" \
-    "c)" "List neighbors" \
+    "a)" "Add Peers" \
+    "b)" "Remove peers" \
+    "c)" "List peers" \
     3>&1 1>&2 2>&3
 }
 
@@ -1391,7 +1391,7 @@ function main_menu() {
     "j)" "Get Node Info" \
     "k)" "Show LatestMilestoneIndex" \
     "l)" "Get new snapshot DB" \
-    "m)" "Neighbors" \
+    "m)" "Peers" \
     "n)" "Toggle ComNet" \
     "o)" "Update config.json" \
     "Z)" "Configure this Script" \
