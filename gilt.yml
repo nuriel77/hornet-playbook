@@ -7,7 +7,8 @@
   dst: roles/haproxy/
 
 - git: https://github.com/nuriel77/ansible-nginx.git
-  version: main
+  # TODO: REPLACE WITH main:
+  version: add/certbot
   dst: roles/nginx/
 
 - git: https://github.com/nuriel77/ansible-monitoring.git
