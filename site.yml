@@ -87,6 +87,5 @@
       - docker
       - hornet
       - nginx
-      - haproxy
       - monitoring
       - cleanup
