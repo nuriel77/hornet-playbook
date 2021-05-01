@@ -218,7 +218,7 @@ Enabling a certificate will allow you to connect to your node with IOTA's offici
 Below is a list of ports and URL paths configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy. The internal ports are not accessible externally.
 
 NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL | URL PATH       | DESCRIPTION
--------------------|---------------|---------------|----------|----------------------------------------------
+-------------------|---------------|---------------|----------|----------------|-----------------------------
 Dashboard          | 8087          | 443           | HTTPS    | /              | Main dashboard
 Hornet API         | 14265         | 443           | HTTPS    | /api           | Used for wallet/API calls
 Hornet peering     | 15600         | 15600         | TCP      | not applicable | Main peering port
