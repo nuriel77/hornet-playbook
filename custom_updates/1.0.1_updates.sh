@@ -15,7 +15,7 @@ ansible-playbook site.yml \
   -i inventory \
   -v \
   -e uninstall_playbook=true \
-  --tags=uninstall_loadbalancer
+  --tags=uninstall_loadbalancer,loadbalancer_role
 
 echo "Updating playbook"
 cp /var/lib/hornet/peering.json ~/.
