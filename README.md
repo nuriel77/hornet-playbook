@@ -399,7 +399,7 @@ To create, test and maintain this playbook requires many hours of work and resou
 
 If you liked this project and would like to leave a donation you can use this IOTA address:
 ```
-JFYIHZQOPCRSLKIYHTWRSIR9RZELTZKHNZFHGWXAPCQIEBNJSZFIWMSBGAPDKZZGFNTAHBLGNPRRQIZHDFNPQPPWGC
+iota1qpsszw7jnknct8960t80ffxn2hmx8wrrrw69ca3us6u5kt92c2hhj8s7ccf
 ```
 
 No IOTA? :star: the project is also a way of saying thank you! :sunglasses:
