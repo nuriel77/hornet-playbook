@@ -207,18 +207,18 @@ You can get a domain name to point to your node's IP. In that case you can use `
 
 **HTTPS Certificate**
 
-A first step is to enable HAProxy via `horc`. By default the API port is not exposed.
+Via `horc` (run on the command line) it is possible to request and enable HTTPS certificate for the node.
 
-The second step is to enable HTTPS certificate. Note that you must already have a fully qualified domain name A record pointing to your server's IP.
+Note that you must already have a fully qualified domain name A record pointing to your server's IP.
 
-Enabling a certificate will allow you to connect to your node with IOTA's official Trinity wallet.
+Enabling a certificate will allow you to connect to your node with IOTA's official wallet.
 
 ## Ports
 
 Below is a list of ports and URL paths configured by the playbook by default. External communication goes via `nginx` acting as a reverse proxy. The internal ports are not accessible externally.
 
 NAME               | PORT INTERNAL | PORT EXTERNAL | PROTOCOL | URL PATH       | DESCRIPTION
--------------------|---------------|---------------|----------|---------------------------------------------
+-------------------|---------------|---------------|----------|----------------------------------------------
 Dashboard          | 8087          | 443           | HTTPS    | /              | Main dashboard
 Hornet API         | 14265         | 443           | HTTPS    | /api           | Used for wallet/API calls
 Hornet peering     | 15600         | 15600         | TCP      | not applicable | Main peering port
