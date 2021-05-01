@@ -236,26 +236,8 @@ Ports: 80/tcp (for certificate verification/enabling HTTPS), 443/tcp and 15600/t
 
 ## Peers
 
-By default HORNET has the autopeering enabled. It is also recommended to have one or two static peers. The tool `horc` or `nbctl` can be used to manage static neighbors.
+Peers can be added via Hornet's dashboard.
 
-### nbctl
-
-This tool has been created to help managed peers from the command line instead of having to manually edit `peering.json` which is error-prone.
-
-**If you didn't install your node using the playbook** you can still use this tool. It communicates with HORNET's API to add, remove or list peers:
-
-```sh
-wget -O /usr/bin/nbctl https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/nbctl && chmod +x /usr/bin/nbctl
-```
-
-Example of adding a peer:
-```sh
-nbctl -a -n somepeer.com:12345
-```
-Remove:
-```sh
-nbctl -r -n somepeer.com:12345
-```
 
 ## Monitoring
 
@@ -340,51 +322,7 @@ Note about the Tangle Monitor plugin: it uses two ports: 4433 and 4434 where the
 
 You can access the Tangle Monitor using `https://[your-server's-address]:4434`. Once your node is fully synced you will start seeing data.
 
-### Install Alongside IRI-Playbook
 
-This has not been tried and basically **discouraged**. It could work if you know exactly what you are doing, i.e. making sure no conflicting ports between the two.
-
-On the otherhand, you could probably run hornet-playbook alongside goshimmer-playbook. However, this has not been tested yet.
-
-### Private Tangle
-
-The Hornet private tangle setup is documented [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle)
-
-Before doing anything make sure you've stopped hornet: `sudo systemctl stop hornet`.
-
-Make sure you remove (or backup to another location) `/var/lib/hornet/mainnetdb/*` and `/var/lib/hornet/snapshot/*` to ensure there are no conflicts with a previous database and snapshot.
-
-Next you'll have to edit `/var/lib/hornet/config.json`: make sure you set the values specified in the `coordinator` configuration as shown [here](https://github.com/gohornet/hornet/wiki/Tutorials%3A-Private-Tangle#configuration). Same for `snapshots`, follow the example in the document (`loadType` etc). **Note** that the correct path for the playbook's base directory is `snapshot/` thus you should end up configuring `snapshot/snapshot.csv` in the configuration.
-
-To generate the **merkle tree root** when using docker you need 2 parameters: a. the image name, b. your COO_SEED.
-
-For example below we're using `gohornet/hornet:v0.5.0` as the image with a random COO_SEED:
-```sh
-docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json -v /var/lib/hornet/snapshot:/app/snapshot gohornet/hornet:v0.5.0- tool merkle
-```
-
-Following HORNET's official tutorial you'll have to add the `merkle tree root` value as the `address` value in the `coordinator` in `/var/lib/hornet/config.json`.
-
-Note that the state file and merkle tree file path are `coordinator/state` and `coordinator/tree`.
-
-The following step is to create the `snapshot.csv`. You should do that in `/var/lib/hornet/snapshot/snapshot.csv` as this is mounted into the HORNET docker container.
-
-Next, here's an example of the coordinator bootstrap command, as before, providing the COO_SEED and the docker image to use:
-```sh
-docker run --rm -e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO -v /var/lib/hornet/mainnetdb:/app/mainnetdb -v /var/lib/hornet/coordinator:/app/coordinator -v /var/lib/hornet/snapshot:/app/snapshot -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/profiles.json:/app/profiles.json gohornet/hornet:v0.5.0 --cooBootstrap
-```
-Bootstrap is ended once you see milestones being issued. At this point you can stop the process with CTRL-c. It will look like this:
-```
-...
-INFO    Coordinator     milestone issued (1): 9AAHNAXNNQJM9HYHEBAKCNVXOLNYYDEJZWHAMLQPKQDEHMZXHYKJGIJSJJGOSZILWAAFZJGBIKHIXPC99
-...
-```
-
-Last step before starting up HORNET is adding the COO_SEED to `/etc/default/hornet` (or `/etc/sysconfig/hornet` in CentOS):
-```
-DOCKER_OPTS="-e COO_SEED=QQXBGONJZKHZBZIEVUYTOYTLPGDGAOVYMOGFNSGPELJFNPZMBLDEJZUPAOCVFZ9JNBKVXNDXYCADRXXFO"
-```
-Now you can start up HORNET using `sudo systemctl start hornet`
 
 ## Known Issues
 
