@@ -318,11 +318,6 @@ sudo systemctl restart grafana-server
 
 Some of Hornet's plugins can be enabled and disabled using the `horc` tool via the menu.
 
-Note about the Tangle Monitor plugin: it uses two ports: 4433 and 4434 where the first is for the API and the latter for the webserver/ws.
-
-You can access the Tangle Monitor using `https://[your-server's-address]:4434`. Once your node is fully synced you will start seeing data.
-
-
 
 ## Known Issues
 
