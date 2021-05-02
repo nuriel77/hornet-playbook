@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.0.2
+VERSION_TEMP=1.0.3
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -341,15 +341,10 @@ function upgrade_hornet() {
 function get_db() {
     local CONFIG_FILE
 
-    # TODO: fix db download
-    pause "Sorry, this feature is still work-in-progress for new Hornet 1.0.0 release"
-    clear
-    return
-
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
 
     # Playbook's default sources
-    SOURCES_ARRAY=($(jq -r '.snapshots.local.downloadURLs[]' < "$CONFIG_FILE") "Custom")
+    SOURCES_ARRAY=($(jq -r '.snapshots.downloadURLs[] | .full' < "$CONFIG_FILE") "Custom")
 
     # Create an indexed array for building the menu
     SOURCES_ARRAY_INDEXED=($(printf "%s\n" "${SOURCES_ARRAY[@]}"| awk -F, '!/^ / && NF { print NR")"; print $1}'))
@@ -397,10 +392,11 @@ function get_db() {
         # extract the database (on the fly) set correct user ownership and start HORNET up again.
         echo "Stopping hornet first, removing old database files and commencing download/extract of database files ..."
         systemctl stop hornet \
-          && rm -rf /var/lib/hornet/snapshot /var/lib/hornet/mainnetdb* \
-          && mkdir -p /var/lib/hornet/{mainnetdb,snapshot} \
-          && cd /var/lib/hornet/snapshot \
-          && wget -O export.bin "$DB_SOURCE" \
+          && rm -rf /var/lib/hornet/snapshots /var/lib/hornet/mainnetdb/* \
+          && mkdir -p /var/lib/hornet/mainnetdb \
+          && mkdir -p /var/lib/hornet/snapshots/mainnet \
+          && cd /var/lib/hornet/snapshots/mainnet \
+          && wget -O full_snapshot.bin "$DB_SOURCE" \
           && chown hornet.hornet /var/lib/hornet -RL \
           && systemctl start hornet
 
@@ -409,7 +405,8 @@ function get_db() {
                      --msgbox "Well this is embarrassing. Downloading the new DB failed..." \
                      8 $WIDTH
             # Cleanup any leftovers
-            rm -rf /var/lib/hornet/mainnetdb* /var/lib/hornet/snapshot/*.bin
+            rm -rf /var/lib/hornet/mainnetdb* /var/lib/hornet/snapshots/*
+            chown hornet.hornet /var/lib/hornet -RL
             clear
             return 1
         else
@@ -831,19 +828,22 @@ function show_lmsi() {
 }
 
 function get_node_info() {
-    pause "Sorry, this is still work-in-progress. Press ENTER to return to menu."
-    clear
-    return
-
     if [ ! -f $HOME/.nbctl ]; then
         whiptail --title "Missing .nbctl" \
                  --msgbox "Error: cannot find $HOME/.nbctl" \
                  8 $WIDTH
         return
     fi
-    local HORNET_HOST=$(grep ^host $HOME/.nbctl | cut -d: -f2-)
-    local HORNET_API_VERSION=$(grep ^api_version $HOME/.nbctl | cut -d: -f2-)
-    NODE_INFO=$(curl -f -m 5 -s $HORNET_HOST -X POST -H "X-IOTA-API-Version: $HORNET_API_VERSION" -H 'Content-Type: application/json' -d '{"command": "getNodeInfo"}'| jq -r 'to_entries[] | "\(.key): \(.value )"' | column -t | sort)
+    local HORNET_HOST=$(grep ^host $HOME/.nbctl | awk {'print $2'})
+    local HORNET_API_VERSION=$(grep ^api_version $HOME/.nbctl | awk {'print $2'})
+    NODE_RESPONSE=$(curl -f -m 5 -s ${HORNET_HOST}/api/v${HORNET_API_VERSION}/info -X GET -H "Accept: application/json" -H "Content-Type: application/json")
+
+    # epoch time to human readable
+    LMST_EPOCH=$(jq -r '.data.latestMilestoneTimestamp' <<< "$NODE_RESPONSE")
+    LMST_TIME=$(echo "$LMST_EPOCH:($(date -d @${LMST_EPOCH}))" | tr ' ' '_')
+
+    # to entries, columns, sort
+    NODE_INFO=$(jq -r --arg a "$LMST_TIME" '.data.latestMilestoneTimestamp = $a | .data | to_entries[] | "\(.key): \(.value)"' <<< "$NODE_RESPONSE" | column -t | sort )
     if [ $? -ne 0 ]; then
         whiptail --title "Query failed" \
                  --msgbox "Error: failed query ${NODE_INFO}. Check if HORNET is active and if $HOME/.nbctl is configured properly." \
@@ -851,7 +851,7 @@ function get_node_info() {
         return
     fi
 
-    HEIGHT=$(expr $(echo "$NODE_INFO"|wc -l) + 13)
+    HEIGHT=$(expr $(echo "$NODE_INFO"|wc -l) + 8)
     whiptail --title "Node Info" \
              --msgbox "$NODE_INFO" \
              $HEIGHT $WIDTH
