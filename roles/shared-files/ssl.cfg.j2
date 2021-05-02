@@ -1,4 +1,4 @@
-ssl_certificate {{ ssl_bundle_cert|default('dummy_ssl_bundle.crt') }};
+ssl_certificate {% if letsencrypt is not defined or letsencrypt|bool == False %}{{ ssl_cert_file }}{% else %}{{ ssl_bundle_cert|default('dummy_ssl_bundle.crt') }}{% endif %};
 ssl_certificate_key {{ ssl_key_file }};
 
 ssl_protocols TLSv1.2 TLSv1.3;
