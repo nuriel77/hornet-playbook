@@ -69,17 +69,17 @@ server {
         proxy_pass http://hornet_api;
     }
 
-    #location /api/v1/peers {
-    #    limit_req zone=hornet_api burst=25;
-    #    auth_basic "restricted";
-    #    proxy_pass http://hornet_api;
-    #}
+    location /api/v1/peers {
+        limit_req zone=hornet_api burst=25;
+        auth_basic "restricted";
+        proxy_pass http://hornet_api;
+    }
 
-    #location /api/plugins {
-    #    limit_req zone=hornet_api burst=25;
-    #    auth_basic "restricted";
-    #    proxy_pass http://hornet_api;
-    #}
+    location /api/plugins {
+        limit_req zone=hornet_api burst=25;
+        auth_basic "restricted";
+        proxy_pass http://hornet_api;
+    }
 
     # grafana
     location /grafana/ {
