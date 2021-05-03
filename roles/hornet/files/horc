@@ -245,7 +245,7 @@ function get_latest_hornet_commit {
 }
 
 function get_latest_hornet_release {
-    curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name
+    curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name | tr -d 'v'
 }
 
 function check_new_hornet {
