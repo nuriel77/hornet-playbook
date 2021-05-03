@@ -178,7 +178,7 @@ https://my-node.io
 ```
 Note that if you haven't configured the HTTPS certificate via `horc` you will get a warning about a self-signed certificate being used.
 
-The first time you connect you'll have to entre the username and password you've configured during the installation. **However** there's one more "dashboard" to login to for which you should just use username: `admin` and password: `admin`.
+The first time you connect you'll have to entre the username and password you've configured during the installation. **However** there's one more "dashboard" to login to for which you should just use the same credentials.
 
 ## Overwrite Hornet Config
 
