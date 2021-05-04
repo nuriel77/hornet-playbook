@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.0.5
+VERSION_TEMP=1.1.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -644,40 +644,33 @@ function edit_config() {
     fi
 }
 
-### Neighbors ###
-function add_neighbors() {
-    local NEIGHBORS
+### Peers ###
+function add_peer() {
+    local PEER
     local HEIGHT
     local NBCTL_OUTPUT
+    local ADD_PEER
     local RC
 
-    NEIGHBORS=$(whiptail --inputbox "Enter a list of peers separated by space:" 8 $WIDTH --title "Add Peers" 3>&1 1>&2 2>&3)
+    PEER=$(whiptail --inputbox "Enter a peer to add:" 8 120 --title "Add Peer" 3>&1 1>&2 2>&3)
     RC=$?
     if [[ $RC -ne 0 ]]; then
         return
     fi
 
-    ADD_LIST=$(echo "$NEIGHBORS" | sed 's/  */ /g' | sed 's/ / -n /g' | sed 's/^\(.*\)/-n \1/')
-    if [[ "$ADD_LIST" != *[:ascii:]* ]]; then
-        whiptail --title "Invalid Input" \
-                 --msgbox "Invalid input provided. Please check the syntax you provided is valid." \
-                  8 $WIDTH
-        return
-    fi
-
-    HEIGHT=$(expr $(echo "$NEIGHBORS"|tr ' ' '\n'|wc -l) + 8)
-    NEIGHBORS_TO_ADD=$(echo "$NEIGHBORS"|tr ' ' '\n')
-    if (whiptail --title "Add Peers" \
-                 --yesno "The following peer(s) will be added:\n\n$NEIGHBORS_TO_ADD" \
-                 $HEIGHT $WIDTH) then
+    HEIGHT=$(expr $(echo "$PEER"|wc -l) + 8)
+    PEER_TO_ADD=$(echo "$PEER"|tr -d ' ')
+    if (whiptail --title "Add Peer" \
+                 --yesno "The following peer will be added:\n\n$PEER_TO_ADD" \
+                 $HEIGHT 120) then
 
         # Run nbctl command
-        NBCTL_OUTPUT=$(nbctl -a $ADD_LIST --hornet 2>&1)
+        NBCTL_OUTPUT=$(nbctl -a -p "$PEER_TO_ADD" 2>&1)
         RC=$?
         if [[ $RC -eq 0 ]]; then
-            HEIGHT=$(expr $(echo "$NBCTL_OUTPUT"|wc -l) + 7)
-            whiptail --title "Added Neighbors" \
-                     --msgbox "$NBCTL_OUTPUT" \
+            HEIGHT=8
+            whiptail --title "Added Peers" \
+                     --msgbox "Peer added." \
                     $HEIGHT $WIDTH
         else
             if echo "$NBCTL_OUTPUT" | grep -q "urllib2.URLError" ; then
@@ -691,52 +684,52 @@ function add_neighbors() {
     fi
 }
 
-function remove_neighbors() {
-    local NEIGHBORS_ARRAY_INDEXED
-    local NEIGHBOR_INDEX
-    local NEIGHBORS_ARRAY
-    local NEIGHBORS
-    local NEIGHBOR
+function remove_peers() {
+    local PEERS_ARRAY_INDEXED
+    local PEER_INDEX
+    local PEERS_ARRAY
+    local PEERS
+    local PEER
     local HEIGHT
 
     echo "Getting peers list..."
-    NEIGHBORS=$(list_neighbors get | awk '{$1=$1}{print}' | tr -d ' ')
+    PEERS=$(list_peers get)
     RC=$?
     clear
     if [[ $RC -ne 0 ]]; then
         whiptail --title "Peers Failed" \
-                 --msgbox "Failed to get list of peers: $NEIGHBORS" \
+                 --msgbox "Failed to get list of peers: $PEERS" \
                  8 $WIDTH
         return
     fi
-    if [ "$NEIGHBORS" == "" ]; then
+    if [ "$PEERS" == "" ]; then
         whiptail --title "No Peers" \
                  --msgbox "There are no peers configured" \
                  8 $WIDTH
         return
     fi
-    HEIGHT=$(expr $(echo "$NEIGHBORS"|wc -l) + 5)
-    NEIGHBORS_ARRAY=($(echo "$NEIGHBORS"))
-    NEIGHBORS_ARRAY_INDEXED=($(echo "$NEIGHBORS" | awk '!/^ / && NF { print NR")"; print $1$2$3}'))
-    NEIGHBOR_INDEX=$(whiptail --title "Remove peers" --menu "Choose a peer" 25 $WIDTH 16  "${NEIGHBORS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
+
+    PEERS=$(echo "$PEERS" | jq -r '.peers[] | "\(.alias),\(.multiAddresses[0]),\(.id)"' | column -c 80 -t)
+    HEIGHT=$(expr $(echo "$PEERS"|wc -l) )
+    PEERS_ARRAY=($(echo "$PEERS"))
+    PEERS_ARRAY_INDEXED=($(echo "$PEERS" | awk '!/^ / && NF { print NR")"; print $1$2$3}'))
+    PEER_INDEX=$(whiptail --title "Remove peers" --menu "Choose a peer" 25 120 16  "${PEERS_ARRAY_INDEXED[@]}" 3>&1 1>&2 2>&3)
     if [ $? -eq 1 ]; then
         return
     fi
 
-    local NEIGHBOR_INX=$(echo "$NEIGHBOR_INDEX" | cut -d')' -f1)
-    local NEIGHBOR_INX=$(expr $NEIGHBOR_INX - 1)
-    local TO_REMOVE="${NEIGHBORS_ARRAY[$NEIGHBOR_INX]}"
-    local SCHEME=$(echo "$TO_REMOVE"|cut -d'/' -f2|cut -d '|' -f1)
-    local ADDRESS=$(echo "$TO_REMOVE"|cut -d'/' -f1)
-    local DOMAIN="($(echo "$TO_REMOVE" | cut -d '|' -f2))"
-    [[ "$DOMAIN" == "(null)" ]] && DOMAIN=""
+    local PEER_INX=$(echo "$PEER_INDEX" | cut -d')' -f1)
+    local PEER_INX=$(expr $PEER_INX - 1)
+    local TO_REMOVE="${PEERS_ARRAY[$PEER_INX]}"
+    local ALIAS=$(echo "$TO_REMOVE" | cut -d',' -f1)
+    local ID="$(echo "$TO_REMOVE" | cut -d ',' -f3)"
 
     if (whiptail --title "Confirm removal" \
-                 --yesno "Are you sure you want to remove:\n\n${SCHEME}://${ADDRESS} ${DOMAIN}" \
+                 --yesno "Are you sure you want to remove:\n\n${ALIAS},${ID}" \
                  --defaultno \
                  12 $WIDTH)
     then
-        REMOVAL_OUTPUT=$(nbctl -r -n "${SCHEME}://${ADDRESS}" --hornet 2>&1)
+        REMOVAL_OUTPUT=$(nbctl -r -p "${ID}" 2>&1)
         if [ $? -eq 0 ];then
             whiptail --title "Removed successfully" \
                      --msgbox "$REMOVAL_OUTPUT" \
@@ -750,45 +743,46 @@ function remove_neighbors() {
     fi
 }
 
-function list_neighbors() {
-    local NEIGHBORS_QUERY
-    local NEIGHBORS
+function list_peers() {
+    local PEERS_QUERY
+    local PEERS
     local HEIGHT
     local RETURN_RES=$1
 
-    NEIGHBORS_QUERY=$(nbctl -l 2>&1)
+    PEERS_QUERY=$(nbctl -s 2>&1)
     RC=$?
     if [[ $RC -ne 0 ]]; then
-        if echo "$NEIGHBORS_QUERY" | egrep -q "urllib..URLError|timeout|refused" ; then
-            NEIGHBORS_QUERY="Failed to communicate with HORNET API port. Check if HORNET is active and if $HOME/.nbctl is configured correctly."
+        if echo "$PEERS_QUERY" | egrep -q "urllib..URLError|timeout|refused" ; then
+            PEERS_QUERY="Failed to communicate with HORNET API port. Check if HORNET is active and if $HOME/.nbctl is configured correctly."
         else
-            NEIGHBORS_QUERY="Unknown error"
+            PEERS_QUERY="Unknown error"
         fi
         if [ -n "$RETURN_RES" ]; then
-            echo "$NEIGHBORS_QUERY"
+            echo "$PEERS_QUERY"
             return 1
         fi
-        HEIGHT=$(expr $(echo "$NEIGHBORS_QUERY"|wc -l) + 7)
+        HEIGHT=$(expr $(echo "$PEERS_QUERY"|wc -l) + 7)
         whiptail --title "List peers failed" \
-                 --msgbox "$NEIGHBORS_QUERY" \
+                 --msgbox "$PEERS_QUERY" \
                  $HEIGHT $WIDTH
         return 1
     else
-        NEIGHBORS=$(echo "$NEIGHBORS_QUERY" | jq -r '.neighbors[] | "\(.address)/\(.connectionType) | \(.domain)"' | column -c 80 -t)
+        #PEERS=$(echo "$PEERS_QUERY" | jq -r '.peers[] | "\(.alias) \(.multiAddresses[0]) conn: \(.connected)\n"' | column -c 80 -t)
         if [ -n "$RETURN_RES" ]; then
-            echo "$NEIGHBORS"
+            echo "$PEERS_QUERY"
             return 0
         fi
 
-        if [ "$NEIGHBORS" == "" ]; then
+        PEERS=$(echo "$PEERS_QUERY" | jq -r '.peers[] | "\(.alias) \(.multiAddresses[0])  connected: \(.connected),\n'"    "'\(.id)"' | column -c 80)
+        if [ "$PEERS" == "" ]; then
             LENGTH=0
         else
-            LENGTH=$(echo "$NEIGHBORS"|wc -l)
-            FOR_WINDOW_LENGTH=$(($(echo "$NEIGHBORS"|wc -l)*2))
+            LENGTH=$(expr $(echo "$PEERS"|wc -l) / 2)
+            FOR_WINDOW_LENGTH=$(($(echo "$PEERS"|wc -l)*2))
         fi
-        local HEIGHT=$(expr $FOR_WINDOW_LENGTH + 8)
+        local HEIGHT=$(expr $FOR_WINDOW_LENGTH + 3)
         whiptail --title "List Peers" \
-                 --msgbox "Total: ${LENGTH} peer(s)\n\n${NEIGHBORS}" \
+                 --msgbox "Total: ${LENGTH} peer(s)\n\n${PEERS}" \
                  $HEIGHT $WIDTH
     fi
 }
@@ -1123,7 +1117,7 @@ function update_config() {
 ### Notice ###
 function how_to_setup() {
     whiptail --title "HORC v${VERSION} - Instructions" \
-             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/peering.json\n\nThis will allow this script to use the nbctl utility to manage neighbors and get the node's data." \
+             --msgbox "Check that you have the .nbctl file in your home folder (ls -l ~/.nbctl).\nExample of the file's contents:\n\napi_version: 1\nhost: http://127.0.0.1:14265\nfile: /var/lib/hornet/peering.json\n\nThis will allow this script to use the nbctl utility to manage peers and get the node's data." \
              15 $WIDTH
 }
 
@@ -1135,7 +1129,7 @@ function configure_files_menu() {
               22 48 12 \
     "a)" "Hornet System Config" \
     "b)" "Hornet Main Config" \
-    "c)" "Hornet Neighbors Config" \
+    "c)" "Hornet Peers Config" \
     "Z)" "Choose Editor" \
     3>&1 1>&2 2>&3
 }
@@ -1318,8 +1312,8 @@ function toggle_comnet(){
     pause "$MSG Press ENTER to return to menu."
 }
 
-### Neighbors ###
-function neighbors_menu(){
+### Peers ###
+function peers_menu(){
     whiptail --title "HORC v${__VERSION__} - Peers" \
              --menu "Choose an option" \
              --cancel-button "Back" \
@@ -1330,13 +1324,9 @@ function neighbors_menu(){
     3>&1 1>&2 2>&3
 }
 
-function neighbors(){
-    pause "Sorry, this is still work-in-progress. Press ENTER to return to menu."
-    clear
-    return
-
+function peers(){
     local CHOICE
-    CHOICE=$(neighbors_menu)
+    CHOICE=$(peers_menu)
     RC=$?
     if [[ $RC -eq 1 ]]; then
         return
@@ -1344,22 +1334,22 @@ function neighbors(){
 
     case "$CHOICE" in
         "a)")
-            add_neighbors
-            neighbors
+            add_peer
+            peers
             ;;
 
         "b)")
-            remove_neighbors
-            neighbors
+            remove_peers
+            peers
             ;;
 
         "c)")
-            list_neighbors
-            neighbors
+            list_peers
+            peers
             ;;
 
         *)
-            neighbors
+            peers
             ;;
     esac
 }
@@ -1473,7 +1463,7 @@ function run_main_menu() {
             ;;
 
         "m)")
-            neighbors
+            peers
             run_main_menu
             ;;
 

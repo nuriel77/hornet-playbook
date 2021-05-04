@@ -50,13 +50,8 @@
       with_items:
         - horc
         - run-playbook
+        - nbctl
       tags: horc_and_run_playbook_scripts
-
-    - name: download nbctl
-      get_url:
-        url: https://raw.githubusercontent.com/nuriel77/iri-playbook/feat/docker/roles/iri/files/nbctl
-        dest: /usr/bin/nbctl
-        mode: 0755
 
     - name: download ps_mem
       get_url:

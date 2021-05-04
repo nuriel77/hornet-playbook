@@ -1,0 +1,263 @@
+#!/bin/sh
+
+# Find the python binary
+""":"
+
+for cmd in python3 python
+do
+   command -v > /dev/null $cmd && exec $cmd $0 "$@"
+done
+
+>&2 echo "Error: Python not found"
+
+exit 2
+
+":"""
+import argparse
+import logging
+import yaml
+import json
+import sys
+import os
+from os.path import expanduser
+from argparse import RawTextHelpFormatter
+
+
+try:
+    import urllib3
+except ImportError:
+    sys.stderr.write("Missing python urllib3? " +
+                     "Install via 'pip install urllib3'"
+                     "\n")
+    sys.exit(1)
+
+
+__VERSION__ = '0.2.5'
+
+LOG = logging.getLogger(__name__)
+DEFAULT_API_VERSION = '1'
+DEFAULT_HOST = 'http://127.0.0.1:14265'
+
+"""Script to list, add or remove peers
+   from Hornet API and the configuration file
+   source: https://github.com/nuriel77/hornet-playbook
+   Copyright (c) 2021 Nuriel Shem-Tov
+"""
+
+def parse_args():
+
+    parser = argparse.ArgumentParser(
+        formatter_class=RawTextHelpFormatter,
+        description='Add or remove full node peers.',
+        epilog='Examples\n'
+               '--------\n'
+               'Add peer:    nbctl -a -p /dns/node02.iota.io/tcp/15600/p2p/23z3RtoNTajsORxSUFb9CDgmJvigZCRd23uMDdppVYNOud1tlXI3,alias/node02\n'
+               'Remove peer: nbctl -r -p 23z3RtoNTajsORxSUFb9CDgmJvigZCRd23uMDdppVYNOud1tlXI3\n'
+               'List full:   nbctl -l\n'
+               'List short:  nbctl -s\n'
+               '--host and --api-version can be placed in a file in the home directory ~/.nbctl:\n'
+               'api_version: 1.4.2.4\n'
+               'host: http://127.0.0.1:12345')
+
+    parser.add_argument('--debug', '-d', action='store_true',
+                        default=False,
+                        help='Set debug on')
+
+    parser.add_argument('--peer', '-p',
+                        help='Peer to process. For removal use peer ID only.')
+
+    group = parser.add_mutually_exclusive_group(required=True)
+
+    group.add_argument('--remove', '-r', action='store_true',
+                       help='Removes peers')
+
+    group.add_argument('--add', '-a', action='store_true',
+                       help='Add peers')
+
+    group.add_argument('--list', '-l', action='store_true',
+                       help='List peers')
+
+    group.add_argument('--list-short', '-s', action='store_true',
+                       help='List peers, short output.')
+
+    parser.add_argument('--host', '-i',
+                        help='Node API endpoint. Default: %s' %
+                        DEFAULT_HOST)
+
+    parser.add_argument('--timeout', '-t',
+                        help='Timeout. Default: %(default)s',
+                        type=int, default=5)
+
+    parser.add_argument('--hornet', action='store_true',
+                        default=True,
+                        help='Set when node software is HORNET. Default: %(default)s')
+
+    parser.add_argument('--version', '-V', action='version',
+                        version='nbctl %s' % __VERSION__)
+
+    parser.add_argument('--api-version', '-v',
+                        default=DEFAULT_API_VERSION,
+                        help='HORNET API Version. Default: %(default)s')
+
+    return parser
+
+
+def send_to_api(http, method, url, body, timeout, headers):
+    response = None
+    try:
+        response = http.request(method,
+                                url,
+                                body=body,
+                                timeout=timeout,
+                                headers=headers)
+    except Exception as e:
+        LOG.error("Unknown error: '%s'" % e)
+        sys.exit(1)
+
+    return response
+
+
+def output_shortened_list(json_data):
+    remove_keys = ["gossip", "relation"]
+
+    for i in range(len(json_data['data'])):
+        [json_data['data'][i].pop(key) for key in remove_keys if key in json_data['data'][i]]
+
+    short_json_data = {
+        "peers": json_data['data'],
+        "total_peers": len(json_data['data']),
+        "total_connected": len([i for i in json_data['data'] if i["connected"] is True])
+    }
+    print(json.dumps(short_json_data, indent=4, sort_keys=True))
+
+
+def run():
+    try:
+        parser = parse_args()
+        args = parser.parse_args()
+    except Exception as e:
+        sys.stderr.write("Failed to parse arguments: %s\n" % e)
+        sys.exit(1)
+
+    set_logger(debug=args.debug)
+
+    peer_data = {}
+    path_append = ''
+
+    if args.add:
+        method = 'POST'
+        peer_data["alias"] = ''
+        peer_data["multiAddress"] = args.peer.split(',')[0]
+        if len(args.peer.split(',')) > 1:
+            try:
+                peer_data["alias"] = args.peer.split(',')[1].split('/')[1]
+            except IndexError:
+                sys.stderr.write("Error: Missing alias\n")
+                sys.exit(1)
+    elif args.remove:
+        method = 'DELETE'
+        peer_id = args.peer
+
+        # If user provides the full peer address syntax, parse only the ID
+        if len(args.peer.split('/')) > 1:
+            peer_id = args.peer.split('/')[6].split(',')[0]
+
+        path_append = '/' + peer_id
+    elif args.list or args.list_short:
+        method = 'GET'
+    else:
+        sys.stderr.write("Error: You need to specify a command:\n\n")
+        parser.print_help()
+        sys.exit(1)
+
+    if (args.add or args.remove) and args.peer is None:
+        sys.stderr.write("Error: Argument --peers/-p is required.\n")
+        sys.exit(1)
+
+    # Set defaults
+    local_config = get_homedir_nbctl()
+    if args.api_version is None and 'api_version' in local_config:
+        args.api_version = local_config['api_version']
+    elif args.api_version is None:
+        args.api_version = DEFAULT_API_VERSION
+
+    if args.host is None and 'host' in local_config:
+        args.host = local_config['host']
+    elif args.host is None:
+        args.host = DEFAULT_HOST
+
+    if not hasattr(args, 'hornet') and 'hornet' in local_config:
+        args.hornet = local_config['hornet']
+    elif not hasattr(args, 'hornet'):
+        args.hornet = False
+
+    # Prepare url and headers
+    base_path = 'api/v%s/peers' % args.api_version
+    url = args.host + '/' + base_path + path_append
+    headers = {'content-type': 'application/json'}
+    to_send = json.dumps(peer_data)
+
+    http = urllib3.PoolManager()
+    LOG.debug(f"Send {method} request to {url}")
+    response = send_to_api(http,
+                           method,
+                           url,
+                           body=to_send,
+                           timeout=args.timeout,
+                           headers=headers)
+
+    if response.status > 204:
+        LOG.error("Error response from node: code %d, response: '%s'" %
+                  (response.status, response.data.decode('utf-8')))
+        sys.exit(1)
+
+    if response.status != 204:
+        json_data = json.loads(response.data.decode('utf-8'))
+        if args.list:
+            print(json.dumps(json_data, indent=4, sort_keys=True))
+        elif args.list_short:
+            output_shortened_list(json_data)
+    else:
+        print("Peer deleted")
+
+    sys.exit()
+
+
+def set_logger(debug):
+    """ Sets the logging handler and level
+    :param debug: Boolean set debug on or off
+    """
+    fh = logging.StreamHandler()
+    formatter = logging.Formatter('%(levelname)s %(message)s')
+    fh.setFormatter(formatter)
+    LOG.addHandler(fh)
+
+    if debug is True:
+        LOG.setLevel(logging.DEBUG)
+    else:
+        LOG.setLevel(logging.INFO)
+
+    LOG.debug('Debug on')
+
+
+def get_homedir_nbctl():
+    home = expanduser("~")
+    config_file = home + '/.nbctl'
+    if not os.path.exists(config_file):
+        return {}
+
+    with open(config_file, 'r') as stream:
+        try:
+            data = yaml.safe_load(stream)
+        except yaml.YAMLError as e:
+            LOG.error("Failed to read '%s': %s" %
+                      (config_file, e))
+
+    if data is None:
+        return {}
+
+    return data
+
+
+if __name__ == "__main__":
+    run()

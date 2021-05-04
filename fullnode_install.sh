@@ -184,10 +184,10 @@ function init_centos_7(){
       python-pip\
       python3-pip
     if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath scrypt
+        /usr/bin/pip install jmespath scrypt pyyaml
     fi
     if [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath scrypt
+        /usr/bin/pip3 install jmespath scrypt pyyaml urllib3
     fi
 }
 
@@ -217,7 +217,7 @@ function init_centos_8(){
       python3-pip\
       cracklib\
       redhat-lsb-core
-    pip3 --disable-pip-version-check install ansible jmespath scrypt
+    pip3 --disable-pip-version-check install ansible jmespath scrypt pyyaml urllib3
     echo "$PATH" | grep -q '/usr/local/bin' || export PATH=$PATH:/usr/local/bin
     grep PATH /root/.bashrc | grep -q '/usr/local/bin' || echo 'export PATH=$PATH:/usr/local/bin' >> /root/.bashrc
 }
@@ -256,10 +256,10 @@ function init_ubuntu(){
     [[ ! "$VER" =~ ^20 ]] && apt-get install python-pip -y
 
     if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath scrypt
+        /usr/bin/pip install jmespath scrypt pyyaml
     fi
     if [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath scrypt
+        /usr/bin/pip3 install jmespath scrypt pyyaml urllib3
     fi
 }
 
@@ -298,10 +298,10 @@ function init_debian(){
                     python-pip \
                     python-backports.functools-lru-cache -y
     if [ -e /usr/bin/pip ]; then
-        /usr/bin/pip install jmespath scrypt
+        /usr/bin/pip install jmespath scrypt pyyaml
     fi
     if [ -e /usr/bin/pip3 ]; then
-        /usr/bin/pip3 install jmespath scrypt
+        /usr/bin/pip3 install jmespath scrypt pyyaml urllib3
     fi
 }
 

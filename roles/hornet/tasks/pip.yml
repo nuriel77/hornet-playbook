@@ -4,6 +4,8 @@
     name:
      - docker
      - jmespath
+     - pyyaml
+     - urllib3
   tags:
     - pip
     - build_hornet_image

@@ -247,8 +247,37 @@ Ports: 80/tcp (for certificate verification/enabling HTTPS), 443/tcp and 15600/t
 
 ## Peers
 
-Peers can be added via Hornet's dashboard.
+Peers can be added via:
 
+* Hornet's dashboard (Note: this will be possible once [this Hornet github issue](https://github.com/gohornet/hornet/issues/1072) will be resolved.
+* via `horc` tool available on the node cli
+* nbctl (see below) a cli tool
+
+### nbctl
+
+You will find that the tool `nbctl` was installed on your node. Using this tool you can manage peers from the command line. See examples below:
+
+Add a peer with alias:
+```sh
+nbctl -a -p /dns/node01.iota.io/tcp/15600/p2p/12D3KzzWDLS1c1O6AaZlf8oipHnJb1361SoYMdh9S1T2Jz7lDd5P,alias/my_friend
+```
+
+Remove a peer:
+```sh
+nbctl -r -p 12D3KzzWDLS1c1O6AaZlf8oipHnJb1361SoYMdh9S1T2Jz7lDd5P
+# or
+nbctl -r -p /dns/node01.iota.io/tcp/15600/p2p/12D3KzzWDLS1c1O6AaZlf8oipHnJb1361SoYMdh9S1T2Jz7lDd5P,alias/my_friend
+```
+
+List peers:
+```sh
+nbctl -l
+```
+
+List peers with shorter output:
+```sh
+nbctl -s
+```
 
 ## Monitoring
 
