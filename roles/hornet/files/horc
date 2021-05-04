@@ -780,7 +780,7 @@ function list_peers() {
             LENGTH=$(expr $(echo "$PEERS"|wc -l) / 2)
             FOR_WINDOW_LENGTH=$(($(echo "$PEERS"|wc -l)*2))
         fi
-        local HEIGHT=$(expr $FOR_WINDOW_LENGTH + 3)
+        local HEIGHT=$(expr $FOR_WINDOW_LENGTH + 8)
         whiptail --title "List Peers" \
                  --msgbox "Total: ${LENGTH} peer(s)\n\n${PEERS}" \
                  $HEIGHT $WIDTH
