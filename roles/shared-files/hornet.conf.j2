@@ -32,6 +32,9 @@ server {
 
     # websocket
     location /ws {
+{% if dashboard_auth_basic_disabled is defined and dashboard_auth_basic_disabled %}
+        auth_basic off;
+{% endif %}
         proxy_pass http://hornet_dashboard/ws;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
