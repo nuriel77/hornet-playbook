@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+# This is just a wrapper to help run ansible-playbook
+# for hornet-playbook and pass arguments to ansible.
+
+function cleanup() {
+    cd - >/dev/null
+    trap - EXIT
+}
+
+# Set exit trap
+trap cleanup INT TERM EXIT
+
+cd /opt/hornet-playbook
+
+echo "Running playbook with arguments: $@"
+ansible-playbook -v site.yml -i inventory "$@"

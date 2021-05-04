@@ -40,13 +40,17 @@
         - ansible_distribution == 'CentOS'
         - found_locale.rc != 0
 
-    - name: copy horc
+    - name: copy node scripts
       copy:
-        src: files/horc
-        dest: /usr/bin/horc
+        src: "files/{{ item }}"
+        dest: "/usr/bin/{{ item }}"
         mode: 0755
         owner: root
         group: root
+      with_items:
+        - horc
+        - run-playbook
+      tags: horc_and_run_playbook_scripts
 
     - name: download nbctl
       get_url:

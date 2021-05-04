@@ -45,6 +45,9 @@ server {
 
     # hornet dashboard
     location / {
+{% if dashboard_auth_basic_disabled is defined and dashboard_auth_basic_disabled %}
+        auth_basic off;
+{% endif %}
         limit_req zone=hornet_dashboard burst={{ vhost_nginx_burst_limit | default('75') }};
         proxy_pass http://hornet_dashboard;
         proxy_set_header X-Forwarded-Host $host;
