@@ -19,6 +19,7 @@ hornet_profiles_config_file: profiles.json
 hornet_db_path: "{{ hornet_home_path }}/mainnetdb"
 hornet_db_tar: "{{ hornet_home_path }}/snapshot/export.bin"
 hornet_p2pstore_path: "{{ hornet_home_path }}/p2p"
+dashboard_auth_basic_enabled: true
 
 # How long to wait (seconds) for hornet to
 # gracefully stop. This applies for restart/stop.

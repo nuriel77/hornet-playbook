@@ -180,6 +180,17 @@ Note that if you haven't configured the HTTPS certificate via `horc` you will ge
 
 The first time you connect you'll have to entre the username and password you've configured during the installation. **However** there's one more "dashboard" to login to for which you should just use the same credentials.
 
+### Disable Initial Login Prompt
+The first user/password login prompt can be disabled with the following steps:
+
+```sh
+cd /opt/hornet-playbook && git pull && echo "dashboard_auth_basic_enabled: false" >> group_vars/all/z-installer-override.yml
+```
+Then run:
+```sh
+run-playbook --tags=nginx_role
+```
+
 ## Overwrite Hornet Config
 
 It is possible to edit `/var/lib/hornet/config.json` manually and restart HORNET to apply the changes. Re-running the playbook will not overwrite your changes by default.

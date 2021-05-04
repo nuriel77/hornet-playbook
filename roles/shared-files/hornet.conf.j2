@@ -26,14 +26,11 @@ server {
     # or include a file containing the SSL directives
     include /etc/nginx/conf.d/ssl.cfg;
 
-    # For password authentication use a htpasswd file
-    auth_basic "Restricted";
-    auth_basic_user_file /etc/nginx/.htpasswd;
-
     # websocket
     location /ws {
-{% if dashboard_auth_basic_disabled is defined and dashboard_auth_basic_disabled %}
-        auth_basic off;
+{% if dashboard_auth_basic_enabled is defined and dashboard_auth_basic_enabled %}
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
 {% endif %}
         proxy_pass http://hornet_dashboard/ws;
         proxy_http_version 1.1;
@@ -48,8 +45,9 @@ server {
 
     # hornet dashboard
     location / {
-{% if dashboard_auth_basic_disabled is defined and dashboard_auth_basic_disabled %}
-        auth_basic off;
+{% if dashboard_auth_basic_enabled is defined and dashboard_auth_basic_enabled %}
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
 {% endif %}
         limit_req zone=hornet_dashboard burst={{ vhost_nginx_burst_limit | default('75') }};
         proxy_pass http://hornet_dashboard;
@@ -77,12 +75,14 @@ server {
 
     location /api/v1/peers {
         limit_req zone=hornet_api burst=25;
+        auth_basic_user_file /etc/nginx/.htpasswd;
         auth_basic "restricted";
         proxy_pass http://hornet_api;
     }
 
     location /api/plugins {
         limit_req zone=hornet_api burst=25;
+        auth_basic_user_file /etc/nginx/.htpasswd;
         auth_basic "restricted";
         proxy_pass http://hornet_api;
     }
@@ -105,6 +105,8 @@ server {
 
     # prometheus
     location /prometheus/ {
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
         limit_req zone=hornet_dashboard burst={{ vhost_nginx_burst_limit | default('75') }};
         proxy_pass http://127.0.0.1:{{ prom_port }};
         proxy_set_header X-Forwarded-Host $host;
@@ -118,6 +120,8 @@ server {
 
     # alertmanager
     location /alertmanager/ {
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htpasswd;
         limit_req zone=hornet_dashboard burst={{ vhost_nginx_burst_limit | default('75') }};
         proxy_pass http://127.0.0.1:{{ alertmanager_port }}/;
         proxy_set_header X-Forwarded-Host $host;
