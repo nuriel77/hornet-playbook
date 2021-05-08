@@ -184,7 +184,7 @@ The first time you connect you'll have to entre the username and password you've
 The first user/password login prompt can be disabled with the following steps:
 
 ```sh
-cd /opt/hornet-playbook && git pull && echo "dashboard_auth_basic_enabled: false" >> group_vars/all/z-installer-override.yml
+cd /opt/hornet-playbook && git pull && grep "^dashboard_auth_basic_enabled: false" group_vars/all/z-installer-override.yml || echo "dashboard_auth_basic_enabled: false" >> group_vars/all/z-installer-override.yml
 ```
 Then run:
 ```sh
