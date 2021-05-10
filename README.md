@@ -170,6 +170,16 @@ Make sure you are root (`sudo su`) and run:
 horc
 ```
 
+## Node Peer ID
+
+During installation the installer script generates a static unique peer ID using Hornet. The key is stored in `/opt/hornet-playbook/group_vars/all/z-installer-override.yml`.
+
+The private key is configured in `/var/lib/hornet/config.json`, thus the ID is kept even if the p2p DB get corrupted or deleted.
+
+You may also choose to back up the key in a safe place in case you need to recover your node's ID due to a failure.
+
+There's an option in `horc` to regenerate the Peer ID if needed.
+
 ## Hornet Dashboard
 
 Point your browser to your host's IP address or fully qualified domain name, e.g.:
