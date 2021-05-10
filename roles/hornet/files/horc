@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.1.1
+VERSION_TEMP=1.2.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -1312,6 +1312,63 @@ function toggle_comnet(){
     pause "$MSG Press ENTER to return to menu."
 }
 
+function set_node_peer_id(){
+    local OUTPUT
+    local TAG
+    local PRIVATE_KEY
+    local PEER_ID
+
+    if grep -q ^hornet_config_p2p_identityPrivateKey /opt/hornet-playbook/group_vars/all/z-installer-override.yml
+    then
+        if ! (whiptail --title "Existing private key" \
+                 --yesno "Node already has a private key set in /opt/hornet-playbook/group_vars/all/z-installer-override.yml\n\nWould you like to re-generate the ID? (Note that you'll have to let your existing peers know about the ID change)." \
+                 --defaultno \
+                 12 $WIDTH)
+        then
+            return 0
+        fi
+    fi
+
+    if [ -f "/etc/default/hornet" ]
+    then
+        TAG=$(grep ^TAG /etc/default/hornet | cut -d'=' -f 2)
+    elif [ -f "/etc/sysconfig/hornet" ]
+    then
+        TAG=$(grep ^TAG /etc/sysconfig/hornet | cut -d'=' -f 2)
+    fi
+
+    echo "Get new ID ..."
+    OUTPUT=$(/usr/bin/docker run -it --rm --name getp2pID "gohornet/hornet:${TAG}" tools p2pidentity)
+
+    # TODO: open github issue for hornet team to output in json format as an option
+    PRIVATE_KEY=$(echo "$OUTPUT" | sed 's|^.*Your p2p private key: \([a-f0-9]*\)|\1|' | head -1 | tr -d ' ' | tr -d '\r')
+    PEER_ID=$(echo "$OUTPUT" | tail -1 | awk -F":" {'print $2'} | tr -d ' ' | tr -d '\r')
+
+    # Make sure old values are gone
+    sed -i '/^hornet_config_p2p_identityPrivateKey/d' /opt/hornet-playbook/group_vars/all/z-installer-override.yml
+    sed -i '/^hornet_config_p2p_identityPeerID/d' /opt/hornet-playbook/group_vars/all/z-installer-override.yml
+
+    echo "hornet_config_p2p_identityPrivateKey: $PRIVATE_KEY" >> /opt/hornet-playbook/group_vars/all/z-installer-override.yml
+    echo "hornet_config_p2p_identityPeerID: $PEER_ID" >> /opt/hornet-playbook/group_vars/all/z-installer-override.yml
+
+    tmpfile=$(mktemp /tmp/hornet.config.XXXXXX)
+    cp -- "/var/lib/hornet/config.json" "/var/lib/hornet/config.json.$(date +%s)"
+    jq '.p2p.identityPrivateKey="'$PRIVATE_KEY'"' < /var/lib/hornet/config.json > "$tmpfile"
+    mv -- "$tmpfile" "/var/lib/hornet/config.json"
+    chown hornet:hornet "/var/lib/hornet/config.json"
+    chmod 600 "/var/lib/hornet/config.json"
+
+    echo "Stopping hornet to remove old identity ..."
+    /bin/systemctl stop hornet
+
+    rm -rf /var/lib/hornet/p2p/*
+
+    echo "Starting hornet with new identity ..."
+    /bin/systemctl start hornet
+
+    pause "Done setting new peer ID. Press ENTER to return to menu."
+}
+
 ### Peers ###
 function peers_menu(){
     whiptail --title "HORC v${__VERSION__} - Peers" \
@@ -1384,6 +1441,7 @@ function main_menu() {
     "m)" "Peers" \
     "n)" "Toggle ComNet" \
     "o)" "Update config.json" \
+    "p)" "Set node Peer ID" \
     "Z)" "Configure this Script" \
     3>&1 1>&2 2>&3
 }
@@ -1476,6 +1534,12 @@ function run_main_menu() {
             update_config
             run_main_menu
             ;;
+
+        "p)")
+            set_node_peer_id
+            run_main_menu
+            ;;
+
         *)
             run_main_menu
             ;;
