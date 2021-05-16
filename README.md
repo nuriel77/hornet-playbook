@@ -190,11 +190,11 @@ Note that if you haven't configured the HTTPS certificate via `horc` you will ge
 
 The first time you connect you'll have to entre the username and password you've configured during the installation. **However** there's one more "dashboard" to login to for which you should just use the same credentials.
 
-### Disable Initial Login Prompt
-The first user/password login prompt can be disabled with the following steps:
+### Enable Initial Login Prompt to Dashboard
+By default anyone can access the node's dashboard with limited access. To disable that, a user/password login prompt can be enabled with the following steps:
 
 ```sh
-cd /opt/hornet-playbook && git pull && grep "^dashboard_auth_basic_enabled: false" group_vars/all/z-installer-override.yml || echo "dashboard_auth_basic_enabled: false" >> group_vars/all/z-installer-override.yml
+cd /opt/hornet-playbook && git pull && grep "^dashboard_auth_basic_enabled: true" group_vars/all/z-installer-override.yml || echo "dashboard_auth_basic_enabled: true" >> group_vars/all/z-installer-override.yml
 ```
 Then run:
 ```sh
