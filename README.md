@@ -25,6 +25,8 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
      * [nbctl](#nbctl)
    * [Monitoring](#monitoring)
    * [Security](#security)
+     * [Node Security](#node-security)
+     * [Get JWT Token](#get-jwt-token)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
      * [Hornet Does Not Startup](#hornet-does-not-startup)
@@ -301,9 +303,19 @@ cd /opt/hornet-playbook && ansible-playbook -i inventory site.yml -v --tags=moni
 
 ## Security
 
+### Node Security
 Security should not be taken lightly. It is recommended to take several steps to improve how you interact and authenticate with your server.
 
 Please follow [this guide](https://iri-playbook.readthedocs.io/en/master/securityhardening.html), it works for any Linux server.
+
+### Get JWT Token
+If you've enabled JWT token access for the REST API you can get a valid token by running the following command. Note that it needs to stop Hornet to obtain the token. It will start it up again once it is done:
+
+```sh
+systemctl stop hornet && docker run -u 39999:39999 --rm -it -v /var/lib/hornet/p2p:/app/p2p:ro gohornet/hornet:1.0.2 --p2p.peerStore.path=/app/p2p/store tool jwt-api && systemctl start hornet
+```
+Make sure to use the right hornet version on the image tag above (`gohornet/hornet:1.0.2`)
+
 
 ## Troubleshooting
 
