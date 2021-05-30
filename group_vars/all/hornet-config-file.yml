@@ -64,9 +64,13 @@ hornet_config_snapshots_downloadURLs:
     delta: https://chrysalis-dbfiles.iota.org/snapshots/hornet/latest-delta_snapshot.bin
 
 # pruning
-hornet_config_pruning_enabled: true
-hornet_config_pruning_delay: 60480
-hornet_config_pruneReceipts: false
+hornet_config_pruning_milestones_enabled: false
+hornet_config_pruning_milestones_maxMilestonesToKeep: 60480
+hornet_config_pruning_size_enabled: true
+hornet_config_pruning_size_targetSize: "{{ hornet_db_max_size }}"
+hornet_config_pruning_size_thresholdPercentage: 10.0
+hornet_config_pruning_size_cooldownTime: 5m
+hornet_config_pruning_pruneReceipts: false
 
 # protocol
 hornet_config_protocol_networkID: chrysalis-mainnet
