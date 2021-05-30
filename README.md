@@ -312,7 +312,7 @@ Please follow [this guide](https://iri-playbook.readthedocs.io/en/master/securit
 If you've enabled JWT token access for the REST API you can get a valid token by running the following command. Note that it needs to stop Hornet to obtain the token. It will start it up again once it is done:
 
 ```sh
-systemctl stop hornet && docker run -u 39999:39999 --rm -it -v /var/lib/hornet/p2p:/app/p2p:ro gohornet/hornet:1.0.2 --p2p.peerStore.path=/app/p2p/store tool jwt-api && systemctl start hornet
+systemctl stop hornet && docker run -u 39999:39999 --rm -it -v /var/lib/hornet/p2p:/app/p2p gohornet/hornet:1.0.2 --p2p.peerStore.path=/app/p2p/store tool jwt-api && systemctl start hornet
 ```
 Make sure to use the right hornet version on the image tag above (`gohornet/hornet:1.0.2`)
 
