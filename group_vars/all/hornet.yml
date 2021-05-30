@@ -70,6 +70,9 @@ hornet_enable_plugins:
 # Set openfiles limit
 hornet_nofile_limit: "65535"
 
+# DB Size Limits
+hornet_db_max_size: 25GB
+
 #
 # Dashboard nginx
 hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"

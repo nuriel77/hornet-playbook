@@ -38,9 +38,17 @@
     "downloadURLs": {{ hornet_config_snapshots_downloadURLs | to_nice_json(indent=4) }}
   },
   "pruning": {
-    "enabled": {{ hornet_config_pruning_enabled | bool | string | lower }},
-    "delay": {{ hornet_config_pruning_delay | int }},
-    "pruneReceipts": {{ hornet_config_pruneReceipts | bool | string | lower }}
+    "milestones": {
+      "enabled": {{ hornet_config_pruning_milestones_enabled | bool | string | lower }},
+      "maxMilestonesToKeep": {{ hornet_config_pruning_milestones_maxMilestonesToKeep | int }}
+    },
+    "size": {
+      "enabled": {{ hornet_config_pruning_size_enabled | bool | string | lower }},
+      "targetSize": "{{ hornet_db_max_size }}",
+      "thresholdPercentage": {{ hornet_config_pruning_size_thresholdPercentage | float }},
+      "cooldownTime": "{{ hornet_config_pruning_size_cooldownTime }}"
+    },
+    "pruneReceipts": {{ hornet_config_pruning_pruneReceipts | bool | string | lower }}
   },
   "protocol": {
     "networkID": "{{ hornet_config_protocol_networkID }}",

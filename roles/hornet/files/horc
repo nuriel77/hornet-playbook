@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.2.1
+VERSION_TEMP=1.3.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -415,6 +415,47 @@ function get_db() {
         fi
     fi
 }
+
+## Set DB Max Size
+function set_db_max_size() {
+    local DB_MAX_SIZE_CURRENT
+    local DB_MAX_SIZE_NEW
+
+    if [[ $(jq -r .pruning.size.enabled < /var/lib/hornet/config.json) != true ]]
+    then
+        whiptail --title "DB Max Size Disabled!" \
+                 --msgbox "Database size limit feature is disabled in hornet.conf!\nMake sure to enable it in order to be able to set Max Size." \
+                 9 $WIDTH
+        return
+    fi
+
+    DB_MAX_SIZE_CURRENT=$(jq -r .pruning.size.targetSize < /var/lib/hornet/config.json)
+    _DB_MAX_SIZE_NEW=$(whiptail --inputbox "\nCurrent DB max size is set to ${DB_MAX_SIZE_CURRENT}.\nEnter a new size:" 10 $WIDTH "" --title "Select DB Max Size" 3>&1 1>&2 2>&3)
+    if [ $? -eq 1 ]; then
+        pause "No size selected. Press ENTER to return to main menu."
+        return
+    fi
+
+    DB_MAX_SIZE_NEW=$(tr -d " \t" <<< "$_DB_MAX_SIZE_NEW")
+    if [[ "$DB_MAX_SIZE_NEW" == "$DB_MAX_SIZE_CURRENT" ]]
+    then
+        pause "No change to DB Max Size. Press ENTER to return to main menu."
+        return
+    fi
+
+    if ! (whiptail --title "Confirm Update" \
+                   --yesno "Are you sure you want to set DB Max Size to '$DB_MAX_SIZE_NEW'?" \
+                   8 $WIDTH) then
+        return
+    fi
+
+    echo "Updating Max Size ..."
+    verify_playbook
+    test -f /opt/hornet-playbook/group_vars/all/z-append.yml && sed -i '/^hornet_db_max_size:/d' /opt/hornet-playbook/group_vars/all/z-append.yml
+    echo "hornet_db_max_size: $DB_MAX_SIZE_NEW" >> /opt/hornet-playbook/group_vars/all/z-append.yml
+    run-playbook --tags=hornet_config_file -e overwrite=yes
+}
+
 
 ## HORC
 function get_latest_horc_version() {
@@ -1438,8 +1479,8 @@ function main_menu() {
     "j)" "Get Node Info" \
     "k)" "Show LatestMilestoneIndex" \
     "l)" "Get new snapshot DB" \
-    "m)" "Peers" \
-    "n)" "Toggle ComNet" \
+    "m)" "Set DB Maximum Size" \
+    "n)" "Peers" \
     "o)" "Update config.json" \
     "p)" "Set node Peer ID" \
     "Z)" "Configure this Script" \
@@ -1521,12 +1562,12 @@ function run_main_menu() {
             ;;
 
         "m)")
-            peers
+            set_db_max_size
             run_main_menu
             ;;
 
         "n)")
-            toggle_comnet
+            peers
             run_main_menu
             ;;
 
