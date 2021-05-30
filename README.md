@@ -323,7 +323,17 @@ If you receive this error when trying to browse to the dashboard then:
 * nginx (the webserver/proxy) is working properly
 * the back-end to which it is trying to connect isn't working properly.
 
-Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io` tells nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly, e.g. checking logs: see [Control Hornet](#control-hornet).
+Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io` tells nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly, e.g. checking logs: see [Control Hornet](#control-hornet). Note that when checking the logs, start from the bottom of the logs and scroll up to the line where you see the error began.
+
+### Hornet Does Not Startup
+
+There are too many reasons and possibilities why this could happen. As stated above, check hornet logs: see [Control Hornet](#control-hornet).
+
+Some of the most common reasons are:
+
+* `no space left on device` - Your storage has been used up completely. Try to download a new DB via `horc`, this will delete the existing one. This is often the problem. Note that you might want to lower the DB Max Size via `horc` to match your storage.
+
+* `panic: unable to initialize data store for peer store: Value log truncate required to run DB. This might result in data loss` - If your node crashed there might be corruption in the node's ID store DB. The way to fix this is by deleting it: `sudo rm -rf /var/lib/hornet/p2p/store` and starting up hornet.
 
 ### Connection not Private
 
