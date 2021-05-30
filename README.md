@@ -27,6 +27,7 @@ This repository installs a fully operational [IOTA HORNET](https://github.com/go
    * [Security](#security)
    * [Troubleshooting](#troubleshooting)
      * [502 Bad Gateway](#502-bad-gateway)
+     * [Hornet Does Not Startup](#hornet-does-not-startup)
      * [Connection not Private](#connection-not-private)
      * [DB Corruption](#db-corruption)
      * [Logs](#logs)
