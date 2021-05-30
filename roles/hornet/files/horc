@@ -421,7 +421,7 @@ function set_db_max_size() {
     local DB_MAX_SIZE_CURRENT
     local DB_MAX_SIZE_NEW
 
-    if [[ $(jq -r .pruning.size.targetSize < /var/lib/hornet/config.json) != true ]]
+    if [[ $(jq -r .pruning.size.enabled < /var/lib/hornet/config.json) != true ]]
     then
         whiptail --title "DB Max Size Disabled!" \
                  --msgbox "Database size limit feature is disabled in hornet.conf!\nMake sure to enable it in order to be able to set Max Size." \
@@ -429,8 +429,8 @@ function set_db_max_size() {
         return
     fi
 
-    DB_MAX_SIZE_CURRENT=$(jq -r .pruning.size.enabled < /var/lib/hornet/config.json)
-    _DB_MAX_SIZE_NEW=$(whiptail --inputbox "Current DB max size is set to ${DB_MAX_SIZE_CURRENT}.\nEnter a new size:" 10 $WIDTH "" --title "Select DB Max Size" 3>&1 1>&2 2>&3)
+    DB_MAX_SIZE_CURRENT=$(jq -r .pruning.size.targetSize < /var/lib/hornet/config.json)
+    _DB_MAX_SIZE_NEW=$(whiptail --inputbox "\nCurrent DB max size is set to ${DB_MAX_SIZE_CURRENT}.\nEnter a new size:" 10 $WIDTH "" --title "Select DB Max Size" 3>&1 1>&2 2>&3)
     if [ $? -eq 1 ]; then
         pause "No size selected. Press ENTER to return to main menu."
         return
@@ -453,7 +453,7 @@ function set_db_max_size() {
     verify_playbook
     test -f /opt/hornet-playbook/group_vars/all/z-append.yml && sed -i '/^hornet_db_max_size:/d' /opt/hornet-playbook/group_vars/all/z-append.yml
     echo "hornet_db_max_size: $DB_MAX_SIZE_NEW" >> /opt/hornet-playbook/group_vars/all/z-append.yml
-    run-playbook --tags=hornet_config_file
+    run-playbook --tags=hornet_config_file -e overwrite=yes
 }
 
 
