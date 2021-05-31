@@ -432,6 +432,8 @@ function set_db_max_size() {
     DB_MAX_SIZE_CURRENT=$(jq -r .pruning.size.targetSize < /var/lib/hornet/config.json)
     _DB_MAX_SIZE_NEW=$(whiptail --inputbox "\nCurrent DB max size is set to ${DB_MAX_SIZE_CURRENT}.\nEnter a new size:" 10 $WIDTH "" --title "Select DB Max Size" 3>&1 1>&2 2>&3)
     if [ $? -eq 1 ]; then
+        return
+    elif [[ "$_DB_MAX_SIZE_NEW" == "" ]]; then
         pause "No size selected. Press ENTER to return to main menu."
         return
     fi
