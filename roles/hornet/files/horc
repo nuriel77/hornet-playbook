@@ -434,14 +434,18 @@ function set_db_max_size() {
     if [ $? -eq 1 ]; then
         return
     elif [[ "$_DB_MAX_SIZE_NEW" == "" ]]; then
-        pause "No size selected. Press ENTER to return to main menu."
+        whiptail --title "No Input" \
+                 --msgbox "No size selected!" \
+                 8 $WIDTH
         return
     fi
 
     DB_MAX_SIZE_NEW=$(tr -d " \t" <<< "$_DB_MAX_SIZE_NEW")
     if [[ "$DB_MAX_SIZE_NEW" == "$DB_MAX_SIZE_CURRENT" ]]
     then
-        pause "No change to DB Max Size. Press ENTER to return to main menu."
+        whiptail --title "No Change" \
+                 --msgbox "You've selected the same max size as the currently configured max size." \
+                 8 $WIDTH
         return
     fi
 
@@ -695,7 +699,7 @@ function add_peer() {
     local ADD_PEER
     local RC
 
-    PEER=$(whiptail --inputbox "Enter a peer to add:" 8 120 --title "Add Peer" 3>&1 1>&2 2>&3)
+    PEER=$(whiptail --inputbox "Enter a peer to add.\nThe format is:\n/dns/hostname/tcp/15600/p2p/peerID,alias/PeerAlias\ne.g: /dns/mynode.io/tcp/15600/p2p/12D3KooWLpSb3fyZ1nIen1F5jAeNRPwLTMgeB534nFUlsWaAfiO7,alias/Mynode" 12 120 --title "Add Peer" 3>&1 1>&2 2>&3)
     RC=$?
     if [[ $RC -ne 0 ]]; then
         return
