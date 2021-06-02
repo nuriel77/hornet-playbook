@@ -88,5 +88,4 @@
       - hornet
       - nginx
       - monitoring
-      - haproxy
       - cleanup
