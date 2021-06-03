@@ -3,7 +3,7 @@
   dst: roles/docker/
 
 - git: https://github.com/nuriel77/ansible-nginx.git
-  eersion: main
+  version: main
   dst: roles/nginx/
 
 - git: https://github.com/nuriel77/ansible-monitoring.git
