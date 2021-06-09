@@ -336,7 +336,7 @@ If you receive this error when trying to browse to the dashboard then:
 * nginx (the webserver/proxy) is working properly
 * the back-end to which it is trying to connect isn't working properly.
 
-Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io` tells nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would be unable to forward your requests to it. Make sure Hornet is working properly, e.g. checking logs: see [Control Hornet](#control-hornet). Note that when checking the logs, start from the bottom of the logs and scroll up to the line where you see the error began.
+Nginx takes requests from the web and forwards those internally. For example, `https://my-site.io` tells nginx to connect to Hornet's dashboard. If Hornet is inactive (crashed? starting up?) then nginx would not be able to forward your requests to it. Make sure Hornet is working properly, e.g. checking logs: see [Control Hornet](#control-hornet). Note that when checking the logs, start from the bottom of the logs and scroll up to the line where you see the error began.
 
 ### Hornet Does Not Startup
 
