@@ -400,9 +400,6 @@ Some of Hornet's plugins can be enabled and disabled using the `horc` tool via t
 
 To create, test and maintain this playbook requires many hours of work and resources. This is done wholeheartedly for the IOTA community.
 
-
-**NOTE** Have not migrated yet to the new network. If you'd like to donate, please visit again soon once I've done migrating. Thank you.
-
 If you liked this project and would like to leave a donation you can use this IOTA address:
 ```
 iota1qpsszw7jnknct8960t80ffxn2hmx8wrrrw69ca3us6u5kt92c2hhj8s7ccf
