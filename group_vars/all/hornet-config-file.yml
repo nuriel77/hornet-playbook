@@ -154,7 +154,7 @@ hornet_config_logger_outputPaths:
   - stdout
 
 # warpsync
-hornet_config_warpsync_advancementRange: 150
+hornet_config_warpsync_advancementRange: 10000
 
 # spammer
 hornet_config_spammer_message: "IOTA Hornet Playbook"
