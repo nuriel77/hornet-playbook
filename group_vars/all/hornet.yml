@@ -70,6 +70,7 @@ hornet_disable_plugins:
 - Coordinator
 hornet_enable_plugins:
 - Prometheus
+- Autopeering
 
 # Set openfiles limit
 hornet_nofile_limit: "65535"
