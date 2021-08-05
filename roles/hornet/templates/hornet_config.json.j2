@@ -67,7 +67,7 @@
   "receipts": {
     "backup": {
       "enabled": {{ hornet_config_receipts_backup_enabled | bool | string | lower }},
-      "folder": "{{ hornet_config_receipts_backup_folder }}"
+      "path": "{{ hornet_config_receipts_backup_path }}"
     },
     "validator": {
       "validate": {{ hornet_config_receipts_validator_validate | bool | string | lower }},
@@ -113,10 +113,23 @@
       "highWatermark": {{ hornet_config_p2p_connectionManager_highWatermark | int }},
       "lowWatermark": {{ hornet_config_p2p_connectionManager_lowWatermark | int }}
     },
-    "gossipUnknownPeersLimit": {{ hornet_config_p2p_gossipUnknownPeersLimit | int }},
+    "gossip" {
+      "unknownPeersLimit": {{ hornet_config_p2p_gossip_unknownPeersLimit | int }},
+      "streamReadTimeout": "{{ hornet_config_p2p_gossip_streamReadTimeout }}",
+      "streamWriteTimeout": "{{ hornet_config_p2p_gossip_streamWriteTimeout }}"
+    },
     "identityPrivateKey": "{{ hornet_config_p2p_identityPrivateKey }}",
     "peerStore": {{ hornet_config_p2p_peerStore | to_nice_json(indent=4) }},
-    "reconnectInterval": "{{ hornet_config_p2p_reconnectInterval }}"
+    "reconnectInterval": "{{ hornet_config_p2p_reconnectInterval }}",
+    "autopeering": {
+      "bindAddress": "{{ hornet_config_p2p_autopeering_bindAddress }}",
+      "db": {
+        "path": "{{ hornet_config_p2p_autopeering_db_path }}"
+      },
+      "entryNodes": {{ hornet_config_p2p_autopeering_entryNodes | to_nice_json(indent=6) }},
+      "entryNodesPreferIPv6": {{ hornet_config_p2p_autopeering_entryNodesPreferIPv6 | bool | lower | string }},
+      "runAsEntryNode": {{ hornet_config_p2p_autopeering_runAsEntryNode | bool | lower | string }}
+    }
   },
   "p2pdisc": {
     "advertiseInterval": "{{ hornet_config_p2pdisc_advertiseInterval }}",

@@ -97,7 +97,7 @@ hornet_config_requests_pendingReEnqueueInterval: 5s
 
 # receipts
 hornet_config_receipts_backup_enabled: false
-hornet_config_receipts_backup_folder: receipts
+hornet_config_receipts_backup_path: receipts
 
 # validator
 hornet_config_receipts_validator_validate: false
@@ -132,13 +132,23 @@ hornet_config_node_enablePlugins: "{{ hornet_enable_plugins }}"
 # p2p
 hornet_config_p2p_bindMultiAddresses:
   - "/ip4/0.0.0.0/tcp/15600"
+  - "/ip6/::/tcp/15600"
 hornet_config_p2p_connectionManager_highWatermark: 10
 hornet_config_p2p_connectionManager_lowWatermark: 5
-hornet_config_p2p_gossipUnknownPeersLimit: 4
+hornet_config_p2p_gossip_unknownPeersLimit: 4
+hornet_config_p2p_gossip_streamReadTimeout: 1m0s
+hornet_config_p2p_gossip_streamWriteTimeout: 10s
 hornet_config_p2p_identityPrivateKey: ""
 hornet_config_p2p_peerStore:
   path: "./p2p/store"
 hornet_config_p2p_reconnectInterval: 30s
+hornet_config_p2p_autopeering_bindAddress: "0.0.0.0:{{ hornet_ports.autopeering.port }}"
+hornet_config_p2p_autopeering_db_path: "./p2p/store"
+hornet_config_p2p_autopeering_entryNodes:
+  - "/dns/lucamoser.ch/udp/14926/autopeering/4H6WV54tB29u8xCcEaMGQMn37LFvM1ynNpp27TTXaqNM"
+  - "/dns/entry-mainnet.tanglebay.com/udp/14626/autopeering/iot4By1FD4pFLrGJ6AAe7YEeSu9RbW9xnPUmxMdQenC"
+hornet_config_p2p_autopeering_entryNodesPreferIPv6: false
+hornet_config_p2p_autopeering_runAsEntryNode: false
 
 # p2pdisc
 hornet_config_p2pdisc_advertiseInterval: 30s
@@ -154,14 +164,14 @@ hornet_config_logger_outputPaths:
   - stdout
 
 # warpsync
-hornet_config_warpsync_advancementRange: 10000
+hornet_config_warpsync_advancementRange: 150
 
 # spammer
 hornet_config_spammer_message: "IOTA Hornet Playbook"
 hornet_config_spammer_index: "Hornet Playbook Spammer"
 hornet_config_spammer_indexSemiLazy: "Hornet Playbook Spammer Lazy"
 hornet_config_spammer_cpuMaxUsage: 0.8
-hornet_config_spammer_mpsRateLimit: 5.0
+hornet_config_spammer_mpsRateLimit: 0.0
 hornet_config_spammer_workers: 0
 hornet_config_spammer_autostart: false
 

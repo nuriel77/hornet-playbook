@@ -44,6 +44,10 @@ hornet_ports:
     port: 15600
     proto: tcp
     allow: yes
+  autopeering:
+    port: 14626
+    proto: udp
+    allow: yes
   api:
     port: 14265
     proto: tcp
