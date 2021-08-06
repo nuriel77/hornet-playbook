@@ -637,10 +637,8 @@ function set_node_peer_id() {
     fi
 
     echo "Get node peer ID ..."
-    OUTPUT=$(/usr/bin/docker run -it --rm --name getp2pID "gohornet/hornet:${TAG}" tools p2pidentity)
-
     # TODO: open github issue for hornet team to output in json format as an option
-    PRIVATE_KEY=$(echo "$OUTPUT" | sed 's|^.*Your p2p private key: \([a-f0-9]*\)|\1|' | head -1 | tr -d ' ' | tr -d '\r')
+    PRIVATE_KEY=$(/usr/bin/docker run -it --rm --name getp2pID "gohornet/hornet:${TAG}" -- tools p2pidentity 2>/dev/null | head -1 | awk -F':' {'print $2'} | tr -d ' '| tr -d '\r')
     PEER_ID=$(echo "$OUTPUT" | tail -1 | awk -F":" {'print $2'} | tr -d ' ' | tr -d '\r')
 
     # Make sure old values are gone
