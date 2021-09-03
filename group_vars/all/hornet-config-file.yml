@@ -150,7 +150,6 @@ hornet_config_p2p_gossip_streamWriteTimeout: 10s
 hornet_config_p2p_db_path: "./p2p/store"
 hornet_config_p2p_reconnectInterval: 30s
 hornet_config_p2p_autopeering_bindAddress: "0.0.0.0:{{ hornet_ports.autopeering.port }}"
-hornet_config_p2p_autopeering_db_path: "./p2p/store"
 hornet_config_p2p_autopeering_entryNodes:
   - "/dns/lucamoser.ch/udp/14826/autopeering/4H6WV54tB29u8xCcEaMGQMn37LFvM1ynNpp27TTXaqNM"
   - "/dns/entry-hornet-0.h.chrysalis-mainnet.iotaledger.net/udp/14626/autopeering/iotaPHdAn7eueBnXtikZMwhfPXaeGJGXDt4RBuLuGgb"

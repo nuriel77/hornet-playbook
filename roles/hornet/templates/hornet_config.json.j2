@@ -124,9 +124,6 @@
     "reconnectInterval": "{{ hornet_config_p2p_reconnectInterval }}",
     "autopeering": {
       "bindAddress": "{{ hornet_config_p2p_autopeering_bindAddress }}",
-      "db": {
-        "path": "{{ hornet_config_p2p_autopeering_db_path }}"
-      },
       "entryNodes": {{ hornet_config_p2p_autopeering_entryNodes | to_nice_json(indent=6) }},
       "entryNodesPreferIPv6": {{ hornet_config_p2p_autopeering_entryNodesPreferIPv6 | bool | lower | string }},
       "runAsEntryNode": {{ hornet_config_p2p_autopeering_runAsEntryNode | bool | lower | string }}
