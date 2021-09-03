@@ -60,6 +60,10 @@ hornet_ports:
     port: 1883
     proto: tcp
     allow: no
+  faucet:
+    port: 8091
+    proto: tcp
+    allow: yes
 
 # These can get overwritten by horc
 # once any changes are applied.
@@ -68,6 +72,7 @@ hornet_disable_plugins:
 - ZMQ
 - MQTT
 - Coordinator
+- Faucet
 hornet_enable_plugins:
 - Prometheus
 - Autopeering
@@ -83,3 +88,6 @@ hornet_db_max_size: 25GB
 hornet_dashboard_proxy_port: "{{ hornet_ports.dashboard.port }}"
 hornet_dashboard_internal_address: 127.0.0.1
 hornet_dashboard_internal_port: "8087"
+
+# Facuet address
+hornet_faucet_bind_address: "127.0.0.1:{{ hornet_ports.faucet.port }}"

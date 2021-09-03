@@ -155,6 +155,19 @@
     "workers": {{ hornet_config_spammer_workers | int }},
     "autostart": {{ hornet_config_spammer_autostart | bool | string | lower }}
   },
+  "faucet": {
+    "amount": {{ hornet_config_faucet_amount | int }},
+    "smallAmount": {{ hornet_config_faucet_smallAmount | int }},
+    "maxAddressBalance": {{ hornet_config_faucet_maxAddressBalance | int }},
+    "maxOutputCount": {{ hornet_config_faucet_maxOutputCount | int }},
+    "indexationMessage": "{{ hornet_config_faucet_indexationMessage }}",
+    "batchTimeout": "{{ hornet_config_faucet_batchTimeout }}",
+    "powWorkerCount": {{ hornet_config_faucet_powWorkerCount | int }},
+    "website": {
+      "bindAddress": "{{ hornet_config_faucet_website_bindAddress }}",
+      "enabled": {{ hornet_config_faucet_website_enabled | bool | lower | string }}
+    }
+  },
   "mqtt": {
     "bindAddress": "{{ hornet_config_mqtt_bindAddress }}",
     "wsPort": {{ hornet_config_mqtt_wsPort | int }},
