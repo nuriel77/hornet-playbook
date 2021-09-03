@@ -118,8 +118,9 @@
       "streamReadTimeout": "{{ hornet_config_p2p_gossip_streamReadTimeout }}",
       "streamWriteTimeout": "{{ hornet_config_p2p_gossip_streamWriteTimeout }}"
     },
-    "identityPrivateKey": "{{ hornet_config_p2p_identityPrivateKey }}",
-    "peerStore": {{ hornet_config_p2p_peerStore | to_nice_json(indent=4) }},
+    "db": {
+      "path": "{{ hornet_config_p2p_db_path }}"
+    },
     "reconnectInterval": "{{ hornet_config_p2p_reconnectInterval }}",
     "autopeering": {
       "bindAddress": "{{ hornet_config_p2p_autopeering_bindAddress }}",
