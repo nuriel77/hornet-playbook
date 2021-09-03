@@ -190,6 +190,7 @@ hornet_config_faucet_smallAmount: 1000000
 hornet_config_faucet_maxAddressBalance: 20000000
 hornet_config_faucet_maxOutputCount: 127
 hornet_config_faucet_indexationMessage: "HORNET PLAYBOOK FAUCET"
+hornet_config_faucet_powWorkerCount: 0
 hornet_config_faucet_batchTimeout: 2s
 hornet_config_faucet_website_bindAddress: "{{ hornet_faucet_bind_address }}"
 hornet_config_faucet_website_enabled: true
