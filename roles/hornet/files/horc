@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.3.5
+VERSION_TEMP=1.3.6
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -1230,7 +1230,7 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZMQ,MQTT,Prometheus,Coordinator,Autopeering"
+    export DISABLE_PLUGINS="Spammer,ZMQ,MQTT,Prometheus,Coordinator,Autopeering,Faucet"
     declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
@@ -1254,13 +1254,14 @@ function hornet_plugins() {
         --checklist \
         --cancel-button "Exit" \
         "\nPlease choose plugins to enable or disable.\n\
-Select/unselect options using space and\nclick Enter to proceed.\n" 17 60 "${#DISABLE_PLUGINS_ARRAY[@]}" \
+Select/unselect options using space and\nclick Enter to proceed.\n" 18 60 "${#DISABLE_PLUGINS_ARRAY[@]}" \
         Spammer           "...         Spammer" "${PLUGINS_STATE[Spammer]}" \
         ZMQ               "...         ZeroMQ" "${PLUGINS_STATE[ZMQ]}" \
         MQTT              "...         MQTT" "${PLUGINS_STATE[MQTT]}" \
         Prometheus        "...         Prometheus Metrics" "${PLUGINS_STATE[Prometheus]}" \
         Coordinator       "...  (*dev) Comnet Coordinator" "${PLUGINS_STATE[Coordinator]}" \
         Autopeering       "...         Autopeering" "${PLUGINS_STATE[Autopeering]}" \
+        Faucet            "...         Faucet" "${PLUGINS_STATE[Faucet]}" \
         3>&1 1>&2 2>&3)
 
     RC=$?
