@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.3.4
+VERSION_TEMP=1.3.5
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
