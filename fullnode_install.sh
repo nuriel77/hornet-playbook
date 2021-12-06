@@ -247,6 +247,7 @@ function init_ubuntu(){
     apt-get install ansible\
                     git\
                     expect-dev\
+                    libssl-dev\
                     tcl\
                     libcrack2\
                     cracklib-runtime\
@@ -289,6 +290,7 @@ function init_debian(){
                     git\
                     less\
                     expect-dev\
+                    libssl-dev\
                     tcl\
                     libcrack2\
                     cracklib-runtime\
