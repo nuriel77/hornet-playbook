@@ -6,32 +6,27 @@
 # config.json
 
 # restAPI
-hornet_config_restAPI_jwtAuth_enabled: false
 hornet_config_restAPI_jwtAuth_salt: 'HORNET'
-hornet_config_restAPI_excludeHealthCheckFromAuth: false
-hornet_config_restAPI_permittedRoutes:
+hornet_config_restAPI_publicRoutes:
   - "/health"
   - "/mqtt"
   - "/api/v1/info"
   - "/api/v1/tips"
-  - "/api/v1/messages/:messageID"
-  - "/api/v1/messages/:messageID/metadata"
-  - "/api/v1/messages/:messageID/raw"
-  - "/api/v1/messages/:messageID/children"
-  - "/api/v1/messages"
-  - "/api/v1/transactions/:transactionID/included-message"
-  - "/api/v1/milestones/:milestoneIndex"
-  - "/api/v1/milestones/:milestoneIndex/utxo-changes"
-  - "/api/v1/outputs/:outputID"
-  - "/api/v1/addresses/:address"
-  - "/api/v1/addresses/:address/outputs"
-  - "/api/v1/addresses/ed25519/:address"
-  - "/api/v1/addresses/ed25519/:address/outputs"
+  - "/api/v1/messages*"
+  - "/api/v1/transactions*"
+  - "/api/v1/milestones*"
+  - "/api/v1/outputs*"
+  - "/api/v1/addresses*"
   - "/api/v1/treasury"
+  - "/api/v1/receipts*"
+  - "/api/plugins/faucet/*"
+  - "/api/plugins/participation/events*"
+  - "/api/plugins/participation/outputs*"
+  - "/api/plugins/participation/addresses*"
 
-hornet_config_restAPI_whitelistedAddresses:
-  - "127.0.0.1"
-  - "::1"
+hornet_config_restAPI_privateRoutes:
+  - "/api/v1/*"
+  - "/api/plugins/*"
 
 hornet_config_restAPI_bindAddress: "127.0.0.1:{{ hornet_ports.api.port }}"
 hornet_config_restAPI_powEnabled: true

@@ -1,12 +1,10 @@
 {
   "restAPI": {
     "jwtAuth": {
-      "enabled": {{ hornet_config_restAPI_jwtAuth_enabled | bool | string | lower }},
       "salt": "{{ hornet_config_restAPI_jwtAuth_salt }}"
     },
-    "excludeHealthCheckFromAuth": {{ hornet_config_restAPI_excludeHealthCheckFromAuth | bool | string | lower }},
-    "permittedRoutes": {{ hornet_config_restAPI_permittedRoutes | to_nice_json(indent=4) }},
-    "whitelistedAddresses": {{ hornet_config_restAPI_whitelistedAddresses | to_nice_json(indent=4) }},
+    "publicRoutes": {{ hornet_config_restAPI_publicRoutes | to_nice_json(indent=4) }},
+    "privateRoutes": {{ hornet_config_restAPI_privateRoutes | to_nice_json(indent=4) }},
     "bindAddress": "{{ hornet_config_restAPI_bindAddress }}",
     "powEnabled": {{ hornet_config_restAPI_powEnabled | bool | string | lower }},
     "powWorkerCount": {{ hornet_config_restAPI_powWorkerCount | int }},
