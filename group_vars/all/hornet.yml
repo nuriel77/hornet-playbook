@@ -73,6 +73,7 @@ hornet_disable_plugins:
 - MQTT
 - Coordinator
 - Faucet
+- Participation
 hornet_enable_plugins:
 - Prometheus
 - Autopeering

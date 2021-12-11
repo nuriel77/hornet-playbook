@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.3.6
+VERSION_TEMP=1.4.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -1230,7 +1230,7 @@ function hornet_plugins() {
 
     # By default list all the existing plugins as disabled
     export ENABLE_PLUGINS=""
-    export DISABLE_PLUGINS="Spammer,ZMQ,MQTT,Prometheus,Coordinator,Autopeering,Faucet"
+    export DISABLE_PLUGINS="Spammer,ZMQ,MQTT,Prometheus,Coordinator,Autopeering,Faucet,Participation"
     declare -A PLUGINS_STATE
 
     CONFIG_FILE=$(grep ^base_config "$HOME/.nbctl" | awk {'print $2'})
@@ -1262,6 +1262,7 @@ Select/unselect options using space and\nclick Enter to proceed.\n" 18 60 "${#DI
         Coordinator       "...  (*dev) Comnet Coordinator" "${PLUGINS_STATE[Coordinator]}" \
         Autopeering       "...         Autopeering" "${PLUGINS_STATE[Autopeering]}" \
         Faucet            "...         Faucet" "${PLUGINS_STATE[Faucet]}" \
+        Participation     "...         Participation" "${PLUGINS_STATE[Participation]}" \
         3>&1 1>&2 2>&3)
 
     RC=$?
