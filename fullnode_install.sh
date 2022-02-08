@@ -629,40 +629,6 @@ function skip_all_updates() {
     done
 }
 
-function set_node_peer_id() {
-    if [ -f "/etc/default/hornet" ]
-    then
-        TAG=$(grep ^TAG /etc/default/hornet | cut -d'=' -f 2)
-    elif [ -f "/etc/sysconfig/hornet" ]
-    then
-        TAG=$(grep ^TAG /etc/sysconfig/hornet | cut -d'=' -f 2)
-    fi
-
-    echo "Get node peer ID ..."
-    # TODO: open github issue for hornet team to output in json format as an option
-    PRIVATE_KEY=$(/usr/bin/docker run -it --rm --name getp2pID "gohornet/hornet:${TAG}" -- tools p2pidentity 2>/dev/null | head -1 | awk -F':' {'print $2'} | tr -d ' '| tr -d '\r')
-    PEER_ID=$(echo "$OUTPUT" | tail -1 | awk -F":" {'print $2'} | tr -d ' ' | tr -d '\r')
-
-    # Make sure old values are gone
-    sed -i '/^hornet_config_p2p_identityPrivateKey/d' /opt/hornet-playbook/group_vars/all/z-installer-override.yml
-    sed -i '/^hornet_config_p2p_identityPeerID/d' /opt/hornet-playbook/group_vars/all/z-installer-override.yml
-
-    echo "hornet_config_p2p_identityPrivateKey: $PRIVATE_KEY" >> /opt/hornet-playbook/group_vars/all/z-installer-override.yml
-    echo "hornet_config_p2p_identityPeerID: $PEER_ID" >> /opt/hornet-playbook/group_vars/all/z-installer-override.yml
-
-    tmpfile=$(mktemp /tmp/hornet.config.XXXXXX)
-    cp -- "/var/lib/hornet/config.json" "/var/lib/hornet/config.json.$(date +%s)"
-    jq '.p2p.identityPrivateKey="'$PRIVATE_KEY'"' < /var/lib/hornet/config.json > "$tmpfile"
-    mv -- "$tmpfile" "/var/lib/hornet/config.json"
-    chown hornet:hornet "/var/lib/hornet/config.json"
-    chmod 600 "/var/lib/hornet/config.json"
-
-    echo "Restarting hornet to update Peer Identity ..."
-    /bin/systemctl stop hornet
-    rm -rf /var/lib/hornet/p2p/*
-    /bin/systemctl start hornet
-}
-
 function run_playbook(){
     # Get default SSH port
     set +o pipefail
@@ -733,9 +699,6 @@ EOF
 
     # Calling set_primary_ip
     set_primary_ip
-
-    # Make sure node has static peer ID
-    set_node_peer_id
 
     # Get configured username if missing.
     # This could happen on script re-run
