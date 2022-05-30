@@ -74,7 +74,7 @@ spec:
       hostNetwork: false
       containers:
       - name: hornet
-        image: "gohornet/hornet:latest"
+        image: "iotaledger/hornet:latest"
         ports:
           - name: dashboard
             protocol: TCP

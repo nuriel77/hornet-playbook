@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: gohornet/hornet
+  repository: iotaledger/hornet
   tag: latest
   pullPolicy: IfNotPresent
 

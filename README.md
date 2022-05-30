@@ -1,6 +1,6 @@
 # Hornet Playbook - IOTA
 
-This repository installs a fully operational [IOTA HORNET](https://github.com/gohornet/hornet.git) node.
+This repository installs a fully operational [IOTA HORNET](https://github.com/iotaledger/hornet.git) node.
 
 *Table of contents*
 
@@ -100,7 +100,7 @@ docker images
 The output will look something like:
 ```sh
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-gohornet/hornet      v0.2.1              c97cba628d38        2 hours ago         90.4MB
+iotaledger/hornet      v0.2.1              c97cba628d38        2 hours ago         90.4MB
 <none>              <none>              b7b60a909a8f        2 hours ago         1.01GB
 golang              1.13                a1072a078890        8 days ago          803MB
 certbot/certbot     latest              3b7ec24cacc3        11 days ago         148MB
@@ -126,7 +126,7 @@ docker ps -a
 ## Hornet Help Output
 Run hornet with `--help`: given that we know the image's name and the tag. A quick way to get the tag variable configured:
 ```sh
-docker run --rm -it gohornet/hornet:v0.2.1 --help
+docker run --rm -it iotaledger/hornet:v0.2.1 --help
 ```
 
 You can get the tag by viewing all images, or check the configuration file to see what is the currently used TAG:
@@ -252,7 +252,7 @@ Ports: 80/tcp (for certificate verification/enabling HTTPS), 443/tcp and 15600/t
 
 Peers can be added via:
 
-* Hornet's dashboard (Note: this will be possible once [this Hornet github issue](https://github.com/gohornet/hornet/issues/1072) will be resolved.
+* Hornet's dashboard
 * via `horc` tool available on the node cli
 * nbctl (see below) a cli tool
 
@@ -302,9 +302,9 @@ Please follow [this guide](https://iri-playbook.readthedocs.io/en/master/securit
 If you've enabled JWT token access for the REST API you can get a valid token by running the following command:
 
 ```sh
-docker run -u 39999:39999 --rm -it -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/p2p:/app/p2p:rw -v /var/lib/hornet/mainnetdb:/app/mainnetdb gohornet/hornet:1.1.3 tools jwt-api
+docker run -u 39999:39999 --rm -it -v /var/lib/hornet/config.json:/app/config.json -v /var/lib/hornet/p2p:/app/p2p:rw -v /var/lib/hornet/mainnetdb:/app/mainnetdb iotaledger/hornet:1.1.3 tools jwt-api
 ```
-Make sure to use the right hornet version on the image tag above (`gohornet/hornet:1.1.3`)
+Make sure to use the right hornet version on the image tag above (`iotaledger/hornet:1.1.3`)
 
 
 ## Troubleshooting

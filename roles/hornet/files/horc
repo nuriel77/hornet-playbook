@@ -17,7 +17,7 @@ clear
 
 : "${EDITOR:=nano}"
 
-VERSION_TEMP=1.4.4
+VERSION_TEMP=1.5.0
 __VERSION__=${VERSION_TEMP}
 SEMVER_REGEX="^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"
 
@@ -241,11 +241,11 @@ EOF
 ### Hornet ###
 function get_latest_hornet_commit {
     # Experimental/dev
-    curl -H 'Cache-Control: no-cache' -s -m 5 -f "https://api.github.com/repos/gohornet/hornet/commits/$HORNET_BRANCH" | jq -r .sha | head -c 7
+    curl -H 'Cache-Control: no-cache' -s -m 5 -f "https://api.github.com/repos/iotaledger/hornet/commits/$HORNET_BRANCH" | jq -r .sha | head -c 7
 }
 
 function get_latest_hornet_release {
-    curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/gohornet/hornet/releases/latest  | jq -r .tag_name | tr -d 'v'
+    curl -H 'Cache-Control: no-cache' -s -m 5 -f https://api.github.com/repos/iotaledger/hornet/releases/latest  | jq -r .tag_name | tr -d 'v'
 }
 
 function check_new_hornet {
