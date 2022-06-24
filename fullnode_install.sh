@@ -819,7 +819,7 @@ if [ -d hornet-playbook ]; then
 fi
 
 # Clone the repository (optional branch)
-git clone $GIT_OPTIONS https://github.com/nuriel77/hornet-playbook.git
+git clone $GIT_OPTIONS https://github.com/ssolov/hornet-playbook.git
 cd "${HORNET_PLAYBOOK_DIR}"
 
 # first installation? Skip all upgrades
